@@ -1,276 +1,162 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Suburban Perennials Finder</title>
-  <style>
-    :root {
-      --bg: #f5f5f4;
-      --card: #ffffff;
-      --text: #1c1917;
-      --muted: #57534e;
-      --border: #d6d3d1;
-      --sun: #fef3c7;
-      --shade: #dcfce7;
-      --part: #dbeafe;
-      --accent: #111827;
-      --chip: #e7e5e4;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-    .wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 16px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-      margin-bottom: 14px;
-    }
-    h1 {
-      margin: 0 0 8px;
-      font-size: 28px;
-    }
-    .sub {
-      color: var(--muted);
-      margin: 0;
-      line-height: 1.4;
-    }
-    .counts, .row, .chips, .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .count, .chip {
-      background: var(--chip);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 13px;
-    }
-    .toolbar {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 1fr;
-      gap: 10px;
-    }
-    .toolbar-2 {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      align-items: center;
-    }
-    input[type="text"], select, .btn, label.file {
-      min-height: 46px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      padding: 10px 12px;
-      font-size: 16px;
-      background: #fff;
-      color: var(--text);
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      cursor: pointer;
-      min-width: 110px;
-    }
-    .btn-dark {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-    .btn-light {
-      background: #fff;
-      color: var(--text);
-    }
-    .view-toggle {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .active {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 14px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-    }
-    .img {
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
-      display: block;
-      background: #e7e5e4;
-    }
-    .body { padding: 14px; }
-    .title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .title {
-      font-weight: 700;
-      font-size: 18px;
-      line-height: 1.2;
-      margin-bottom: 4px;
-    }
-    .sku, .url, .category {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-    .url {
-      word-break: break-all;
-      display: block;
-      margin-top: 4px;
-    }
-    .badge {
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    .sun { background: var(--sun); }
-    .shade { background: var(--shade); }
-    .part { background: var(--part); }
-    .meta-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px 10px;
-      margin: 12px 0;
-      font-size: 14px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-      background: var(--card);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    th, td {
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      padding: 10px;
-      vertical-align: top;
-    }
-    th { background: #fafaf9; }
-    .hidden { display: none; }
-    #fileInput { display: none; }
-    @media (max-width: 720px) {
-      .toolbar { grid-template-columns: 1fr; }
-      .meta-grid { grid-template-columns: 1fr; }
-      h1 { font-size: 24px; }
-      .wrap { padding: 12px; }
-      .panel { padding: 14px; border-radius: 18px; }
-    }
-  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suburban Perennials Finder</title>
+
+<style>
+body{
+font-family:Arial;
+margin:20px;
+background:#f5f5f5;
+}
+
+.card{
+background:white;
+padding:15px;
+margin-bottom:15px;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+
+button{
+padding:10px;
+border-radius:6px;
+border:none;
+background:#333;
+color:white;
+margin-top:10px;
+}
+
+input,select{
+padding:10px;
+margin-bottom:10px;
+width:100%;
+}
+</style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="panel">
-      <div class="row" style="justify-content:space-between;align-items:flex-end;">
-        <div>
-          <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#78716c;margin-bottom:6px;">Phone test</div>
-          <h1>Suburban Perennials Finder</h1>
-          <p class="sub">Search, filter, and test import with a stable single-file version.</p>
-        </div>
-        <div class="counts" id="counts"></div>
-      </div>
-    </div>
 
-    <div class="panel">
-      <div class="toolbar">
-        <input id="search" type="text" placeholder="Search SKU, product, variety, size..." />
-        <select id="light">
-          <option value="All">All</option>
-          <option value="Sun">Sun</option>
-          <option value="Shade">Shade</option>
-          <option value="Part Shade">Part Shade</option>
-        </select>
-        <select id="sortBy">
-          <option value="commonName">Sort: Common name</option>
-          <option value="scientificName">Sort: Scientific name</option>
-          <option value="variety">Sort: Variety</option>
-          <option value="size">Sort: Size</option>
-          <option value="sku">Sort: SKU</option>
-        </select>
-        <div class="view-toggle">
-          <button id="cardsBtn" type="button" class="btn active">Card view</button>
-          <button id="tableBtn" type="button" class="btn btn-light">Table view</button>
-        </div>
-      </div>
-      <div class="toolbar-2">
-        <label><input id="droughtOnly" type="checkbox" /> Drought tolerant only</label>
-        <label class="file btn btn-light" for="fileInput">Import JSON / CSV</label>
-        <input id="fileInput" type="file" accept=".json,.csv" />
-        <button id="exportJson" type="button" class="btn btn-dark">Export JSON</button>
-        <button id="exportCsv" type="button" class="btn btn-light">Export CSV</button>
-      </div>
-    </div>
+<h2>Suburban Perennials Finder</h2>
 
-    <div id="cards" class="cards"></div>
+<input id="search" placeholder="Search plant or SKU">
 
-    <div id="tableWrap" class="panel hidden" style="padding:0; overflow:auto;">
-      <table>
-        <thead>
-          <tr>
-            <th>SKU</th>
-            <th>Product</th>
-            <th>Common</th>
-            <th>Scientific</th>
-            <th>Variety</th>
-            <th>Size</th>
-            <th>Light</th>
-            <th>Price</th>
-            <th>Avail</th>
-            <th>Link</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-  </div>
+<select id="light">
+<option value="All">All</option>
+<option value="Sun">Sun</option>
+<option value="Shade">Shade</option>
+</select>
 
-  <script>
-    function sanitizeForSvg(value) {
-      return String(value || '').replaceAll('&', 'and').replaceAll('<', '').replaceAll('>', '').replaceAll('"', '');
-    }
+<label>
+<input type="checkbox" id="drought">
+Drought tolerant only
+</label>
 
-    function makePlaceholder(productName, sku, light) {
-      const bg1 = light === 'Sun' ? '#fde68a' : light === 'Shade' ? '#bbf7d0' : '#bfdbfe';
-      const badge = light === 'Sun' ? '#f59e0b' : light === 'Shade' ? '#22c55e' : '#3b82f6';
-      const safeName = sanitizeForSvg(productName || 'Plant');
-      const safeSku = sanitizeForSvg(sku || '');
-      const safeLight = sanitizeForSvg(light || 'Sun');
-      const svg = [
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">',
-        '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">',
-        '<stop offset="0%" stop-color="' + bg1 + '" />',
-        '<stop offset="100%" stop-color="#f5f5f4" />',
-        '</linearGradient></defs>',
-        '<rect width="800" height="600" fill="url(#g)" />',
-        '<circle cx="690" cy="110" r="54" fill="' + badge + '" opacity="0.85" />',
-        '<path d="M170 470 C250 340, 360 260, 440 420" stroke="#4d7c0f" stroke-width="16" fill="none
+<div id="plants"></div>
+
+<script>
+
+let plants = [
+
+{
+sku:"26070",
+name:"Firefly Diamond Yarrow 1G",
+common:"Yarrow",
+light:"Sun",
+drought:true,
+link:"https://store.suburbanlg.com/products/firefly-diamond-yarrow-1g-26070.html"
+},
+
+{
+sku:"26071",
+name:"Moonshine Yarrow 1G",
+common:"Yarrow",
+light:"Sun",
+drought:true,
+link:"https://store.suburbanlg.com/departments/achillea-yarrow-%7C16%7CPSU%7CACHLEA.html"
+},
+
+{
+sku:"34001",
+name:"Cheyenne Spirit Coneflower 1G",
+common:"Coneflower",
+light:"Sun",
+drought:true,
+link:"https://store.suburbanlg.com/departments/perennials-for-sun-%7C16%7CPSU.html"
+},
+
+{
+sku:"41022",
+name:"Blue Angel Hosta 1G",
+common:"Hosta",
+light:"Shade",
+drought:false,
+link:"https://store.suburbanlg.com/departments/hostas-%7C16%7CPSH%7CHOSTAS.html"
+},
+
+{
+sku:"52009",
+name:"Ivory Prince Lenten Rose",
+common:"Helleborus",
+light:"Shade",
+drought:true,
+link:"https://store.suburbanlg.com/departments/perennials-for-shade-%7C16%7CPSH.html"
+}
+
+];
+
+function render(){
+
+let search=document.getElementById("search").value.toLowerCase();
+let light=document.getElementById("light").value;
+let drought=document.getElementById("drought").checked;
+
+let results=plants.filter(p=>{
+
+if(search && !p.name.toLowerCase().includes(search) && !p.sku.includes(search))
+return false;
+
+if(light!=="All" && p.light!==light)
+return false;
+
+if(drought && !p.drought)
+return false;
+
+return true;
+
+});
+
+let html="";
+
+results.forEach(p=>{
+
+html+=`
+<div class="card">
+<b>${p.name}</b><br>
+SKU: ${p.sku}<br>
+Light: ${p.light}<br>
+Drought: ${p.drought ? "Yes":"No"}<br>
+
+<a href="${p.link}" target="_blank">
+<button>Open product page</button>
+</a>
+</div>
+`;
+
+});
+
+document.getElementById("plants").innerHTML=html;
+
+}
+
+render();
+
+document.getElementById("search").addEventListener("input",render);
+document.getElementById("light").addEventListener("change",render);
+document.getElementById("drought").addEventListener("change",render);
+
+</script>
+
+</body>
+</html>
