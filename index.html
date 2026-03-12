@@ -1,174 +1,203 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suburban Perennials Finder</title>
+  <style>
+    body {
+      font-family: system-ui, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f6f6f6;
+      color: #222;
+    }
 
-<title>Suburban Perennials Finder</title>
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
 
-<style>
+    h1 {
+      margin: 0 0 16px;
+    }
 
-body{
-font-family:system-ui;
-margin:0;
-padding:20px;
-background:#f6f6f6;
-}
+    .controls, .status, .plant {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.08);
+      margin-bottom: 14px;
+    }
 
-.container{
-max-width:900px;
-margin:auto;
-}
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
 
-h1{
-margin-bottom:20px;
-}
+    .plant-name {
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
 
-.controls{
-background:white;
-padding:15px;
-border-radius:10px;
-margin-bottom:20px;
-}
+    .sku {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
 
-input,select{
-width:100%;
-padding:10px;
-margin-bottom:10px;
-font-size:16px;
-}
+    .price {
+      margin-top: 6px;
+      font-weight: 600;
+    }
 
-.plant{
-background:white;
-padding:15px;
-border-radius:10px;
-margin-bottom:12px;
-box-shadow:0 2px 4px rgba(0,0,0,.1);
-}
+    .muted {
+      color: #666;
+      font-size: 14px;
+    }
 
-.plant-name{
-font-weight:bold;
-font-size:18px;
-}
+    a.button {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #333;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
 
-.sku{
-color:#666;
-font-size:14px;
-}
-
-.price{
-margin-top:5px;
-}
-
-a.button{
-display:inline-block;
-margin-top:8px;
-padding:8px 12px;
-background:#333;
-color:white;
-text-decoration:none;
-border-radius:6px;
-}
-
-</style>
-
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <h1>Suburban Perennials Finder</h1>
 
-<div class="container">
+    <div class="controls">
+      <input id="search" placeholder="Search plant or SKU" />
 
-<h1>Suburban Perennials Finder</h1>
+      <select id="light">
+        <option value="">All Light</option>
+        <option value="Sun">Sun</option>
+        <option value="Shade">Shade</option>
+      </select>
 
-<div class="controls">
+      <label>
+        <input type="checkbox" id="drought" />
+        Drought tolerant only
+      </label>
+    </div>
 
-<input id="search" placeholder="Search plant or SKU">
+    <div id="status" class="status">Loading plants…</div>
+    <div id="results"></div>
+  </div>
 
-<select id="light">
-<option value="">All Light</option>
-<option value="Sun">Sun</option>
-<option value="Shade">Shade</option>
-</select>
+  <script>
+    let plants = [];
 
-<label>
-<input type="checkbox" id="drought">
-Drought tolerant only
-</label>
+    const searchEl = document.getElementById("search");
+    const lightEl = document.getElementById("light");
+    const droughtEl = document.getElementById("drought");
+    const statusEl = document.getElementById("status");
+    const resultsEl = document.getElementById("results");
 
-</div>
+    function safeText(value) {
+      return String(value ?? "");
+    }
 
-<div id="results"></div>
+    function render() {
+      const search = safeText(searchEl.value).toLowerCase().trim();
+      const light = safeText(lightEl.value);
+      const droughtOnly = droughtEl.checked;
 
-</div>
+      const filtered = plants.filter((p) => {
+        const name = safeText(p.name).toLowerCase();
+        const sku = safeText(p.sku).toLowerCase();
+        const itemLight = safeText(p.light);
+        const drought = Boolean(p.drought);
 
-<script>
+        if (search && !name.includes(search) && !sku.includes(search)) {
+          return false;
+        }
 
-let plants = []
+        if (light && itemLight !== light) {
+          return false;
+        }
 
-fetch("plants.json")
-.then(r => r.json())
-.then(data => {
-plants = data
-render()
-})
+        if (droughtOnly && !drought) {
+          return false;
+        }
 
-document.getElementById("search").addEventListener("input",render)
-document.getElementById("light").addEventListener("change",render)
-document.getElementById("drought").addEventListener("change",render)
+        return true;
+      });
 
-function render(){
+      resultsEl.innerHTML = "";
 
-let search = document.getElementById("search").value.toLowerCase()
-let light = document.getElementById("light").value
-let drought = document.getElementById("drought").checked
+      if (filtered.length === 0) {
+        statusEl.textContent = plants.length === 0
+          ? "No plant data loaded."
+          : "No matching plants found.";
+        return;
+      }
 
-let filtered = plants.filter(p => {
+      statusEl.textContent = `Showing ${filtered.length} of ${plants.length} plants`;
 
-if(search){
-if(
-!p.name.toLowerCase().includes(search) &&
-!p.sku.toLowerCase().includes(search)
-){
-return false
-}
-}
+      filtered.forEach((p) => {
+        const card = document.createElement("div");
+        card.className = "plant";
 
-if(light && p.light !== light){
-return false
-}
+        const name = safeText(p.name) || "Unnamed plant";
+        const sku = safeText(p.sku) || "N/A";
+        const light = safeText(p.light) || "Unknown";
+        const price = safeText(p.price);
+        const link = safeText(p.link);
 
-if(drought && !p.drought){
-return false
-}
+        card.innerHTML = `
+          <div class="plant-name">${name}</div>
+          <div class="sku">SKU: ${sku}</div>
+          <div>Light: ${light}</div>
+          ${price ? `<div class="price">${price}</div>` : `<div class="muted">No price listed</div>`}
+          ${link ? `<a class="button" href="${link}" target="_blank" rel="noopener noreferrer">Open product page</a>` : `<div class="muted">No product link</div>`}
+        `;
 
-return true
+        resultsEl.appendChild(card);
+      });
+    }
 
-})
+    async function loadPlants() {
+      try {
+        const response = await fetch("plants.json", { cache: "no-store" });
 
-let results = document.getElementById("results")
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
 
-results.innerHTML = ""
+        const data = await response.json();
 
-filtered.forEach(p => {
+        if (!Array.isArray(data)) {
+          throw new Error("plants.json is not an array");
+        }
 
-let card = document.createElement("div")
-card.className = "plant"
+        plants = data;
+        render();
+      } catch (err) {
+        statusEl.textContent = `Failed to load plants.json: ${err.message}`;
+        resultsEl.innerHTML = "";
+        console.error(err);
+      }
+    }
 
-card.innerHTML = `
-<div class="plant-name">${p.name}</div>
-<div class="sku">SKU: ${p.sku}</div>
-<div>Light: ${p.light}</div>
-<div class="price">${p.price || ""}</div>
-<a class="button" href="${p.link}" target="_blank">Open product page</a>
-`
+    searchEl.addEventListener("input", render);
+    lightEl.addEventListener("change", render);
+    droughtEl.addEventListener("change", render);
 
-results.appendChild(card)
-
-})
-
-}
-
-</script>
-
+    loadPlants();
+  </script>
 </body>
 </html>
