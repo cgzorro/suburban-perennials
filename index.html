@@ -356,7 +356,7 @@ let drought=document.getElementById("drought").checked;
 
 let results=plants.filter(p=>{
 
-if(search && !p.name.toLowerCase().includes(search) && !p.sku.includes(search))
+if(search && !p.name.toLowerCase().includes(search) && !p.sku.toLowerCase().includes(search))
 return false;
 
 if(light!=="All" && p.light!==light)
