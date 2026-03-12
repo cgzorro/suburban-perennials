@@ -6,79 +6,42 @@
 
 <style>
 body{
-  font-family:Arial, sans-serif;
-  margin:20px;
-  background:#f5f5f5;
-}
-
-h2{
-  margin-bottom:16px;
-}
-
-.controls{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-  margin-bottom:18px;
+font-family:Arial;
+margin:20px;
+background:#f5f5f5;
 }
 
 .card{
-  background:white;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:10px;
-  box-shadow:0 2px 6px rgba(0,0,0,.1);
+background:white;
+padding:15px;
+margin-bottom:15px;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,.1);
 }
 
 button{
-  padding:10px 14px;
-  border-radius:6px;
-  border:none;
-  background:#333;
-  color:white;
-  margin-top:10px;
-  cursor:pointer;
+padding:10px;
+border-radius:6px;
+border:none;
+background:#333;
+color:white;
+margin-top:10px;
 }
 
 input,select{
-  padding:10px;
-  width:100%;
-  border:1px solid #ccc;
-  border-radius:6px;
-  font-size:16px;
-  box-sizing:border-box;
-}
-
-label{
-  font-size:15px;
-}
-
-.meta{
-  margin-top:8px;
-  line-height:1.5;
+padding:10px;
+margin-bottom:10px;
+width:100%;
 }
 
 .tag{
-  display:inline-block;
-  background:#e8f0e8;
-  color:#234;
-  padding:4px 8px;
-  border-radius:999px;
-  font-size:12px;
-  margin:4px 6px 0 0;
-}
-
-.empty{
-  background:white;
-  padding:18px;
-  border-radius:10px;
-  box-shadow:0 2px 6px rgba(0,0,0,.08);
-}
-
-@media (min-width:700px){
-  .controls{
-    grid-template-columns:repeat(2, 1fr);
-  }
+display:inline-block;
+background:#e8f0e8;
+padding:4px 8px;
+border-radius:6px;
+font-size:12px;
+margin-right:6px;
+margin-top:6px;
 }
 </style>
 </head>
@@ -87,455 +50,132 @@ label{
 
 <h2>Suburban Perennials Finder</h2>
 
-<div class="controls">
-  <input id="search" placeholder="Search plant, genus, color, or SKU">
+<input id="search" placeholder="Search plant, color, genus or SKU">
 
-  <select id="light">
-    <option value="All">All Light</option>
-    <option value="Sun">Sun</option>
-    <option value="Shade">Shade</option>
-  </select>
+<select id="light">
+<option value="All">All Light</option>
+<option value="Sun">Sun</option>
+<option value="Shade">Shade</option>
+</select>
 
-  <select id="height">
-    <option value="All">Any Height</option>
-    <option value="Short">Short (under 12&quot;)</option>
-    <option value="Medium">Medium (12–24&quot;)</option>
-    <option value="Tall">Tall (over 24&quot;)</option>
-  </select>
+<select id="height">
+<option value="All">Any Height</option>
+<option value="Short">Short</option>
+<option value="Medium">Medium</option>
+<option value="Tall">Tall</option>
+</select>
 
-  <select id="color">
-    <option value="All">Any Bloom Color</option>
-    <option value="Purple">Purple</option>
-    <option value="Pink">Pink</option>
-    <option value="White">White</option>
-    <option value="Yellow">Yellow</option>
-    <option value="Red">Red</option>
-    <option value="Orange">Orange</option>
-  </select>
-</div>
+<select id="color">
+<option value="All">Any Bloom Color</option>
+<option value="Purple">Purple</option>
+<option value="Pink">Pink</option>
+<option value="White">White</option>
+<option value="Yellow">Yellow</option>
+<option value="Red">Red</option>
+<option value="Orange">Orange</option>
+</select>
 
-<div style="margin-bottom:16px;">
-  <label>
-    <input type="checkbox" id="drought">
-    Drought tolerant only
-  </label>
-</div>
+<label>
+<input type="checkbox" id="drought">
+Drought tolerant only
+</label>
 
 <div id="plants"></div>
 
 <script>
-let plants = [
-  {
-    sku:"PACHFD1",
-    name:"Firefly Diamond Yarrow 1G",
-    common:"Yarrow",
-    genus:"Achillea",
-    light:"Sun",
-    height:"Medium",
-    color:"White",
-    drought:true,
-    pollinator:true,
-    deer:false,
-    native:false,
-    price:"$14.99",
-    link:"https://store.suburbanlg.com/products/firefly-diamond-yarrow-1g-26070.html"
-  },
-  {
-    sku:"PACHMRT1",
-    name:"Milly Rock Trio Yarrow 1G",
-    common:"Yarrow",
-    genus:"Achillea",
-    light:"Sun",
-    height:"Medium",
-    color:"Pink",
-    drought:true,
-    pollinator:true,
-    deer:false,
-    native:false,
-    price:"$11.99",
-    link:"https://store.suburbanlg.com/products/milly-rock-trio-yarrow-1g-26072.html"
-  },
-  {
-    sku:"PACHSSSU1",
-    name:"Sassy Summer Sunset Yarrow 1G",
-    common:"Yarrow",
-    genus:"Achillea",
-    light:"Sun",
-    height:"Medium",
-    color:"Orange",
-    drought:true,
-    pollinator:true,
-    deer:false,
-    native:false,
-    price:"$11.99",
-    link:"https://store.suburbanlg.com/products/sassy-summer-sunset-yarrow-26077.html"
-  },
-  {
-    sku:"PECHKY1",
-    name:"Kismet Yellow Coneflower 1G",
-    common:"Coneflower",
-    genus:"Echinacea",
-    light:"Sun",
-    height:"Tall",
-    color:"Yellow",
-    drought:true,
-    pollinator:true,
-    deer:false,
-    native:true,
-    price:"$13.99",
-    link:"https://store.suburbanlg.com/products/kismet-yellow-coneflower-1g-26216.html"
-  },
-  {
-    sku:"PECHPWW1",
-    name:"Powwow White Coneflower 1G",
-    common:"Coneflower",
-    genus:"Echinacea",
-    light:"Sun",
-    height:"Tall",
-    color:"White",
-    drought:true,
-    pollinator:true,
-    deer:true,
-    native:true,
-    price:"$8.99",
-    link:"https://store.suburbanlg.com/products/powwow-white-coneflower-1g-26218.html"
-  },
-  {
-    sku:"PHOSPAT1",
-    name:"Patriot Hosta 1G",
-    common:"Hosta",
-    genus:"Hosta",
-    light:"Shade",
-    height:"Medium",
-    color:"White",
-    drought:false,
-    pollinator:false,
-    deer:true,
-    native:false,
-    price:"$11.99",
-    link:"https://store.suburbanlg.com/products/patriot-hosta-1g-26369.html"
-  },
-  {
-    sku:"PHOSLIB1",
-    name:"Liberty Hosta 1G",
-    common:"Hosta",
-    genus:"Hosta",
-    light:"Shade",
-    height:"Medium",
-    color:"White",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$13.99",
-    link:"https://store.suburbanlg.com/products/liberty-hosta-1g-26366.html"
-  },
-  {
-    sku:"PHOSWHE1",
-    name:"Wheee! Hosta 1G",
-    common:"Hosta",
-    genus:"Hosta",
-    light:"Shade",
-    height:"Short",
-    color:"White",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$14.99",
-    link:"https://store.suburbanlg.com/products/wheee--hosta-1g-26380.html"
-  },
-  {
-    sku:"PASLAM1",
-    name:"Amber Moon Astilbe 1G",
-    common:"Astilbe",
-    genus:"Astilbe",
-    light:"Shade",
-    height:"Medium",
-    color:"Pink",
-    drought:false,
-    pollinator:false,
-    deer:true,
-    native:false,
-    price:"$11.99",
-    link:"https://store.suburbanlg.com/products/amber-moon-astilbe-1g-26124.html"
-  },
-  {
-    sku:"PASLBB1",
-    name:"Bressingham Beauty Astilbe 1G",
-    common:"Astilbe",
-    genus:"Astilbe",
-    light:"Shade",
-    height:"Tall",
-    color:"Pink",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$11.99",
-    link:"https://store.suburbanlg.com/products/bressingham-beauty-astilbe-1g-26126.html"
-  },
-  {
-    sku:"PASLRHE1",
-    name:"Rheinland Astilbe 1G",
-    common:"Astilbe",
-    genus:"Astilbe",
-    light:"Shade",
-    height:"Medium",
-    color:"Pink",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$11.99",
-    link:"https://store.suburbanlg.com/products/rheinland-astilbe-1g-26132.html"
-  },
-  {
-    sku:"PASLPUM1",
-    name:"Pumila Astilbe 1G",
-    common:"Astilbe",
-    genus:"Astilbe",
-    light:"Shade",
-    height:"Short",
-    color:"Pink",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$11.99",
-    link:"https://store.suburbanlg.com/products/pumila-astilbe-1g-26129.html"
-  },
-  {
-    sku:"PASLFAN1",
-    name:"Fanal Astilbe 1G",
-    common:"Astilbe",
-    genus:"Astilbe",
-    light:"Shade",
-    height:"Medium",
-    color:"Red",
-    drought:false,
-    pollinator:false,
-    deer:true,
-    native:false,
-    price:"$11.99",
-    link:"https://store.suburbanlg.com/products/fanal-astilbe-1g-26128.html"
-  },
-  {
-    sku:"PHEUCAR1",
-    name:"Caramel Coral Bells 1G",
-    common:"Coral Bells",
-    genus:"Heuchera",
-    light:"Shade",
-    height:"Short",
-    color:"Pink",
-    drought:false,
-    pollinator:false,
-    deer:true,
-    native:false,
-    price:"$13.99",
-    link:"https://store.suburbanlg.com/products/caramel-coral-bells-1g-26293.html"
-  },
-  {
-    sku:"PHEUFR1",
-    name:"Forever Red Coral Bells 1G",
-    common:"Coral Bells",
-    genus:"Heuchera",
-    light:"Shade",
-    height:"Short",
-    color:"Red",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$13.99",
-    link:"https://store.suburbanlg.com/products/forever-red-coral-bells-1g-26298.html"
-  },
-  {
-    sku:"PHEUOBS1",
-    name:"Obsidian Coral Bells 1G",
-    common:"Coral Bells",
-    genus:"Heuchera",
-    light:"Shade",
-    height:"Short",
-    color:"White",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$15.99",
-    link:"https://store.suburbanlg.com/products/obsidian-coral-bells-1g-26309.html"
-  },
-  {
-    sku:"PHEUPAR1",
-    name:"Paris Coral Bells 1G",
-    common:"Coral Bells",
-    genus:"Heuchera",
-    light:"Shade",
-    height:"Short",
-    color:"Pink",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$11.99",
-    link:"https://store.suburbanlg.com/products/paris-coral-bells-1g-26311.html"
-  },
-  {
-    sku:"PHEUPP1",
-    name:"Palace Purple Coral Bells 1G",
-    common:"Coral Bells",
-    genus:"Heuchera",
-    light:"Shade",
-    height:"Short",
-    color:"Purple",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$8.99",
-    link:"https://store.suburbanlg.com/products/palace-purple-coral-bells-1g-26310.html"
-  },
-  {
-    sku:"PHEURL1",
-    name:"Red Lightning Coral Bells 1G",
-    common:"Coral Bells",
-    genus:"Heuchera",
-    light:"Shade",
-    height:"Short",
-    color:"Red",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$13.99",
-    link:"https://store.suburbanlg.com/products/red-lightning-coral-bells-26316.html"
-  },
-  {
-    sku:"PHEUSPE1",
-    name:"Spearmint Coral Bells 1G",
-    common:"Coral Bells",
-    genus:"Heuchera",
-    light:"Shade",
-    height:"Short",
-    color:"Pink",
-    drought:false,
-    pollinator:false,
-    deer:true,
-    native:false,
-    price:"$13.99",
-    link:"https://store.suburbanlg.com/products/spearmint-coral-bells-1g-26319.html"
-  },
-  {
-    sku:"PHEUWB1",
-    name:"Wildberry Coral Bells 1G",
-    common:"Coral Bells",
-    genus:"Heuchera",
-    light:"Shade",
-    height:"Short",
-    color:"Pink",
-    drought:false,
-    pollinator:false,
-    deer:true,
-    native:false,
-    price:"$14.99",
-    link:"https://store.suburbanlg.com/products/wildberry-coral-bells-1g-26323.html"
-  },
-  {
-    sku:"PHEUGT1",
-    name:"Grape Timeless Heuchera 1G",
-    common:"Coral Bells",
-    genus:"Heuchera",
-    light:"Shade",
-    height:"Short",
-    color:"Purple",
-    drought:false,
-    pollinator:false,
-    deer:false,
-    native:false,
-    price:"$13.99",
-    link:"https://store.suburbanlg.com/products/grape-timeless-heuchera-1g-33116.html"
-  }
-];
 
-function render(){
-  let search = document.getElementById("search").value.toLowerCase();
-  let light = document.getElementById("light").value;
-  let height = document.getElementById("height").value;
-  let color = document.getElementById("color").value;
-  let drought = document.getElementById("drought").checked;
+let plants = [];
 
-  let results = plants.filter(p => {
-    if (
-      search &&
-      !p.name.toLowerCase().includes(search) &&
-      !p.common.toLowerCase().includes(search) &&
-      !p.genus.toLowerCase().includes(search) &&
-      !p.sku.toLowerCase().includes(search) &&
-      !p.color.toLowerCase().includes(search)
-    ) return false;
+async function loadPlants(){
 
-    if (light !== "All" && p.light !== light) return false;
-    if (height !== "All" && p.height !== height) return false;
-    if (color !== "All" && p.color !== color) return false;
-    if (drought && !p.drought) return false;
+let response = await fetch("plants.json");
 
-    return true;
-  });
-
-  let html = "";
-
-  if(results.length === 0){
-    html = `
-      <div class="empty">
-        <b>No plants found.</b><br><br>
-        Try clearing one filter, or search by a broader term like:
-        <br>• yarrow
-        <br>• hosta
-        <br>• purple
-        <br>• PACHFD1
-      </div>
-    `;
-  } else {
-    results.forEach(p => {
-      html += `
-      <div class="card">
-        <b>${p.name}</b>
-        <div class="meta">
-          SKU: ${p.sku}<br>
-          Common: ${p.common}<br>
-          Genus: ${p.genus}<br>
-          Light: ${p.light}<br>
-          Height: ${p.height}<br>
-          Bloom Color: ${p.color}<br>
-          Drought: ${p.drought ? "Yes" : "No"}<br>
-          Price: ${p.price}
-        </div>
-
-        <div style="margin-top:8px;">
-          ${p.pollinator ? '<span class="tag">Pollinator</span>' : ''}
-          ${p.deer ? '<span class="tag">Deer resistant</span>' : ''}
-          ${p.native ? '<span class="tag">Native</span>' : ''}
-          ${p.drought ? '<span class="tag">Drought tolerant</span>' : ''}
-        </div>
-
-        <a href="${p.link}" target="_blank" rel="noopener noreferrer">
-          <button>Open product page</button>
-        </a>
-      </div>
-      `;
-    });
-  }
-
-  document.getElementById("plants").innerHTML = html;
-}
+plants = await response.json();
 
 render();
 
-document.getElementById("search").addEventListener("input", render);
-document.getElementById("light").addEventListener("change", render);
-document.getElementById("height").addEventListener("change", render);
-document.getElementById("color").addEventListener("change", render);
-document.getElementById("drought").addEventListener("change", render);
+}
+
+function render(){
+
+let search=document.getElementById("search").value.toLowerCase();
+let light=document.getElementById("light").value;
+let height=document.getElementById("height").value;
+let color=document.getElementById("color").value;
+let drought=document.getElementById("drought").checked;
+
+let results=plants.filter(p=>{
+
+if(search &&
+!p.name.toLowerCase().includes(search) &&
+!p.common.toLowerCase().includes(search) &&
+!p.genus.toLowerCase().includes(search) &&
+!p.sku.toLowerCase().includes(search) &&
+!p.color.toLowerCase().includes(search)
+)
+return false;
+
+if(light!=="All" && p.light!==light)
+return false;
+
+if(height!=="All" && p.height!==height)
+return false;
+
+if(color!=="All" && p.color!==color)
+return false;
+
+if(drought && !p.drought)
+return false;
+
+return true;
+
+});
+
+let html="";
+
+results.forEach(p=>{
+
+html+=`
+<div class="card">
+
+<b>${p.name} ${p.size}</b><br>
+
+SKU: ${p.sku}<br>
+Common: ${p.common}<br>
+Genus: ${p.genus}<br>
+Light: ${p.light}<br>
+Height: ${p.height}<br>
+Color: ${p.color}<br>
+Price: ${p.price}<br>
+
+${p.pollinator ? '<span class="tag">Pollinator</span>' : ''}
+${p.deer ? '<span class="tag">Deer Resistant</span>' : ''}
+${p.native ? '<span class="tag">Native</span>' : ''}
+${p.drought ? '<span class="tag">Drought</span>' : ''}
+
+<br>
+
+<a href="${p.link}" target="_blank">
+<button>Open product page</button>
+</a>
+
+</div>
+`;
+
+});
+
+document.getElementById("plants").innerHTML=html;
+
+}
+
+loadPlants();
+
+document.getElementById("search").addEventListener("input",render);
+document.getElementById("light").addEventListener("change",render);
+document.getElementById("height").addEventListener("change",render);
+document.getElementById("color").addEventListener("change",render);
+document.getElementById("drought").addEventListener("change",render);
+
 </script>
 
 </body>
