@@ -1,0 +1,86 @@
+[
+ {
+  "sku":"PACHFD1",
+  "name":"Firefly Diamond Yarrow",
+  "size":"1G",
+  "common":"Yarrow",
+  "genus":"Achillea",
+  "light":"Sun",
+  "height":"Medium",
+  "color":"White",
+  "drought":true,
+  "pollinator":true,
+  "deer":false,
+  "native":false,
+  "price":"$14.99",
+  "link":"https://store.suburbanlg.com/products/firefly-diamond-yarrow-1g-26070.html"
+ },
+
+ {
+  "sku":"PACHSSSU1",
+  "name":"Sassy Summer Sunset Yarrow",
+  "size":"1G",
+  "common":"Yarrow",
+  "genus":"Achillea",
+  "light":"Sun",
+  "height":"Medium",
+  "color":"Orange",
+  "drought":true,
+  "pollinator":true,
+  "deer":false,
+  "native":false,
+  "price":"$11.99",
+  "link":"https://store.suburbanlg.com/products/sassy-summer-sunset-yarrow-26077.html"
+ },
+
+ {
+  "sku":"PECHPWW1",
+  "name":"Powwow White Coneflower",
+  "size":"1G",
+  "common":"Coneflower",
+  "genus":"Echinacea",
+  "light":"Sun",
+  "height":"Tall",
+  "color":"White",
+  "drought":true,
+  "pollinator":true,
+  "deer":true,
+  "native":true,
+  "price":"$8.99",
+  "link":"https://store.suburbanlg.com/products/powwow-white-coneflower-1g-26218.html"
+ },
+
+ {
+  "sku":"PHOSPAT1",
+  "name":"Patriot Hosta",
+  "size":"1G",
+  "common":"Hosta",
+  "genus":"Hosta",
+  "light":"Shade",
+  "height":"Medium",
+  "color":"White",
+  "drought":false,
+  "pollinator":false,
+  "deer":true,
+  "native":false,
+  "price":"$11.99",
+  "link":"https://store.suburbanlg.com/products/patriot-hosta-1g-26369.html"
+ },
+
+ {
+  "sku":"PHEUPP1",
+  "name":"Palace Purple Coral Bells",
+  "size":"1G",
+  "common":"Coral Bells",
+  "genus":"Heuchera",
+  "light":"Shade",
+  "height":"Short",
+  "color":"Purple",
+  "drought":false,
+  "pollinator":false,
+  "deer":false,
+  "native":false,
+  "price":"$8.99",
+  "link":"https://store.suburbanlg.com/products/palace-purple-coral-bells-1g-26310.html"
+ }
+]
