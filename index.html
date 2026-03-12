@@ -1,78 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Suburban Perennials Finder</title>
 
 <style>
+
 body{
-font-family:Arial;
-margin:20px;
-background:#f5f5f5;
+font-family:system-ui;
+margin:0;
+padding:20px;
+background:#f6f6f6;
 }
 
-.card{
+.container{
+max-width:900px;
+margin:auto;
+}
+
+h1{
+margin-bottom:20px;
+}
+
+.controls{
 background:white;
 padding:15px;
-margin-bottom:15px;
 border-radius:10px;
-box-shadow:0 2px 6px rgba(0,0,0,.1);
-}
-
-button{
-padding:10px;
-border-radius:6px;
-border:none;
-background:#333;
-color:white;
-margin-top:10px;
+margin-bottom:20px;
 }
 
 input,select{
+width:100%;
 padding:10px;
 margin-bottom:10px;
-width:100%;
+font-size:16px;
 }
 
-.tag{
-display:inline-block;
-background:#e8f0e8;
-padding:4px 8px;
-border-radius:6px;
-font-size:12px;
-margin-right:6px;
-margin-top:6px;
+.plant{
+background:white;
+padding:15px;
+border-radius:10px;
+margin-bottom:12px;
+box-shadow:0 2px 4px rgba(0,0,0,.1);
 }
+
+.plant-name{
+font-weight:bold;
+font-size:18px;
+}
+
+.sku{
+color:#666;
+font-size:14px;
+}
+
+.price{
+margin-top:5px;
+}
+
+a.button{
+display:inline-block;
+margin-top:8px;
+padding:8px 12px;
+background:#333;
+color:white;
+text-decoration:none;
+border-radius:6px;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<h2>Suburban Perennials Finder</h2>
+<div class="container">
 
-<input id="search" placeholder="Search plant, color, genus or SKU">
+<h1>Suburban Perennials Finder</h1>
+
+<div class="controls">
+
+<input id="search" placeholder="Search plant or SKU">
 
 <select id="light">
-<option value="All">All Light</option>
+<option value="">All Light</option>
 <option value="Sun">Sun</option>
 <option value="Shade">Shade</option>
-</select>
-
-<select id="height">
-<option value="All">Any Height</option>
-<option value="Short">Short</option>
-<option value="Medium">Medium</option>
-<option value="Tall">Tall</option>
-</select>
-
-<select id="color">
-<option value="All">Any Bloom Color</option>
-<option value="Purple">Purple</option>
-<option value="Pink">Pink</option>
-<option value="White">White</option>
-<option value="Yellow">Yellow</option>
-<option value="Red">Red</option>
-<option value="Orange">Orange</option>
 </select>
 
 <label>
@@ -80,101 +95,78 @@ margin-top:6px;
 Drought tolerant only
 </label>
 
-<div id="plants"></div>
+</div>
+
+<div id="results"></div>
+
+</div>
 
 <script>
 
-let plants = [];
+let plants = []
 
-async function loadPlants(){
+fetch("plants.json")
+.then(r => r.json())
+.then(data => {
+plants = data
+render()
+})
 
-let response = await fetch("plants.json");
-
-plants = await response.json();
-
-render();
-
-}
+document.getElementById("search").addEventListener("input",render)
+document.getElementById("light").addEventListener("change",render)
+document.getElementById("drought").addEventListener("change",render)
 
 function render(){
 
-let search=document.getElementById("search").value.toLowerCase();
-let light=document.getElementById("light").value;
-let height=document.getElementById("height").value;
-let color=document.getElementById("color").value;
-let drought=document.getElementById("drought").checked;
+let search = document.getElementById("search").value.toLowerCase()
+let light = document.getElementById("light").value
+let drought = document.getElementById("drought").checked
 
-let results=plants.filter(p=>{
+let filtered = plants.filter(p => {
 
-if(search &&
+if(search){
+if(
 !p.name.toLowerCase().includes(search) &&
-!p.common.toLowerCase().includes(search) &&
-!p.genus.toLowerCase().includes(search) &&
-!p.sku.toLowerCase().includes(search) &&
-!p.color.toLowerCase().includes(search)
-)
-return false;
-
-if(light!=="All" && p.light!==light)
-return false;
-
-if(height!=="All" && p.height!==height)
-return false;
-
-if(color!=="All" && p.color!==color)
-return false;
-
-if(drought && !p.drought)
-return false;
-
-return true;
-
-});
-
-let html="";
-
-results.forEach(p=>{
-
-html+=`
-<div class="card">
-
-<b>${p.name} ${p.size}</b><br>
-
-SKU: ${p.sku}<br>
-Common: ${p.common}<br>
-Genus: ${p.genus}<br>
-Light: ${p.light}<br>
-Height: ${p.height}<br>
-Color: ${p.color}<br>
-Price: ${p.price}<br>
-
-${p.pollinator ? '<span class="tag">Pollinator</span>' : ''}
-${p.deer ? '<span class="tag">Deer Resistant</span>' : ''}
-${p.native ? '<span class="tag">Native</span>' : ''}
-${p.drought ? '<span class="tag">Drought</span>' : ''}
-
-<br>
-
-<a href="${p.link}" target="_blank">
-<button>Open product page</button>
-</a>
-
-</div>
-`;
-
-});
-
-document.getElementById("plants").innerHTML=html;
-
+!p.sku.toLowerCase().includes(search)
+){
+return false
+}
 }
 
-loadPlants();
+if(light && p.light !== light){
+return false
+}
 
-document.getElementById("search").addEventListener("input",render);
-document.getElementById("light").addEventListener("change",render);
-document.getElementById("height").addEventListener("change",render);
-document.getElementById("color").addEventListener("change",render);
-document.getElementById("drought").addEventListener("change",render);
+if(drought && !p.drought){
+return false
+}
+
+return true
+
+})
+
+let results = document.getElementById("results")
+
+results.innerHTML = ""
+
+filtered.forEach(p => {
+
+let card = document.createElement("div")
+card.className = "plant"
+
+card.innerHTML = `
+<div class="plant-name">${p.name}</div>
+<div class="sku">SKU: ${p.sku}</div>
+<div>Light: ${p.light}</div>
+<div class="price">${p.price || ""}</div>
+<a class="button" href="${p.link}" target="_blank">Open product page</a>
+`
+
+results.appendChild(card)
+
+})
+
+}
 
 </script>
 
