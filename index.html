@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Suburban Perennials Finder</title>
+  <title>Suburban Plant Finder</title>
   <style>
     :root {
       --bg: #f6f6f4;
@@ -52,15 +52,35 @@
     .topbar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
       margin-bottom: 14px;
+    }
+
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--green-2);
+      font-weight: 700;
     }
 
     h1 {
       margin: 0;
       font-size: 2rem;
       line-height: 1.05;
+    }
+
+    .subhead {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.4;
     }
 
     .theme-toggle {
@@ -71,6 +91,7 @@
       padding: 10px 14px;
       cursor: pointer;
       font-size: 14px;
+      white-space: nowrap;
     }
 
     .panel,
@@ -233,7 +254,11 @@
 <body>
   <div class="container">
     <div class="topbar">
-      <h1>Suburban Perennials Finder</h1>
+      <div class="brand-block">
+        <div class="eyebrow">Suburban Demo • White Label Plant Finder</div>
+        <h1>Suburban Plant Finder</h1>
+        <div class="subhead">Mobile-ready product finder for perennials, roses, and specialty plant inventory.</div>
+      </div>
       <button id="themeToggle" class="theme-toggle" type="button">🌙 Dark Mode</button>
     </div>
 
@@ -283,7 +308,7 @@
       </div>
 
       <div class="subtle">
-        Tip: search by SKU like <strong>26170</strong>, common name like <strong>hosta</strong>, or category like <strong>yarrow</strong>.
+        Tip: search by SKU like <strong>26170</strong>, common name like <strong>hosta</strong>, or category like <strong>ground covers</strong>.
       </div>
     </div>
 
@@ -480,7 +505,6 @@
         const sku = txt(p.sku) || "N/A";
         const common = txt(p.common);
         const genus = txt(p.genus);
-        const category = txt(p.category);
         const light = txt(p.light) || "Not set";
         const price = txt(p.price);
         const height = txt(p.height);
@@ -511,7 +535,6 @@
             <div class="meta"><strong>SKU:</strong> ${sku}</div>
             ${common ? `<div class="meta"><strong>Common:</strong> ${common}</div>` : ""}
             ${genus ? `<div class="meta"><strong>Genus:</strong> ${genus}</div>` : ""}
-            ${category ? `<div class="meta"><strong>Category:</strong> ${category}</div>` : ""}
             <div class="meta"><strong>Light:</strong> ${light}</div>
             ${height ? `<div class="meta"><strong>Height:</strong> ${height}</div>` : ""}
             ${width ? `<div class="meta"><strong>Width:</strong> ${width}</div>` : ""}
