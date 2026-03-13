@@ -5,12 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Suburban Perennials Finder</title>
   <style>
+    :root {
+      --bg: #f5f5f5;
+      --card: #ffffff;
+      --text: #222222;
+      --muted: #666666;
+      --border: #dddddd;
+      --button: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: system-ui, Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background: #f6f6f6;
-      color: #222;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, Arial, sans-serif;
     }
 
     .container {
@@ -19,59 +32,93 @@
     }
 
     h1 {
-      margin: 0 0 16px;
+      font-size: 2.5rem;
+      line-height: 1.05;
+      margin: 0 0 20px;
     }
 
-    .controls, .status, .plant {
-      background: white;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 2px 4px rgba(0,0,0,.08);
-      margin-bottom: 14px;
+    .panel,
+    .plant {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      margin-bottom: 16px;
     }
 
-    input, select {
+    input[type="text"],
+    select {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
+      padding: 14px;
       font-size: 16px;
-      box-sizing: border-box;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 12px;
+      background: white;
+      color: var(--text);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .checkbox-row input {
+      width: 22px;
+      height: 22px;
+      margin: 0;
+    }
+
+    .status {
+      font-size: 1rem;
     }
 
     .plant-name {
+      font-size: 1.2rem;
       font-weight: 700;
-      font-size: 18px;
-      margin-bottom: 4px;
-    }
-
-    .sku {
-      color: #666;
-      font-size: 14px;
       margin-bottom: 6px;
     }
 
-    .price {
-      margin-top: 6px;
+    .sku,
+    .meta,
+    .price,
+    .light {
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .tags {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #eef3ee;
+      font-size: 12px;
+      color: #2d3a2d;
+    }
+
+    .button {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--button);
+      color: white;
+      text-decoration: none;
       font-weight: 600;
     }
 
-    .muted {
-      color: #666;
-      font-size: 14px;
-    }
-
-    a.button {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 8px 12px;
-      background: #333;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-    }
-
-    .hidden {
-      display: none;
+    .small {
+      font-size: 0.95rem;
+      color: var(--muted);
     }
   </style>
 </head>
@@ -79,8 +126,8 @@
   <div class="container">
     <h1>Suburban Perennials Finder</h1>
 
-    <div class="controls">
-      <input id="search" placeholder="Search plant or SKU" />
+    <div class="panel">
+      <input id="search" type="text" placeholder="Search plant or SKU" />
 
       <select id="light">
         <option value="">All Light</option>
@@ -88,13 +135,14 @@
         <option value="Shade">Shade</option>
       </select>
 
-      <label>
-        <input type="checkbox" id="drought" />
-        Drought tolerant only
-      </label>
+      <div class="checkbox-row">
+        <input id="drought" type="checkbox" />
+        <label for="drought">Drought tolerant only</label>
+      </div>
     </div>
 
-    <div id="status" class="status">Loading plants…</div>
+    <div id="status" class="panel status">Loading plants…</div>
+
     <div id="results"></div>
   </div>
 
@@ -107,26 +155,38 @@
     const statusEl = document.getElementById("status");
     const resultsEl = document.getElementById("results");
 
-    function safeText(value) {
+    function text(value) {
       return String(value ?? "");
     }
 
+    function bool(value) {
+      return value === true;
+    }
+
     function render() {
-      const search = safeText(searchEl.value).toLowerCase().trim();
-      const light = safeText(lightEl.value);
+      const search = text(searchEl.value).toLowerCase().trim();
+      const selectedLight = text(lightEl.value);
       const droughtOnly = droughtEl.checked;
 
-      const filtered = plants.filter((p) => {
-        const name = safeText(p.name).toLowerCase();
-        const sku = safeText(p.sku).toLowerCase();
-        const itemLight = safeText(p.light);
-        const drought = Boolean(p.drought);
+      const filtered = plants.filter((plant) => {
+        const name = text(plant.name).toLowerCase();
+        const sku = text(plant.sku).toLowerCase();
+        const common = text(plant.common).toLowerCase();
+        const genus = text(plant.genus).toLowerCase();
+        const light = text(plant.light);
+        const drought = bool(plant.drought);
 
-        if (search && !name.includes(search) && !sku.includes(search)) {
+        if (
+          search &&
+          !name.includes(search) &&
+          !sku.includes(search) &&
+          !common.includes(search) &&
+          !genus.includes(search)
+        ) {
           return false;
         }
 
-        if (light && itemLight !== light) {
+        if (selectedLight && light !== selectedLight) {
           return false;
         }
 
@@ -139,43 +199,59 @@
 
       resultsEl.innerHTML = "";
 
+      if (plants.length === 0) {
+        statusEl.textContent = "No plant data loaded.";
+        return;
+      }
+
       if (filtered.length === 0) {
-        statusEl.textContent = plants.length === 0
-          ? "No plant data loaded."
-          : "No matching plants found.";
+        statusEl.textContent = "No matching plants found.";
         return;
       }
 
       statusEl.textContent = `Showing ${filtered.length} of ${plants.length} plants`;
 
-      filtered.forEach((p) => {
+      filtered.forEach((plant) => {
+        const name = text(plant.name) || "Unnamed plant";
+        const size = text(plant.size);
+        const sku = text(plant.sku) || "N/A";
+        const light = text(plant.light) || "Unknown";
+        const price = text(plant.price);
+        const link = text(plant.link);
+        const common = text(plant.common);
+        const genus = text(plant.genus);
+
+        const tagHtml = [
+          bool(plant.drought) ? '<span class="tag">Drought</span>' : '',
+          bool(plant.pollinator) ? '<span class="tag">Pollinator</span>' : '',
+          bool(plant.deer) ? '<span class="tag">Deer resistant</span>' : '',
+          bool(plant.native) ? '<span class="tag">Native</span>' : ''
+        ].join("");
+
         const card = document.createElement("div");
         card.className = "plant";
-
-        const name = safeText(p.name) || "Unnamed plant";
-        const sku = safeText(p.sku) || "N/A";
-        const light = safeText(p.light) || "Unknown";
-        const price = safeText(p.price);
-        const link = safeText(p.link);
-
         card.innerHTML = `
-          <div class="plant-name">${name}</div>
+          <div class="plant-name">${name}${size ? " " + size : ""}</div>
           <div class="sku">SKU: ${sku}</div>
-          <div>Light: ${light}</div>
-          ${price ? `<div class="price">${price}</div>` : `<div class="muted">No price listed</div>`}
-          ${link ? `<a class="button" href="${link}" target="_blank" rel="noopener noreferrer">Open product page</a>` : `<div class="muted">No product link</div>`}
+          ${common ? `<div class="meta">Common: ${common}</div>` : ""}
+          ${genus ? `<div class="meta">Genus: ${genus}</div>` : ""}
+          <div class="light">Light: ${light}</div>
+          ${price ? `<div class="price">Price: ${price}</div>` : `<div class="small">No price listed</div>`}
+          ${tagHtml ? `<div class="tags">${tagHtml}</div>` : ""}
+          ${link ? `<a class="button" href="${link}" target="_blank" rel="noopener noreferrer">Open product page</a>` : `<div class="small">No product link</div>`}
         `;
-
         resultsEl.appendChild(card);
       });
     }
 
     async function loadPlants() {
       try {
-        const response = await fetch("plants.json", { cache: "no-store" });
+        statusEl.textContent = "Loading plants…";
+
+        const response = await fetch("./plants.json", { cache: "no-store" });
 
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+          throw new Error(`Could not load plants.json (HTTP ${response.status})`);
         }
 
         const data = await response.json();
@@ -186,10 +262,10 @@
 
         plants = data;
         render();
-      } catch (err) {
-        statusEl.textContent = `Failed to load plants.json: ${err.message}`;
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = `Failed to load plants.json: ${error.message}`;
         resultsEl.innerHTML = "";
-        console.error(err);
       }
     }
 
