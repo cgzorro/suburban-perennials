@@ -25,15 +25,17 @@
       --text: #f3f4f6;
       --muted: #9ca3af;
       --border: #374151;
-      --green: #7fb07f;
-      --green-2: #99c299;
+      --green: #8fc48f;
+      --green-2: #a7d2a7;
       --chip: #243224;
-      --chip-active: #7fb07f;
+      --chip-active: #8fc48f;
       --chip-active-text: #111827;
       --shadow: 0 2px 12px rgba(0,0,0,.35);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -42,11 +44,33 @@
       color: var(--text);
       font-family: system-ui, Arial, sans-serif;
       transition: background .2s ease, color .2s ease;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("./Suburban.png");
+      background-repeat: no-repeat;
+      background-position: center 18%;
+      background-size: min(540px, 72vw);
+      opacity: 0.045;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body.dark::before {
+      opacity: 0.06;
+      filter: brightness(1.15);
     }
 
     .container {
       max-width: 1150px;
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
 
     .topbar {
@@ -54,13 +78,19 @@
       justify-content: space-between;
       align-items: flex-start;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 3px solid rgba(47,79,47,0.16);
+    }
+
+    body.dark .topbar {
+      border-bottom-color: rgba(143,196,143,0.18);
     }
 
     .brand-block {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
 
     .eyebrow-row {
@@ -78,25 +108,25 @@
       font-weight: 700;
     }
 
-    .brand-badge {
+    .brand-inline {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: var(--chip);
-      color: var(--green);
-      font-size: 12px;
-      font-weight: 700;
-      border: 1px solid var(--border);
+      gap: 10px;
     }
 
-    .brand-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--green);
-      display: inline-block;
+    .brand-thumb {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--border);
+      padding: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+
+    body.dark .brand-thumb {
+      background: rgba(255,255,255,0.06);
     }
 
     h1 {
@@ -109,6 +139,7 @@
       color: var(--muted);
       font-size: 0.95rem;
       line-height: 1.4;
+      max-width: 720px;
     }
 
     .theme-toggle {
@@ -130,6 +161,7 @@
       box-shadow: var(--shadow);
       margin-bottom: 14px;
       border: 1px solid var(--border);
+      backdrop-filter: blur(2px);
     }
 
     .search-box {
@@ -302,12 +334,19 @@
     <div class="topbar">
       <div class="brand-block">
         <div class="eyebrow-row">
-          <div class="eyebrow">Internal Demo • White Label Inventory Tool</div>
-          <div class="brand-badge"><span class="brand-dot"></span> Suburban Prototype</div>
+          <div class="eyebrow">Internal Demo • Inventory Explorer</div>
         </div>
-        <h1>Suburban Plant Finder</h1>
-        <div class="subhead">Mobile-ready plant lookup for perennials, roses, and specialty inventory across locations.</div>
+
+        <div class="brand-inline">
+          <img src="./Suburban.png" alt="Suburban logo" class="brand-thumb" />
+          <h1>Suburban Plant Finder</h1>
+        </div>
+
+        <div class="subhead">
+          Mobile-ready plant lookup for perennials, roses, and specialty inventory across locations.
+        </div>
       </div>
+
       <button id="themeToggle" class="theme-toggle" type="button">🌙 Dark Mode</button>
     </div>
 
@@ -359,7 +398,9 @@
 
       <div id="scannerWrap">
         <video id="scannerVideo" autoplay playsinline></video>
-        <div class="scanner-note">Camera-based scan works best on phones that support barcode detection in the browser. If not, paste/type the SKU in the search box.</div>
+        <div class="scanner-note">
+          Camera-based scan works best on phones that support barcode detection in the browser. If not, type the SKU in the search box.
+        </div>
       </div>
 
       <div class="subtle">
@@ -640,9 +681,7 @@
                 stopScanner();
               }
             }
-          } catch (e) {
-            // ignore intermittent scan errors
-          }
+          } catch (e) {}
         }, 800);
 
       } catch (err) {
