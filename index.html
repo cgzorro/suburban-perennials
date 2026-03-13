@@ -16,6 +16,21 @@
       --chip: #eef4ee;
       --chip-active: #2f4f2f;
       --chip-active-text: #ffffff;
+      --shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    body.dark {
+      --bg: #111827;
+      --card: #1f2937;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --border: #374151;
+      --green: #7fb07f;
+      --green-2: #99c299;
+      --chip: #243224;
+      --chip-active: #7fb07f;
+      --chip-active-text: #111827;
+      --shadow: 0 2px 12px rgba(0,0,0,.35);
     }
 
     * { box-sizing: border-box; }
@@ -26,17 +41,36 @@
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, Arial, sans-serif;
+      transition: background .2s ease, color .2s ease;
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: 0 auto;
     }
 
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
     h1 {
-      margin: 0 0 14px;
+      margin: 0;
       font-size: 2rem;
       line-height: 1.05;
+    }
+
+    .theme-toggle {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 14px;
     }
 
     .panel,
@@ -44,8 +78,9 @@
       background: var(--card);
       border-radius: 18px;
       padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      box-shadow: var(--shadow);
       margin-bottom: 14px;
+      border: 1px solid var(--border);
     }
 
     .search-box {
@@ -55,7 +90,8 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       margin-bottom: 12px;
-      background: white;
+      background: var(--card);
+      color: var(--text);
     }
 
     .chip-row,
@@ -96,7 +132,7 @@
       font-size: 15px;
       border: 1px solid var(--border);
       border-radius: 12px;
-      background: white;
+      background: var(--card);
       color: var(--text);
     }
 
@@ -106,10 +142,38 @@
       line-height: 1.4;
     }
 
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .thumb {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      display: block;
+      background: #dfe7df;
+    }
+
+    body.dark .thumb {
+      background: #273244;
+    }
+
+    .card-body {
+      padding: 14px 16px 16px;
+    }
+
     .card-title {
-      font-size: 1.15rem;
+      font-size: 1.12rem;
       font-weight: 700;
       margin-bottom: 6px;
+      line-height: 1.3;
     }
 
     .meta {
@@ -139,10 +203,14 @@
       font-weight: 600;
     }
 
-    .results-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
+    body.dark .link-btn {
+      color: #111827;
+    }
+
+    .subtle {
+      font-size: .9rem;
+      color: var(--muted);
+      margin-top: 6px;
     }
 
     @media (min-width: 760px) {
@@ -155,7 +223,7 @@
       }
     }
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1100px) {
       .results-grid {
         grid-template-columns: repeat(3, 1fr);
       }
@@ -164,7 +232,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>Suburban Perennials Finder</h1>
+    <div class="topbar">
+      <h1>Suburban Perennials Finder</h1>
+      <button id="themeToggle" class="theme-toggle" type="button">🌙 Dark Mode</button>
+    </div>
 
     <div class="panel">
       <input
@@ -210,6 +281,10 @@
       <div class="button-row" style="margin-top:12px;">
         <button type="button" class="action-btn" id="clearFilters">Clear Filters</button>
       </div>
+
+      <div class="subtle">
+        Tip: search by SKU like <strong>26170</strong>, common name like <strong>hosta</strong>, or category like <strong>yarrow</strong>.
+      </div>
     </div>
 
     <div id="status" class="panel status">Loading plants…</div>
@@ -234,7 +309,8 @@
       chipDrought: document.getElementById("chipDrought"),
       chipPollinator: document.getElementById("chipPollinator"),
       chipDeer: document.getElementById("chipDeer"),
-      chipNative: document.getElementById("chipNative")
+      chipNative: document.getElementById("chipNative"),
+      themeToggle: document.getElementById("themeToggle")
     };
 
     const state = {
@@ -312,6 +388,29 @@
       setChipActive(els.chipNative, state.native);
     }
 
+    function applyTheme(theme) {
+      document.body.classList.toggle("dark", theme === "dark");
+      els.themeToggle.textContent = theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
+      localStorage.setItem("finderTheme", theme);
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.contains("dark");
+      applyTheme(isDark ? "light" : "dark");
+    }
+
+    function placeholderSvg(label) {
+      const safe = encodeURIComponent(label || "Plant");
+      const fill = document.body.classList.contains("dark") ? "273244" : "dfe7df";
+      const textFill = document.body.classList.contains("dark") ? "e5e7eb" : "374151";
+      return `data:image/svg+xml;utf8,
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 450'>
+        <rect width='600' height='450' fill='%23${fill}'/>
+        <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'
+          font-family='Arial, sans-serif' font-size='28' fill='%23${textFill}'>${safe}</text>
+      </svg>`;
+    }
+
     function render() {
       const search = txt(els.search.value).toLowerCase();
       const sectionDropdown = txt(els.section.value);
@@ -375,27 +474,51 @@
       els.status.textContent = `Showing ${filtered.length} of ${plants.length} plants`;
 
       filtered.forEach((p) => {
+        const image = txt(p.image);
+        const title = txt(p.name) || "Unnamed plant";
+        const size = txt(p.size);
+        const sku = txt(p.sku) || "N/A";
+        const common = txt(p.common);
+        const genus = txt(p.genus);
+        const category = txt(p.category);
+        const light = txt(p.light) || "Not set";
+        const price = txt(p.price);
+        const height = txt(p.height);
+        const width = txt(p.width);
+        const section = txt(p.section);
+        const link = txt(p.link);
+
         const tags = [
           bool(p.drought) ? '<span class="tag">Drought</span>' : '',
           bool(p.pollinator) ? '<span class="tag">Pollinator</span>' : '',
           bool(p.deer) ? '<span class="tag">Deer Resistant</span>' : '',
           bool(p.native) ? '<span class="tag">Native</span>' : '',
           txt(p.color) ? `<span class="tag">${txt(p.color)}</span>` : '',
-          txt(p.section) ? `<span class="tag">${txt(p.section)}</span>` : ''
+          section ? `<span class="tag">${section}</span>` : ''
         ].join("");
 
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-          <div class="card-title">${txt(p.name) || "Unnamed plant"}${txt(p.size) ? " " + txt(p.size) : ""}</div>
-          <div class="meta"><strong>SKU:</strong> ${txt(p.sku) || "N/A"}</div>
-          ${txt(p.common) ? `<div class="meta"><strong>Common:</strong> ${txt(p.common)}</div>` : ""}
-          ${txt(p.genus) ? `<div class="meta"><strong>Genus:</strong> ${txt(p.genus)}</div>` : ""}
-          ${txt(p.category) ? `<div class="meta"><strong>Category:</strong> ${txt(p.category)}</div>` : ""}
-          <div class="meta"><strong>Light:</strong> ${txt(p.light) || "Not set"}</div>
-          ${txt(p.price) ? `<div class="meta"><strong>Price:</strong> ${txt(p.price)}</div>` : ""}
-          ${tags ? `<div class="tag-row">${tags}</div>` : ""}
-          ${txt(p.link) ? `<a class="link-btn" href="${txt(p.link)}" target="_blank" rel="noopener noreferrer">Open Product Page</a>` : ""}
+          <img
+            class="thumb"
+            src="${image || placeholderSvg(common || title)}"
+            alt="${title}"
+            onerror="this.src='${placeholderSvg(common || title)}'"
+          />
+          <div class="card-body">
+            <div class="card-title">${title}${size ? " " + size : ""}</div>
+            <div class="meta"><strong>SKU:</strong> ${sku}</div>
+            ${common ? `<div class="meta"><strong>Common:</strong> ${common}</div>` : ""}
+            ${genus ? `<div class="meta"><strong>Genus:</strong> ${genus}</div>` : ""}
+            ${category ? `<div class="meta"><strong>Category:</strong> ${category}</div>` : ""}
+            <div class="meta"><strong>Light:</strong> ${light}</div>
+            ${height ? `<div class="meta"><strong>Height:</strong> ${height}</div>` : ""}
+            ${width ? `<div class="meta"><strong>Width:</strong> ${width}</div>` : ""}
+            ${price ? `<div class="meta"><strong>Price:</strong> ${price}</div>` : ""}
+            ${tags ? `<div class="tag-row">${tags}</div>` : ""}
+            ${link ? `<a class="link-btn" href="${link}" target="_blank" rel="noopener noreferrer">Open Product Page</a>` : ""}
+          </div>
         `;
         els.results.appendChild(card);
       });
@@ -425,6 +548,7 @@
     els.color.addEventListener("change", render);
     els.sort.addEventListener("change", render);
     els.clear.addEventListener("click", clearFilters);
+    els.themeToggle.addEventListener("click", toggleTheme);
 
     els.chipSun.addEventListener("click", () => {
       state.light = state.light === "Sun" ? "" : "Sun";
@@ -468,6 +592,8 @@
       render();
     });
 
+    const savedTheme = localStorage.getItem("finderTheme") || "dark";
+    applyTheme(savedTheme);
     loadPlants();
   </script>
 </body>
