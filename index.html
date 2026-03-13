@@ -6,119 +6,159 @@
   <title>Suburban Perennials Finder</title>
   <style>
     :root {
-      --bg: #f5f5f5;
+      --bg: #f6f6f4;
       --card: #ffffff;
-      --text: #222222;
-      --muted: #666666;
-      --border: #dddddd;
-      --button: #333333;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --green: #2f4f2f;
+      --green-2: #5d7a5d;
+      --chip: #eef4ee;
+      --chip-active: #2f4f2f;
+      --chip-active-text: #ffffff;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 20px;
+      padding: 16px;
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, Arial, sans-serif;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
     h1 {
-      font-size: 2.5rem;
+      margin: 0 0 14px;
+      font-size: 2rem;
       line-height: 1.05;
-      margin: 0 0 20px;
     }
 
     .panel,
-    .plant {
+    .card {
       background: var(--card);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      margin-bottom: 14px;
     }
 
-    input[type="text"],
+    .search-box {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 17px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: white;
+    }
+
+    .chip-row,
+    .tag-row,
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .chip-btn,
+    .action-btn {
+      border: 1px solid var(--border);
+      background: var(--chip);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .chip-btn.active {
+      background: var(--chip-active);
+      color: var(--chip-active-text);
+      border-color: var(--chip-active);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
     select {
       width: 100%;
-      padding: 14px;
-      font-size: 16px;
+      padding: 12px 14px;
+      font-size: 15px;
       border: 1px solid var(--border);
-      border-radius: 10px;
-      margin-bottom: 12px;
+      border-radius: 12px;
       background: white;
       color: var(--text);
     }
 
-    .checkbox-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
-    .checkbox-row input {
-      width: 22px;
-      height: 22px;
-      margin: 0;
-    }
-
     .status {
+      color: var(--muted);
       font-size: 1rem;
+      line-height: 1.4;
     }
 
-    .plant-name {
-      font-size: 1.2rem;
+    .card-title {
+      font-size: 1.15rem;
       font-weight: 700;
       margin-bottom: 6px;
     }
 
-    .sku,
-    .meta,
-    .price,
-    .light {
+    .meta {
       color: var(--muted);
+      line-height: 1.45;
       margin-bottom: 4px;
-    }
-
-    .tags {
-      margin-top: 10px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      font-size: 0.96rem;
     }
 
     .tag {
       display: inline-block;
-      padding: 5px 9px;
+      background: var(--chip);
+      color: var(--green);
+      padding: 5px 10px;
       border-radius: 999px;
-      background: #eef3ee;
       font-size: 12px;
-      color: #2d3a2d;
     }
 
-    .button {
+    .link-btn {
       display: inline-block;
       margin-top: 12px;
-      padding: 10px 14px;
-      border-radius: 8px;
-      background: var(--button);
-      color: white;
       text-decoration: none;
+      background: var(--green);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
       font-weight: 600;
     }
 
-    .small {
-      font-size: 0.95rem;
-      color: var(--muted);
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 760px) {
+      .filters-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .results-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .results-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
   </style>
 </head>
@@ -127,151 +167,306 @@
     <h1>Suburban Perennials Finder</h1>
 
     <div class="panel">
-      <input id="search" type="text" placeholder="Search plant or SKU" />
+      <input
+        id="search"
+        class="search-box"
+        type="text"
+        placeholder="Search plant, SKU, common name, genus, category..."
+      />
 
-      <select id="light">
-        <option value="">All Light</option>
-        <option value="Sun">Sun</option>
-        <option value="Shade">Shade</option>
-      </select>
+      <div class="chip-row">
+        <button type="button" class="chip-btn" id="chipSun">Sun</button>
+        <button type="button" class="chip-btn" id="chipShade">Shade</button>
+        <button type="button" class="chip-btn" id="chipRoses">Roses</button>
+        <button type="button" class="chip-btn" id="chipDrought">Drought</button>
+        <button type="button" class="chip-btn" id="chipPollinator">Pollinator</button>
+        <button type="button" class="chip-btn" id="chipDeer">Deer Resistant</button>
+        <button type="button" class="chip-btn" id="chipNative">Native</button>
+      </div>
 
-      <div class="checkbox-row">
-        <input id="drought" type="checkbox" />
-        <label for="drought">Drought tolerant only</label>
+      <div class="filters-grid">
+        <select id="section">
+          <option value="">All Sections</option>
+          <option value="Perennials">Perennials</option>
+          <option value="Roses">Roses</option>
+        </select>
+
+        <select id="category">
+          <option value="">All Categories</option>
+        </select>
+
+        <select id="color">
+          <option value="">All Colors</option>
+        </select>
+
+        <select id="sort">
+          <option value="name">Sort: Name</option>
+          <option value="sku">Sort: SKU</option>
+          <option value="category">Sort: Category</option>
+          <option value="price">Sort: Price</option>
+        </select>
+      </div>
+
+      <div class="button-row" style="margin-top:12px;">
+        <button type="button" class="action-btn" id="clearFilters">Clear Filters</button>
       </div>
     </div>
 
     <div id="status" class="panel status">Loading plants…</div>
-
-    <div id="results"></div>
+    <div id="results" class="results-grid"></div>
   </div>
 
   <script>
     let plants = [];
 
-    const searchEl = document.getElementById("search");
-    const lightEl = document.getElementById("light");
-    const droughtEl = document.getElementById("drought");
-    const statusEl = document.getElementById("status");
-    const resultsEl = document.getElementById("results");
+    const els = {
+      search: document.getElementById("search"),
+      section: document.getElementById("section"),
+      category: document.getElementById("category"),
+      color: document.getElementById("color"),
+      sort: document.getElementById("sort"),
+      status: document.getElementById("status"),
+      results: document.getElementById("results"),
+      clear: document.getElementById("clearFilters"),
+      chipSun: document.getElementById("chipSun"),
+      chipShade: document.getElementById("chipShade"),
+      chipRoses: document.getElementById("chipRoses"),
+      chipDrought: document.getElementById("chipDrought"),
+      chipPollinator: document.getElementById("chipPollinator"),
+      chipDeer: document.getElementById("chipDeer"),
+      chipNative: document.getElementById("chipNative")
+    };
 
-    function text(value) {
-      return String(value ?? "");
+    const state = {
+      light: "",
+      sectionChip: "",
+      drought: false,
+      pollinator: false,
+      deer: false,
+      native: false
+    };
+
+    function txt(v) {
+      return String(v ?? "").trim();
     }
 
-    function bool(value) {
-      return value === true;
+    function bool(v) {
+      return v === true;
+    }
+
+    function priceValue(v) {
+      const m = txt(v).match(/\d+(?:\.\d{2})?/);
+      return m ? Number(m[0]) : Number.POSITIVE_INFINITY;
+    }
+
+    function setChipActive(el, on) {
+      el.classList.toggle("active", on);
+    }
+
+    function buildDropdowns() {
+      const categories = [...new Set(plants.map(p => txt(p.category)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+      const colors = [...new Set(plants.map(p => txt(p.color)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+
+      els.category.innerHTML = '<option value="">All Categories</option>';
+      categories.forEach(v => {
+        const o = document.createElement("option");
+        o.value = v;
+        o.textContent = v;
+        els.category.appendChild(o);
+      });
+
+      els.color.innerHTML = '<option value="">All Colors</option>';
+      colors.forEach(v => {
+        const o = document.createElement("option");
+        o.value = v;
+        o.textContent = v;
+        els.color.appendChild(o);
+      });
+    }
+
+    function clearFilters() {
+      els.search.value = "";
+      els.section.value = "";
+      els.category.value = "";
+      els.color.value = "";
+      els.sort.value = "name";
+
+      state.light = "";
+      state.sectionChip = "";
+      state.drought = false;
+      state.pollinator = false;
+      state.deer = false;
+      state.native = false;
+
+      syncChips();
+      render();
+    }
+
+    function syncChips() {
+      setChipActive(els.chipSun, state.light === "Sun");
+      setChipActive(els.chipShade, state.light === "Shade");
+      setChipActive(els.chipRoses, state.sectionChip === "Roses");
+      setChipActive(els.chipDrought, state.drought);
+      setChipActive(els.chipPollinator, state.pollinator);
+      setChipActive(els.chipDeer, state.deer);
+      setChipActive(els.chipNative, state.native);
     }
 
     function render() {
-      const search = text(searchEl.value).toLowerCase().trim();
-      const selectedLight = text(lightEl.value);
-      const droughtOnly = droughtEl.checked;
+      const search = txt(els.search.value).toLowerCase();
+      const sectionDropdown = txt(els.section.value);
+      const category = txt(els.category.value);
+      const color = txt(els.color.value);
+      const sort = txt(els.sort.value);
 
-      const filtered = plants.filter((plant) => {
-        const name = text(plant.name).toLowerCase();
-        const sku = text(plant.sku).toLowerCase();
-        const common = text(plant.common).toLowerCase();
-        const genus = text(plant.genus).toLowerCase();
-        const light = text(plant.light);
-        const drought = bool(plant.drought);
+      let filtered = plants.filter((p) => {
+        const name = txt(p.name).toLowerCase();
+        const sku = txt(p.sku).toLowerCase();
+        const common = txt(p.common).toLowerCase();
+        const genus = txt(p.genus).toLowerCase();
+        const categoryText = txt(p.category).toLowerCase();
+        const colorText = txt(p.color).toLowerCase();
+        const light = txt(p.light);
+        const section = txt(p.section);
 
         if (
           search &&
           !name.includes(search) &&
           !sku.includes(search) &&
           !common.includes(search) &&
-          !genus.includes(search)
-        ) {
-          return false;
-        }
+          !genus.includes(search) &&
+          !categoryText.includes(search) &&
+          !colorText.includes(search)
+        ) return false;
 
-        if (selectedLight && light !== selectedLight) {
-          return false;
-        }
+        if (sectionDropdown && section !== sectionDropdown) return false;
+        if (state.sectionChip && section !== state.sectionChip) return false;
+        if (state.light && light !== state.light) return false;
+        if (category && txt(p.category) !== category) return false;
+        if (color && txt(p.color) !== color) return false;
 
-        if (droughtOnly && !drought) {
-          return false;
-        }
+        if (state.drought && !bool(p.drought)) return false;
+        if (state.pollinator && !bool(p.pollinator)) return false;
+        if (state.deer && !bool(p.deer)) return false;
+        if (state.native && !bool(p.native)) return false;
 
         return true;
       });
 
-      resultsEl.innerHTML = "";
+      filtered.sort((a, b) => {
+        if (sort === "sku") return txt(a.sku).localeCompare(txt(b.sku), undefined, { numeric: true });
+        if (sort === "category") return txt(a.category).localeCompare(txt(b.category));
+        if (sort === "price") return priceValue(a.price) - priceValue(b.price);
+        return txt(a.name).localeCompare(txt(b.name));
+      });
+
+      els.results.innerHTML = "";
 
       if (plants.length === 0) {
-        statusEl.textContent = "No plant data loaded.";
+        els.status.textContent = "No plant data loaded.";
         return;
       }
 
       if (filtered.length === 0) {
-        statusEl.textContent = "No matching plants found.";
+        els.status.textContent = `No matching plants found. Loaded ${plants.length} plants.`;
         return;
       }
 
-      statusEl.textContent = `Showing ${filtered.length} of ${plants.length} plants`;
+      els.status.textContent = `Showing ${filtered.length} of ${plants.length} plants`;
 
-      filtered.forEach((plant) => {
-        const name = text(plant.name) || "Unnamed plant";
-        const size = text(plant.size);
-        const sku = text(plant.sku) || "N/A";
-        const light = text(plant.light) || "Unknown";
-        const price = text(plant.price);
-        const link = text(plant.link);
-        const common = text(plant.common);
-        const genus = text(plant.genus);
-
-        const tagHtml = [
-          bool(plant.drought) ? '<span class="tag">Drought</span>' : '',
-          bool(plant.pollinator) ? '<span class="tag">Pollinator</span>' : '',
-          bool(plant.deer) ? '<span class="tag">Deer resistant</span>' : '',
-          bool(plant.native) ? '<span class="tag">Native</span>' : ''
+      filtered.forEach((p) => {
+        const tags = [
+          bool(p.drought) ? '<span class="tag">Drought</span>' : '',
+          bool(p.pollinator) ? '<span class="tag">Pollinator</span>' : '',
+          bool(p.deer) ? '<span class="tag">Deer Resistant</span>' : '',
+          bool(p.native) ? '<span class="tag">Native</span>' : '',
+          txt(p.color) ? `<span class="tag">${txt(p.color)}</span>` : '',
+          txt(p.section) ? `<span class="tag">${txt(p.section)}</span>` : ''
         ].join("");
 
         const card = document.createElement("div");
-        card.className = "plant";
+        card.className = "card";
         card.innerHTML = `
-          <div class="plant-name">${name}${size ? " " + size : ""}</div>
-          <div class="sku">SKU: ${sku}</div>
-          ${common ? `<div class="meta">Common: ${common}</div>` : ""}
-          ${genus ? `<div class="meta">Genus: ${genus}</div>` : ""}
-          <div class="light">Light: ${light}</div>
-          ${price ? `<div class="price">Price: ${price}</div>` : `<div class="small">No price listed</div>`}
-          ${tagHtml ? `<div class="tags">${tagHtml}</div>` : ""}
-          ${link ? `<a class="button" href="${link}" target="_blank" rel="noopener noreferrer">Open product page</a>` : `<div class="small">No product link</div>`}
+          <div class="card-title">${txt(p.name) || "Unnamed plant"}${txt(p.size) ? " " + txt(p.size) : ""}</div>
+          <div class="meta"><strong>SKU:</strong> ${txt(p.sku) || "N/A"}</div>
+          ${txt(p.common) ? `<div class="meta"><strong>Common:</strong> ${txt(p.common)}</div>` : ""}
+          ${txt(p.genus) ? `<div class="meta"><strong>Genus:</strong> ${txt(p.genus)}</div>` : ""}
+          ${txt(p.category) ? `<div class="meta"><strong>Category:</strong> ${txt(p.category)}</div>` : ""}
+          <div class="meta"><strong>Light:</strong> ${txt(p.light) || "Not set"}</div>
+          ${txt(p.price) ? `<div class="meta"><strong>Price:</strong> ${txt(p.price)}</div>` : ""}
+          ${tags ? `<div class="tag-row">${tags}</div>` : ""}
+          ${txt(p.link) ? `<a class="link-btn" href="${txt(p.link)}" target="_blank" rel="noopener noreferrer">Open Product Page</a>` : ""}
         `;
-        resultsEl.appendChild(card);
+        els.results.appendChild(card);
       });
     }
 
     async function loadPlants() {
       try {
-        statusEl.textContent = "Loading plants…";
-
+        els.status.textContent = "Loading plants…";
         const response = await fetch("./plants.json", { cache: "no-store" });
-
-        if (!response.ok) {
-          throw new Error(`Could not load plants.json (HTTP ${response.status})`);
-        }
-
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
-
-        if (!Array.isArray(data)) {
-          throw new Error("plants.json is not an array");
-        }
-
+        if (!Array.isArray(data)) throw new Error("plants.json is not an array");
         plants = data;
+        buildDropdowns();
+        syncChips();
         render();
-      } catch (error) {
-        console.error(error);
-        statusEl.textContent = `Failed to load plants.json: ${error.message}`;
-        resultsEl.innerHTML = "";
+      } catch (err) {
+        console.error(err);
+        els.status.textContent = `Failed to load plants.json: ${err.message}`;
+        els.results.innerHTML = "";
       }
     }
 
-    searchEl.addEventListener("input", render);
-    lightEl.addEventListener("change", render);
-    droughtEl.addEventListener("change", render);
+    els.search.addEventListener("input", render);
+    els.section.addEventListener("change", render);
+    els.category.addEventListener("change", render);
+    els.color.addEventListener("change", render);
+    els.sort.addEventListener("change", render);
+    els.clear.addEventListener("click", clearFilters);
+
+    els.chipSun.addEventListener("click", () => {
+      state.light = state.light === "Sun" ? "" : "Sun";
+      syncChips();
+      render();
+    });
+
+    els.chipShade.addEventListener("click", () => {
+      state.light = state.light === "Shade" ? "" : "Shade";
+      syncChips();
+      render();
+    });
+
+    els.chipRoses.addEventListener("click", () => {
+      state.sectionChip = state.sectionChip === "Roses" ? "" : "Roses";
+      syncChips();
+      render();
+    });
+
+    els.chipDrought.addEventListener("click", () => {
+      state.drought = !state.drought;
+      syncChips();
+      render();
+    });
+
+    els.chipPollinator.addEventListener("click", () => {
+      state.pollinator = !state.pollinator;
+      syncChips();
+      render();
+    });
+
+    els.chipDeer.addEventListener("click", () => {
+      state.deer = !state.deer;
+      syncChips();
+      render();
+    });
+
+    els.chipNative.addEventListener("click", () => {
+      state.native = !state.native;
+      syncChips();
+      render();
+    });
 
     loadPlants();
   </script>
