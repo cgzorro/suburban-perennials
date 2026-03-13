@@ -60,7 +60,14 @@
     .brand-block {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
+    }
+
+    .eyebrow-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .eyebrow {
@@ -69,6 +76,27 @@
       text-transform: uppercase;
       color: var(--green-2);
       font-weight: 700;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--chip);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+    }
+
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      display: inline-block;
     }
 
     h1 {
@@ -234,6 +262,24 @@
       margin-top: 6px;
     }
 
+    #scannerWrap {
+      display: none;
+      margin-top: 12px;
+    }
+
+    #scannerVideo {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    .scanner-note {
+      font-size: .9rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
     @media (min-width: 760px) {
       .filters-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -255,9 +301,12 @@
   <div class="container">
     <div class="topbar">
       <div class="brand-block">
-        <div class="eyebrow">Suburban Demo • White Label Plant Finder</div>
+        <div class="eyebrow-row">
+          <div class="eyebrow">Internal Demo • White Label Inventory Tool</div>
+          <div class="brand-badge"><span class="brand-dot"></span> Suburban Prototype</div>
+        </div>
         <h1>Suburban Plant Finder</h1>
-        <div class="subhead">Mobile-ready product finder for perennials, roses, and specialty plant inventory.</div>
+        <div class="subhead">Mobile-ready plant lookup for perennials, roses, and specialty inventory across locations.</div>
       </div>
       <button id="themeToggle" class="theme-toggle" type="button">🌙 Dark Mode</button>
     </div>
@@ -305,6 +354,12 @@
 
       <div class="button-row" style="margin-top:12px;">
         <button type="button" class="action-btn" id="clearFilters">Clear Filters</button>
+        <button type="button" class="action-btn" id="toggleScanner">Scan SKU</button>
+      </div>
+
+      <div id="scannerWrap">
+        <video id="scannerVideo" autoplay playsinline></video>
+        <div class="scanner-note">Camera-based scan works best on phones that support barcode detection in the browser. If not, paste/type the SKU in the search box.</div>
       </div>
 
       <div class="subtle">
@@ -318,6 +373,9 @@
 
   <script>
     let plants = [];
+    let scannerStream = null;
+    let scannerActive = false;
+    let scanInterval = null;
 
     const els = {
       search: document.getElementById("search"),
@@ -335,7 +393,10 @@
       chipPollinator: document.getElementById("chipPollinator"),
       chipDeer: document.getElementById("chipDeer"),
       chipNative: document.getElementById("chipNative"),
-      themeToggle: document.getElementById("themeToggle")
+      themeToggle: document.getElementById("themeToggle"),
+      toggleScanner: document.getElementById("toggleScanner"),
+      scannerWrap: document.getElementById("scannerWrap"),
+      scannerVideo: document.getElementById("scannerVideo")
     };
 
     const state = {
@@ -547,6 +608,75 @@
       });
     }
 
+    async function startScanner() {
+      if (!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia) {
+        alert("Barcode scanning is not supported in this browser. Use the search box to enter a SKU.");
+        return;
+      }
+
+      try {
+        scannerStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" }
+        });
+
+        els.scannerVideo.srcObject = scannerStream;
+        els.scannerWrap.style.display = "block";
+        scannerActive = true;
+        els.toggleScanner.textContent = "Stop Scanner";
+
+        const detector = new BarcodeDetector({
+          formats: ["code_128", "ean_13", "ean_8", "upc_a", "upc_e"]
+        });
+
+        scanInterval = setInterval(async () => {
+          if (!scannerActive) return;
+          try {
+            const barcodes = await detector.detect(els.scannerVideo);
+            if (barcodes.length > 0) {
+              const raw = barcodes[0].rawValue || "";
+              if (raw) {
+                els.search.value = raw;
+                render();
+                stopScanner();
+              }
+            }
+          } catch (e) {
+            // ignore intermittent scan errors
+          }
+        }, 800);
+
+      } catch (err) {
+        console.error(err);
+        alert("Could not access the camera for scanning.");
+      }
+    }
+
+    function stopScanner() {
+      scannerActive = false;
+      els.scannerWrap.style.display = "none";
+      els.toggleScanner.textContent = "Scan SKU";
+
+      if (scanInterval) {
+        clearInterval(scanInterval);
+        scanInterval = null;
+      }
+
+      if (scannerStream) {
+        scannerStream.getTracks().forEach(track => track.stop());
+        scannerStream = null;
+      }
+
+      els.scannerVideo.srcObject = null;
+    }
+
+    function toggleScanner() {
+      if (scannerActive) {
+        stopScanner();
+      } else {
+        startScanner();
+      }
+    }
+
     async function loadPlants() {
       try {
         els.status.textContent = "Loading plants…";
@@ -572,6 +702,7 @@
     els.sort.addEventListener("change", render);
     els.clear.addEventListener("click", clearFilters);
     els.themeToggle.addEventListener("click", toggleTheme);
+    els.toggleScanner.addEventListener("click", toggleScanner);
 
     els.chipSun.addEventListener("click", () => {
       state.light = state.light === "Sun" ? "" : "Sun";
