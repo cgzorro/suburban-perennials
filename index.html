@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -285,6 +284,24 @@
       margin-top: 6px;
     }
 
+    #scannerWrap {
+      display: none;
+      margin-top: 12px;
+    }
+
+    #scannerVideo {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    .scanner-note {
+      font-size: .9rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
     @media (min-width: 760px) {
       .filters-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -345,7 +362,7 @@
         </select>
 
         <select id="category">
-          <option value="">All Categories</option>
+          <option value="">All Plant Groups</option>
         </select>
 
         <select id="color">
@@ -361,6 +378,14 @@
 
       <div class="button-row" style="margin-top:12px;">
         <button type="button" class="action-btn" id="clearFilters">Clear Filters</button>
+        <button type="button" class="action-btn" id="toggleScanner">Scan SKU</button>
+      </div>
+
+      <div id="scannerWrap">
+        <video id="scannerVideo" autoplay playsinline></video>
+        <div class="scanner-note">
+          Camera-based scan works best on phones that support barcode detection in the browser. If not, type the SKU in the search box.
+        </div>
       </div>
 
       <div class="subtle">
@@ -374,6 +399,9 @@
 
   <script>
     let plants = [];
+    let scannerStream = null;
+    let scannerActive = false;
+    let scanInterval = null;
 
     const els = {
       search: document.getElementById("search"),
@@ -391,7 +419,10 @@
       chipPollinator: document.getElementById("chipPollinator"),
       chipDeer: document.getElementById("chipDeer"),
       chipNative: document.getElementById("chipNative"),
-      themeToggle: document.getElementById("themeToggle")
+      themeToggle: document.getElementById("themeToggle"),
+      toggleScanner: document.getElementById("toggleScanner"),
+      scannerWrap: document.getElementById("scannerWrap"),
+      scannerVideo: document.getElementById("scannerVideo")
     };
 
     const state = {
@@ -473,7 +504,7 @@
       const colors = [...new Set(plants.map(p => txt(p.color)).filter(Boolean))]
         .sort((a,b)=>a.localeCompare(b));
 
-      els.category.innerHTML = '<option value="">All Categories</option>';
+      els.category.innerHTML = '<option value="">All Plant Groups</option>';
       categories.forEach(([raw, clean]) => {
         const o = document.createElement("option");
         o.value = raw;
@@ -656,6 +687,73 @@
       });
     }
 
+    async function startScanner() {
+      if (!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia) {
+        alert("Barcode scanning is not supported in this browser. Use the search box to enter a SKU.");
+        return;
+      }
+
+      try {
+        scannerStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" }
+        });
+
+        els.scannerVideo.srcObject = scannerStream;
+        els.scannerWrap.style.display = "block";
+        scannerActive = true;
+        els.toggleScanner.textContent = "Stop Scanner";
+
+        const detector = new BarcodeDetector({
+          formats: ["code_128", "ean_13", "ean_8", "upc_a", "upc_e"]
+        });
+
+        scanInterval = setInterval(async () => {
+          if (!scannerActive) return;
+          try {
+            const barcodes = await detector.detect(els.scannerVideo);
+            if (barcodes.length > 0) {
+              const raw = barcodes[0].rawValue || "";
+              if (raw) {
+                els.search.value = raw.trim();
+                els.search.dispatchEvent(new Event("input", { bubbles: true }));
+                stopScanner();
+              }
+            }
+          } catch (e) {}
+        }, 800);
+
+      } catch (err) {
+        console.error(err);
+        alert("Could not access the camera for scanning.");
+      }
+    }
+
+    function stopScanner() {
+      scannerActive = false;
+      els.scannerWrap.style.display = "none";
+      els.toggleScanner.textContent = "Scan SKU";
+
+      if (scanInterval) {
+        clearInterval(scanInterval);
+        scanInterval = null;
+      }
+
+      if (scannerStream) {
+        scannerStream.getTracks().forEach(track => track.stop());
+        scannerStream = null;
+      }
+
+      els.scannerVideo.srcObject = null;
+    }
+
+    function toggleScanner() {
+      if (scannerActive) {
+        stopScanner();
+      } else {
+        startScanner();
+      }
+    }
+
     els.search.addEventListener("input", render);
     els.section.addEventListener("change", render);
     els.category.addEventListener("change", render);
@@ -663,6 +761,7 @@
     els.sort.addEventListener("change", render);
     els.clear.addEventListener("click", clearFilters);
     els.themeToggle.addEventListener("click", toggleTheme);
+    els.toggleScanner.addEventListener("click", toggleScanner);
 
     els.chipSun.addEventListener("click", () => {
       state.light = state.light === "Sun" ? "" : "Sun";
