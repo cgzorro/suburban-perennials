@@ -16,7 +16,7 @@
       --chip: #eef4ee;
       --chip-active: #2f4f2f;
       --chip-active-text: #ffffff;
-      --shadow: 0 2px 10px rgba(0,0,0,.08);
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     }
 
     body.dark {
@@ -30,10 +30,12 @@
       --chip: #243224;
       --chip-active: #8fc48f;
       --chip-active-text: #111827;
-      --shadow: 0 2px 12px rgba(0,0,0,.35);
+      --shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -41,7 +43,7 @@
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, Arial, sans-serif;
-      transition: background .2s ease, color .2s ease;
+      transition: background 0.2s ease, color 0.2s ease;
       position: relative;
       overflow-x: hidden;
     }
@@ -72,23 +74,35 @@
     }
 
     .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
       margin-bottom: 18px;
       padding-bottom: 14px;
-      border-bottom: 3px solid rgba(47,79,47,0.16);
+      border-bottom: 3px solid rgba(47, 79, 47, 0.16);
     }
 
     body.dark .topbar {
-      border-bottom-color: rgba(143,196,143,0.18);
+      border-bottom-color: rgba(143, 196, 143, 0.18);
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .theme-toggle {
+        justify-self: start;
+      }
     }
 
     .brand-block {
       display: flex;
       flex-direction: column;
       gap: 8px;
+      min-width: 0;
     }
 
     .eyebrow {
@@ -100,9 +114,12 @@
     }
 
     .brand-inline {
-      display: inline-flex;
+      display: grid;
+      grid-template-columns: auto 1fr;
       align-items: center;
       gap: 10px;
+      min-width: 0;
+      width: 100%;
     }
 
     .brand-thumb {
@@ -110,20 +127,22 @@
       height: 34px;
       object-fit: contain;
       border-radius: 8px;
-      background: rgba(255,255,255,0.72);
+      background: rgba(255, 255, 255, 0.72);
       border: 1px solid var(--border);
       padding: 4px;
-      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      flex: 0 0 auto;
     }
 
     body.dark .brand-thumb {
-      background: rgba(255,255,255,0.06);
+      background: rgba(255, 255, 255, 0.06);
     }
 
     h1 {
       margin: 0;
-      font-size: 2rem;
+      font-size: clamp(1.7rem, 4vw, 2rem);
       line-height: 1.05;
+      overflow-wrap: anywhere;
     }
 
     .subhead {
@@ -279,7 +298,7 @@
     }
 
     .subtle {
-      font-size: .9rem;
+      font-size: 0.9rem;
       color: var(--muted);
       margin-top: 6px;
     }
@@ -297,7 +316,7 @@
     }
 
     .scanner-note {
-      font-size: .9rem;
+      font-size: 0.9rem;
       color: var(--muted);
       margin-top: 8px;
     }
@@ -492,17 +511,18 @@
     function buildDropdowns() {
       const categoryMap = new Map();
 
-      plants.forEach(p => {
+      plants.forEach((p) => {
         const raw = txt(p.category);
         const clean = cleanCategoryLabel(raw);
         if (raw && clean) categoryMap.set(raw, clean);
       });
 
-      const categories = [...categoryMap.entries()]
-        .sort((a, b) => a[1].localeCompare(b[1]));
+      const categories = [...categoryMap.entries()].sort((a, b) =>
+        a[1].localeCompare(b[1])
+      );
 
-      const colors = [...new Set(plants.map(p => txt(p.color)).filter(Boolean))]
-        .sort((a,b)=>a.localeCompare(b));
+      const colors = [...new Set(plants.map((p) => txt(p.color)).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b));
 
       els.category.innerHTML = '<option value="">All Plant Groups</option>';
       categories.forEach(([raw, clean]) => {
@@ -513,7 +533,7 @@
       });
 
       els.color.innerHTML = '<option value="">All Colors</option>';
-      colors.forEach(v => {
+      colors.forEach((v) => {
         const o = document.createElement("option");
         o.value = v;
         o.textContent = v;
@@ -619,8 +639,12 @@
       });
 
       filtered.sort((a, b) => {
-        if (sort === "sku") return txt(a.sku).localeCompare(txt(b.sku), undefined, { numeric: true });
-        if (sort === "price") return priceValue(a.price) - priceValue(b.price);
+        if (sort === "sku") {
+          return txt(a.sku).localeCompare(txt(b.sku), undefined, { numeric: true });
+        }
+        if (sort === "price") {
+          return priceValue(a.price) - priceValue(b.price);
+        }
         return txt(a.name).localeCompare(txt(b.name));
       });
 
@@ -721,7 +745,6 @@
             }
           } catch (e) {}
         }, 800);
-
       } catch (err) {
         console.error(err);
         alert("Could not access the camera for scanning.");
@@ -739,7 +762,7 @@
       }
 
       if (scannerStream) {
-        scannerStream.getTracks().forEach(track => track.stop());
+        scannerStream.getTracks().forEach((track) => track.stop());
         scannerStream = null;
       }
 
