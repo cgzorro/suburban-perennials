@@ -405,7 +405,7 @@
 
     @media (min-width: 760px) {
       .filters-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
       }
 
       .results-grid {
@@ -415,7 +415,7 @@
 
     @media (min-width: 1100px) {
       .filters-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
       }
 
       .results-grid {
@@ -465,14 +465,6 @@
       <div class="filter-section">
         <div class="filter-label">Browse Filters</div>
         <div class="filters-grid">
-          <div class="select-wrap">
-            <select id="section">
-              <option value="">All Sections</option>
-              <option value="Perennials">Perennials</option>
-              <option value="Roses">Roses</option>
-            </select>
-          </div>
-
           <div class="select-wrap">
             <select id="plantGroup">
               <option value="">All Plant Groups</option>
@@ -552,11 +544,9 @@
 
     const els = {
       search: document.getElementById("search"),
-      section: document.getElementById("section"),
       plantGroup: document.getElementById("plantGroup"),
       color: document.getElementById("color"),
       heightBucket: document.getElementById("heightBucket"),
-      sort: { value: "name" },
       status: document.getElementById("status"),
       results: document.getElementById("results"),
       clear: document.getElementById("clearFilters"),
@@ -749,7 +739,6 @@
 
     function clearFilters() {
       els.search.value = "";
-      els.section.value = "";
       els.plantGroup.value = "";
       els.color.value = "";
       els.heightBucket.value = "";
@@ -813,7 +802,6 @@
 
     function render() {
       const search = txt(els.search.value).toLowerCase();
-      const sectionDropdown = txt(els.section.value);
       const plantGroup = txt(els.plantGroup.value);
       const color = txt(els.color.value);
       const heightBucket = txt(els.heightBucket.value);
@@ -827,10 +815,10 @@
         const groupText = cleanPlantGroup(p).toLowerCase();
         const colorText = txt(p.color).toLowerCase();
         const light = txt(p.light);
-        const section = txt(p.section);
         const image = txt(p.image);
         const price = txt(p.price);
         const link = txt(p.link);
+        const section = txt(p.section);
 
         const normalizedSearch = normalizeScanValue(search);
         const normalizedSku = normalizeScanValue(p.sku);
@@ -849,9 +837,8 @@
           !(searchDigits && skuDigits.includes(searchDigits))
         ) return false;
 
-        if (sectionDropdown && section !== sectionDropdown) return false;
-        if (state.sectionChip && section !== state.sectionChip) return false;
         if (state.light && light !== state.light) return false;
+        if (state.sectionChip && section !== state.sectionChip && groupText !== state.sectionChip.toLowerCase()) return false;
         if (plantGroup && cleanPlantGroup(p) !== plantGroup) return false;
         if (color && txt(p.color) !== color) return false;
         if (!inHeightBucket(txt(p.height), heightBucket)) return false;
@@ -908,7 +895,6 @@
         const price = txt(p.price);
         const height = txt(p.height);
         const width = txt(p.width);
-        const section = txt(p.section);
         const link = txt(p.link);
         const group = cleanPlantGroup(p);
 
@@ -921,7 +907,6 @@
           bool(p.deer) ? '<span class="tag">Deer Resistant</span>' : '',
           bool(p.native) ? '<span class="tag">Native</span>' : '',
           txt(p.color) ? `<span class="tag">${txt(p.color)}</span>` : '',
-          section ? `<span class="tag">${section}</span>` : '',
           group ? `<span class="tag">${group}</span>` : ''
         ].join("");
 
@@ -1032,7 +1017,6 @@
     }
 
     els.search.addEventListener("input", render);
-    els.section.addEventListener("change", render);
     els.plantGroup.addEventListener("change", render);
     els.color.addEventListener("change", render);
     els.heightBucket.addEventListener("change", render);
