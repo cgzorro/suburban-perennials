@@ -1,281 +1,833 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Suburban Plant Explorer</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suburban Plant Finder</title>
+  <style>
+    :root {
+      --bg: #111827;
+      --panel: #1f2937;
+      --panel-2: #243247;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --border: #374151;
+      --chip: #243224;
+      --chip-active: #8fc48f;
+      --chip-active-text: #111827;
+      --green: #8fc48f;
+      --green-dark: #203320;
+      --shadow: 0 8px 30px rgba(0,0,0,.28);
+      --radius: 18px;
+    }
 
-<style>
+    * { box-sizing: border-box; }
 
-:root{
-  --bg:#1e2736;
-  --panel:#243247;
-  --accent:#3e65c7;
-  --green:#2e4d2a;
-  --text:#e7edf7;
-  --muted:#94a3b8;
-}
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
 
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 24px;
+    }
 
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:20px;
-}
+    .topbar {
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid rgba(143,196,143,.12);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
 
-.panel{
-  background:var(--panel);
-  border-radius:16px;
-  padding:20px;
-  margin-bottom:20px;
-  overflow:visible;
-}
+    .eyebrow {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
 
-.search-box{
-  width:100%;
-  padding:14px;
-  font-size:16px;
-  border-radius:10px;
-  border:none;
-  margin-bottom:20px;
-}
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      line-height: 1.05;
+    }
 
-.filter-section{
-  margin-top:18px;
-}
+    .subhead {
+      margin-top: 8px;
+      color: var(--muted);
+      max-width: 780px;
+      line-height: 1.4;
+    }
 
-.filter-section:first-of-type{
-  margin-top:0;
-}
+    .theme-toggle {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
 
-.filter-label{
-  font-size:12px;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  color:var(--muted);
-  margin-bottom:8px;
-  font-weight:700;
-}
+    .panel {
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 20px;
+      overflow: visible;
+      margin-bottom: 18px;
+    }
 
-.filters-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:16px;
-  margin-bottom:20px;
-}
+    .search-box {
+      width: 100%;
+      min-height: 56px;
+      padding: 14px 16px;
+      background: rgba(17,24,39,.65);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font-size: 17px;
+      outline: none;
+    }
 
-.select-wrap select{
-  width:100%;
-  padding:14px;
-  border-radius:10px;
-  border:none;
-  font-size:16px;
-}
+    .search-box::placeholder { color: var(--muted); }
 
-.chip-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
+    .filter-section { margin-top: 18px; }
+    .filter-section:first-of-type { margin-top: 0; }
 
-.chip-btn{
-  padding:10px 14px;
-  border-radius:20px;
-  border:none;
-  background:#334155;
-  color:white;
-  cursor:pointer;
-}
+    .filter-label {
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
 
-.meta-bar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  margin-top:16px;
-}
+    .chip-row,
+    .meta-bar,
+    .button-row,
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-.pill{
-  padding:10px 14px;
-  border-radius:20px;
-  border:none;
-  background:var(--green);
-  color:white;
-  cursor:pointer;
-}
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
 
-.button-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  margin-top:18px;
-}
+    .select-wrap { min-width: 0; }
 
-.action-btn{
-  padding:12px 18px;
-  border:none;
-  border-radius:20px;
-  background:var(--green);
-  color:white;
-  cursor:pointer;
-}
+    select {
+      width: 100%;
+      min-height: 56px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(17,24,39,.65);
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+    }
 
-.subtle{
-  margin-top:16px;
-  font-size:14px;
-  color:var(--muted);
-}
+    .chip-btn,
+    .pill,
+    .action-btn,
+    .link-btn,
+    .icon-btn {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: .15s ease;
+    }
 
-.cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:20px;
-}
+    .chip-btn,
+    .pill,
+    .action-btn {
+      background: var(--chip);
+      color: var(--text);
+      padding: 11px 15px;
+    }
 
-.card{
-  background:#27364d;
-  border-radius:16px;
-  padding:16px;
-}
+    .chip-btn.active,
+    .pill.active,
+    .action-btn.active {
+      background: var(--chip-active);
+      color: var(--chip-active-text);
+      border-color: var(--chip-active);
+    }
 
-.card img{
-  width:100%;
-  border-radius:10px;
-}
+    .status {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 1rem;
+    }
 
-.card h3{
-  margin:12px 0 6px 0;
-}
+    .subtle {
+      color: var(--muted);
+      font-size: .95rem;
+      margin-top: 12px;
+      line-height: 1.45;
+    }
 
-.card .price{
-  color:#a5e3a1;
-}
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
 
-@media(min-width:760px){
+    .card {
+      background: linear-gradient(180deg, #243247, #1f2937);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
 
-.filters-grid{
-  grid-template-columns:repeat(3,1fr);
-}
+    .thumb {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      display: block;
+      background: #273244;
+    }
 
-}
+    .card-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
 
-</style>
+    .card-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: 1.12rem;
+      line-height: 1.3;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      background: rgba(17,24,39,.7);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 12px;
+    }
+
+    .meta {
+      color: #d1d5db;
+      font-size: .96rem;
+      line-height: 1.42;
+    }
+
+    .price {
+      color: var(--green);
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--chip);
+      color: var(--green);
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(143,196,143,.15);
+    }
+
+    .link-btn {
+      display: inline-block;
+      align-self: flex-start;
+      text-decoration: none;
+      background: var(--chip-active);
+      color: #0f172a;
+      padding: 11px 15px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    #scannerWrap { display: none; margin-top: 16px; }
+    #scannerVideo {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    .section-header {
+      margin: 0 0 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    @media (min-width: 760px) {
+      .filters-grid { grid-template-columns: repeat(3, 1fr); }
+      .results-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 1100px) {
+      .results-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <div class="eyebrow">Internal Demo • Inventory Explorer</div>
+        <h1>Suburban Plant Finder</h1>
+        <div class="subhead">Search, filter, compare, and scan plant inventory from the cleaned product catalog.</div>
+      </div>
+      <button id="themeToggle" class="theme-toggle" type="button">Dark UI</button>
+    </div>
 
-<div class="container">
+    <div class="panel">
+      <input id="search" class="search-box" type="text" placeholder="Search plant, SKU, common name, genus..." />
 
-<div class="panel">
+      <div class="filter-section">
+        <div class="filter-label">Quick Traits</div>
+        <div class="chip-row">
+          <button type="button" class="chip-btn" id="chipSun">Sun</button>
+          <button type="button" class="chip-btn" id="chipShade">Shade</button>
+          <button type="button" class="chip-btn" id="chipRoses">Roses</button>
+          <button type="button" class="chip-btn" id="chipDrought">Drought</button>
+          <button type="button" class="chip-btn" id="chipPollinator">Pollinator</button>
+          <button type="button" class="chip-btn" id="chipDeer">Deer Resistant</button>
+          <button type="button" class="chip-btn" id="chipNative">Native</button>
+        </div>
+      </div>
 
-<input
-id="search"
-class="search-box"
-type="text"
-placeholder="Search plant, SKU, common name, genus..."
->
+      <div class="filter-section">
+        <div class="filter-label">Browse Filters</div>
+        <div class="filters-grid">
+          <div class="select-wrap">
+            <select id="plantGroup">
+              <option value="">All Plant Groups</option>
+            </select>
+          </div>
+          <div class="select-wrap">
+            <select id="color">
+              <option value="">All Colors</option>
+            </select>
+          </div>
+          <div class="select-wrap">
+            <select id="heightBucket">
+              <option value="">All Heights</option>
+              <option value="under12">Under 12&quot;</option>
+              <option value="12to24">12–24&quot;</option>
+              <option value="24to36">24–36&quot;</option>
+              <option value="36plus">36&quot;+</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-<!-- Quick Traits -->
+      <div class="filter-section">
+        <div class="filter-label">View Options</div>
+        <div class="meta-bar">
+          <button type="button" class="pill" id="onlyImages">Only With Images</button>
+          <button type="button" class="pill" id="onlyPriced">Only Priced Items</button>
+          <button type="button" class="pill" id="show24">24</button>
+          <button type="button" class="pill active" id="show48">48</button>
+          <button type="button" class="pill" id="show96">96</button>
+          <button type="button" class="pill" id="showAll">All</button>
+        </div>
+      </div>
 
-<div class="filter-section">
-<div class="filter-label">Quick Traits</div>
+      <div class="filter-section">
+        <div class="filter-label">Tools</div>
+        <div class="button-row">
+          <button type="button" class="action-btn" id="clearFilters">Clear Filters</button>
+          <button type="button" class="action-btn" id="showFavorites">Favorites</button>
+          <button type="button" class="action-btn" id="showCompare">Compare</button>
+          <button type="button" class="action-btn" id="toggleScanner">Scan SKU</button>
+        </div>
+      </div>
 
-<div class="chip-row">
-<button class="chip-btn">Sun</button>
-<button class="chip-btn">Shade</button>
-<button class="chip-btn">Roses</button>
-<button class="chip-btn">Drought</button>
-<button class="chip-btn">Pollinator</button>
-<button class="chip-btn">Deer Resistant</button>
-<button class="chip-btn">Native</button>
-</div>
+      <div id="scannerWrap">
+        <video id="scannerVideo" autoplay playsinline></video>
+        <div class="subtle">Camera-based scan works best on phones that support barcode detection in the browser. If not, type the SKU in the search box.</div>
+      </div>
 
-</div>
+      <div class="subtle">Tip: search by SKU like <strong>26170</strong>, common name like <strong>hosta</strong>, or genus like <strong>echinacea</strong>.</div>
+    </div>
 
-<!-- Browse Filters -->
+    <div id="status" class="panel status">Loading plants…</div>
 
-<div class="filter-section">
+    <div id="compareSection" class="panel" style="display:none;">
+      <div class="section-header">Compare Plants</div>
+      <div id="compareContent" class="subtle">No plants selected for comparison.</div>
+    </div>
 
-<div class="filter-label">Browse Filters</div>
+    <div id="results" class="results-grid"></div>
+  </div>
 
-<div class="filters-grid">
+  <script>
+    let plants = [];
+    let scannerStream = null;
+    let scannerActive = false;
+    let scanInterval = null;
 
-<div class="select-wrap">
-<select id="plantGroup">
-<option value="">All Plant Groups</option>
-</select>
-</div>
+    const FAVORITES_KEY = 'suburbanFinderFavorites';
+    const COMPARE_KEY = 'suburbanFinderCompare';
 
-<div class="select-wrap">
-<select id="color">
-<option value="">All Colors</option>
-</select>
-</div>
+    const els = {
+      search: document.getElementById('search'),
+      plantGroup: document.getElementById('plantGroup'),
+      color: document.getElementById('color'),
+      heightBucket: document.getElementById('heightBucket'),
+      status: document.getElementById('status'),
+      results: document.getElementById('results'),
+      clear: document.getElementById('clearFilters'),
+      chipSun: document.getElementById('chipSun'),
+      chipShade: document.getElementById('chipShade'),
+      chipRoses: document.getElementById('chipRoses'),
+      chipDrought: document.getElementById('chipDrought'),
+      chipPollinator: document.getElementById('chipPollinator'),
+      chipDeer: document.getElementById('chipDeer'),
+      chipNative: document.getElementById('chipNative'),
+      onlyImages: document.getElementById('onlyImages'),
+      onlyPriced: document.getElementById('onlyPriced'),
+      show24: document.getElementById('show24'),
+      show48: document.getElementById('show48'),
+      show96: document.getElementById('show96'),
+      showAll: document.getElementById('showAll'),
+      showFavorites: document.getElementById('showFavorites'),
+      showCompare: document.getElementById('showCompare'),
+      compareSection: document.getElementById('compareSection'),
+      compareContent: document.getElementById('compareContent'),
+      toggleScanner: document.getElementById('toggleScanner'),
+      scannerWrap: document.getElementById('scannerWrap'),
+      scannerVideo: document.getElementById('scannerVideo'),
+      themeToggle: document.getElementById('themeToggle')
+    };
 
-<div class="select-wrap">
-<select id="height">
-<option value="">All Heights</option>
-<option value="under12">Under 12"</option>
-<option value="12to24">12–24"</option>
-<option value="24to36">24–36"</option>
-<option value="36plus">36"+</option>
-</select>
-</div>
+    const state = {
+      light: '',
+      sectionChip: '',
+      drought: false,
+      pollinator: false,
+      deer: false,
+      native: false,
+      onlyImages: false,
+      onlyPriced: false,
+      limit: 48,
+      favoritesOnly: false
+    };
 
-</div>
-</div>
+    function txt(v) { return String(v ?? '').trim(); }
+    function digitsOnly(v) { return txt(v).replace(/\D/g, ''); }
+    function normalizeScanValue(v) { return txt(v).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+    function bool(v) { return v === true; }
+    function cleanPlantGroup(p) { return txt(p.plant_group || p.category); }
 
-<!-- View Options -->
+    function parseMaxInches(value) {
+      const v = txt(value).toLowerCase();
+      if (!v) return null;
+      const nums = [...v.matchAll(/(\d+(?:\.\d+)?)/g)].map(m => Number(m[1]));
+      if (!nums.length) return null;
+      let max = Math.max(...nums);
+      if (v.includes('ft') || v.includes('feet')) max *= 12;
+      return max;
+    }
 
-<div class="filter-section">
+    function inHeightBucket(heightValue, bucket) {
+      if (!bucket) return true;
+      const inches = parseMaxInches(heightValue);
+      if (inches == null) return false;
+      if (bucket === 'under12') return inches < 12;
+      if (bucket === '12to24') return inches >= 12 && inches <= 24;
+      if (bucket === '24to36') return inches > 24 && inches <= 36;
+      if (bucket === '36plus') return inches > 36;
+      return true;
+    }
 
-<div class="filter-label">View Options</div>
+    function getFavorites() {
+      try { return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'); }
+      catch { return []; }
+    }
 
-<div class="meta-bar">
+    function saveFavorites(list) {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
+    }
 
-<button class="pill">Only With Images</button>
-<button class="pill">Only Priced Items</button>
+    function getCompare() {
+      try { return JSON.parse(localStorage.getItem(COMPARE_KEY) || '[]'); }
+      catch { return []; }
+    }
 
-<button class="pill">24</button>
-<button class="pill">48</button>
-<button class="pill">96</button>
-<button class="pill">All</button>
+    function saveCompare(list) {
+      localStorage.setItem(COMPARE_KEY, JSON.stringify(list));
+    }
 
-</div>
+    function setActive(el, on) {
+      el.classList.toggle('active', on);
+    }
 
-</div>
+    function syncUI() {
+      setActive(els.chipSun, state.light === 'Sun');
+      setActive(els.chipShade, state.light === 'Shade');
+      setActive(els.chipRoses, state.sectionChip === 'Roses');
+      setActive(els.chipDrought, state.drought);
+      setActive(els.chipPollinator, state.pollinator);
+      setActive(els.chipDeer, state.deer);
+      setActive(els.chipNative, state.native);
+      setActive(els.onlyImages, state.onlyImages);
+      setActive(els.onlyPriced, state.onlyPriced);
+      setActive(els.showFavorites, state.favoritesOnly);
+      setActive(els.show24, state.limit === 24);
+      setActive(els.show48, state.limit === 48);
+      setActive(els.show96, state.limit === 96);
+      setActive(els.showAll, state.limit === Infinity);
+    }
 
-<!-- Tools -->
+    function placeholderSvg(label) {
+      const safe = encodeURIComponent(label || 'Plant');
+      return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 450'><rect width='600' height='450' fill='%23273244'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial,sans-serif' font-size='28' fill='%23e5e7eb'>${safe}</text></svg>`;
+    }
 
-<div class="filter-section">
+    function buildDropdowns() {
+      const groups = [...new Set(plants.map(p => cleanPlantGroup(p)).filter(Boolean))].sort((a,b) => a.localeCompare(b));
+      const colors = [...new Set(plants.map(p => txt(p.color)).filter(Boolean))].sort((a,b) => a.localeCompare(b));
 
-<div class="filter-label">Tools</div>
+      els.plantGroup.innerHTML = '<option value="">All Plant Groups</option>';
+      groups.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v;
+        o.textContent = v;
+        els.plantGroup.appendChild(o);
+      });
 
-<div class="button-row">
+      els.color.innerHTML = '<option value="">All Colors</option>';
+      colors.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v;
+        o.textContent = v;
+        els.color.appendChild(o);
+      });
+    }
 
-<button class="action-btn">Clear Filters</button>
-<button class="action-btn">Favorites</button>
-<button class="action-btn">Compare</button>
-<button class="action-btn">Scan SKU</button>
+    function toggleFavorite(link) {
+      const list = getFavorites();
+      const next = list.includes(link) ? list.filter(x => x !== link) : [...list, link];
+      saveFavorites(next);
+      render();
+    }
 
-</div>
+    function toggleCompare(link) {
+      let list = getCompare();
+      if (list.includes(link)) list = list.filter(x => x !== link);
+      else {
+        if (list.length >= 3) list.shift();
+        list.push(link);
+      }
+      saveCompare(list);
+      render();
+    }
 
-</div>
+    function renderCompare() {
+      const compareLinks = getCompare();
+      const selected = plants.filter(p => compareLinks.includes(txt(p.link)));
+      if (!selected.length) {
+        els.compareSection.style.display = 'none';
+        els.compareContent.innerHTML = '';
+        return;
+      }
+      els.compareSection.style.display = 'block';
+      els.compareContent.innerHTML = selected.map(p => `
+        <div style="padding:10px 0;border-top:1px solid var(--border);">
+          <strong>${txt(p.name)}</strong><br>
+          SKU: ${txt(p.sku) || 'N/A'}<br>
+          Light: ${txt(p.light) || 'Not set'}<br>
+          Height: ${txt(p.height) || '—'}<br>
+          Width: ${txt(p.width) || '—'}<br>
+          Price: ${txt(p.price) || '—'}<br>
+          Plant Group: ${cleanPlantGroup(p) || '—'}
+        </div>
+      `).join('');
+    }
 
-<div class="subtle">
-Tip: search by SKU like <b>26170</b>, common name like <b>hosta</b>, or genus like <b>echinacea</b>.
-</div>
+    function clearFilters() {
+      els.search.value = '';
+      els.plantGroup.value = '';
+      els.color.value = '';
+      els.heightBucket.value = '';
+      state.light = '';
+      state.sectionChip = '';
+      state.drought = false;
+      state.pollinator = false;
+      state.deer = false;
+      state.native = false;
+      state.onlyImages = false;
+      state.onlyPriced = false;
+      state.limit = 48;
+      state.favoritesOnly = false;
+      syncUI();
+      render();
+    }
 
-</div>
+    function render() {
+      const search = txt(els.search.value).toLowerCase();
+      const plantGroup = txt(els.plantGroup.value);
+      const color = txt(els.color.value);
+      const heightBucket = txt(els.heightBucket.value);
+      const favorites = getFavorites();
 
-<div id="plantCards" class="cards"></div>
+      let filtered = plants.filter(p => {
+        const name = txt(p.name).toLowerCase();
+        const sku = txt(p.sku).toLowerCase();
+        const common = txt(p.common).toLowerCase();
+        const genus = txt(p.genus).toLowerCase();
+        const groupText = cleanPlantGroup(p).toLowerCase();
+        const colorText = txt(p.color).toLowerCase();
+        const light = txt(p.light);
+        const image = txt(p.image);
+        const price = txt(p.price);
+        const link = txt(p.link);
 
-</div>
+        const normalizedSearch = normalizeScanValue(search);
+        const normalizedSku = normalizeScanValue(p.sku);
+        const searchDigits = digitsOnly(search);
+        const skuDigits = digitsOnly(p.sku);
 
+        if (
+          search &&
+          !name.includes(search) &&
+          !sku.includes(search) &&
+          !common.includes(search) &&
+          !genus.includes(search) &&
+          !groupText.includes(search) &&
+          !colorText.includes(search) &&
+          !(normalizedSearch && normalizedSku.includes(normalizedSearch)) &&
+          !(searchDigits && skuDigits.includes(searchDigits))
+        ) return false;
+
+        if (state.light && light !== state.light) return false;
+        if (state.sectionChip && groupText !== state.sectionChip.toLowerCase()) return false;
+        if (plantGroup && cleanPlantGroup(p) !== plantGroup) return false;
+        if (color && txt(p.color) !== color) return false;
+        if (!inHeightBucket(txt(p.height), heightBucket)) return false;
+        if (state.drought && !bool(p.drought)) return false;
+        if (state.pollinator && !bool(p.pollinator)) return false;
+        if (state.deer && !bool(p.deer)) return false;
+        if (state.native && !bool(p.native)) return false;
+        if (state.onlyImages && !image) return false;
+        if (state.onlyPriced && !price) return false;
+        if (state.favoritesOnly && !favorites.includes(link)) return false;
+        return true;
+      });
+
+      filtered.sort((a,b) => txt(a.name).localeCompare(txt(b.name)));
+      const totalMatches = filtered.length;
+      const visible = state.limit === Infinity ? filtered : filtered.slice(0, state.limit);
+      els.results.innerHTML = '';
+
+      if (plants.length === 0) {
+        els.status.textContent = 'No plant data loaded.';
+        renderCompare();
+        return;
+      }
+
+      if (totalMatches === 0) {
+        els.status.innerHTML = `No matching plants found. Loaded ${plants.length} plants.<div class="subtle">Try clearing Plant Group, Height, or Color — or search by common name or SKU.</div>`;
+        renderCompare();
+        return;
+      }
+
+      els.status.innerHTML = `Showing ${visible.length} of ${totalMatches} matching plants<div class="subtle">Catalog loaded: ${plants.length} total plants</div>`;
+
+      const compareLinks = getCompare();
+      const favoritesSet = new Set(favorites);
+
+      visible.forEach(p => {
+        const image = txt(p.image);
+        const title = txt(p.name) || 'Unnamed plant';
+        const sku = txt(p.sku) || 'N/A';
+        const size = txt(p.size);
+        const common = txt(p.common);
+        const genus = txt(p.genus);
+        const light = txt(p.light) || 'Not set';
+        const price = txt(p.price);
+        const height = txt(p.height);
+        const width = txt(p.width);
+        const link = txt(p.link);
+        const group = cleanPlantGroup(p);
+        const isFavorite = favoritesSet.has(link);
+        const inCompare = compareLinks.includes(link);
+
+        const tags = [
+          bool(p.drought) ? '<span class="tag">Drought</span>' : '',
+          bool(p.pollinator) ? '<span class="tag">Pollinator</span>' : '',
+          bool(p.deer) ? '<span class="tag">Deer Resistant</span>' : '',
+          bool(p.native) ? '<span class="tag">Native</span>' : '',
+          txt(p.color) ? `<span class="tag">${txt(p.color)}</span>` : '',
+          group ? `<span class="tag">${group}</span>` : ''
+        ].join('');
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img class="thumb" src="${image || placeholderSvg(common || title)}" alt="${title}" onerror="this.src='${placeholderSvg(common || title)}'" />
+          <div class="card-body">
+            <div class="card-topline">
+              <div class="card-title">${title}${size ? ' ' + size : ''}</div>
+              <div class="card-actions">
+                <button class="icon-btn ${isFavorite ? 'active' : ''}" data-favorite="${link}" title="Favorite">★</button>
+                <button class="icon-btn ${inCompare ? 'active' : ''}" data-compare="${link}" title="Compare">⇄</button>
+              </div>
+            </div>
+            <div class="meta"><strong>SKU:</strong> ${sku}</div>
+            ${common ? `<div class="meta"><strong>Common:</strong> ${common}</div>` : ''}
+            ${genus ? `<div class="meta"><strong>Genus:</strong> ${genus}</div>` : ''}
+            <div class="meta"><strong>Light:</strong> ${light}</div>
+            ${height ? `<div class="meta"><strong>Height:</strong> ${height}</div>` : ''}
+            ${width ? `<div class="meta"><strong>Width:</strong> ${width}</div>` : ''}
+            ${price ? `<div class="price">Price: ${price}</div>` : ''}
+            ${tags ? `<div class="tag-row">${tags}</div>` : ''}
+            ${link ? `<a class="link-btn" href="${link}" target="_blank" rel="noopener noreferrer">Open Product Page</a>` : ''}
+          </div>
+        `;
+        els.results.appendChild(card);
+      });
+
+      document.querySelectorAll('[data-favorite]').forEach(btn => btn.addEventListener('click', () => toggleFavorite(btn.dataset.favorite)));
+      document.querySelectorAll('[data-compare]').forEach(btn => btn.addEventListener('click', () => toggleCompare(btn.dataset.compare)));
+      renderCompare();
+    }
+
+    async function startScanner() {
+      if (!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia) {
+        alert('Barcode scanning is not supported in this browser. Use the search box to enter a SKU.');
+        return;
+      }
+      try {
+        scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        els.scannerVideo.srcObject = scannerStream;
+        els.scannerWrap.style.display = 'block';
+        scannerActive = true;
+        els.toggleScanner.textContent = 'Stop Scanner';
+
+        const detector = new BarcodeDetector({ formats: ['code_128', 'ean_13', 'ean_8', 'upc_a', 'upc_e'] });
+        scanInterval = setInterval(async () => {
+          if (!scannerActive) return;
+          try {
+            const barcodes = await detector.detect(els.scannerVideo);
+            if (barcodes.length > 0) {
+              const raw = barcodes[0].rawValue || '';
+              if (raw) {
+                els.search.value = raw.trim();
+                render();
+                stopScanner();
+              }
+            }
+          } catch {}
+        }, 800);
+      } catch {
+        alert('Could not access the camera for scanning.');
+      }
+    }
+
+    function stopScanner() {
+      scannerActive = false;
+      els.scannerWrap.style.display = 'none';
+      els.toggleScanner.textContent = 'Scan SKU';
+      if (scanInterval) {
+        clearInterval(scanInterval);
+        scanInterval = null;
+      }
+      if (scannerStream) {
+        scannerStream.getTracks().forEach(track => track.stop());
+        scannerStream = null;
+      }
+      els.scannerVideo.srcObject = null;
+    }
+
+    function toggleScanner() {
+      if (scannerActive) stopScanner();
+      else startScanner();
+    }
+
+    els.search.addEventListener('input', render);
+    els.plantGroup.addEventListener('change', render);
+    els.color.addEventListener('change', render);
+    els.heightBucket.addEventListener('change', render);
+    els.clear.addEventListener('click', clearFilters);
+    els.toggleScanner.addEventListener('click', toggleScanner);
+    els.themeToggle.addEventListener('click', () => document.body.classList.toggle('light-mode-disabled'));
+
+    els.onlyImages.addEventListener('click', () => { state.onlyImages = !state.onlyImages; syncUI(); render(); });
+    els.onlyPriced.addEventListener('click', () => { state.onlyPriced = !state.onlyPriced; syncUI(); render(); });
+    els.showFavorites.addEventListener('click', () => { state.favoritesOnly = !state.favoritesOnly; syncUI(); render(); });
+    els.showCompare.addEventListener('click', () => {
+      const showing = els.compareSection.style.display !== 'none';
+      els.compareSection.style.display = showing ? 'none' : 'block';
+      if (!showing) renderCompare();
+    });
+    els.show24.addEventListener('click', () => { state.limit = 24; syncUI(); render(); });
+    els.show48.addEventListener('click', () => { state.limit = 48; syncUI(); render(); });
+    els.show96.addEventListener('click', () => { state.limit = 96; syncUI(); render(); });
+    els.showAll.addEventListener('click', () => { state.limit = Infinity; syncUI(); render(); });
+    els.chipSun.addEventListener('click', () => { state.light = state.light === 'Sun' ? '' : 'Sun'; syncUI(); render(); });
+    els.chipShade.addEventListener('click', () => { state.light = state.light === 'Shade' ? '' : 'Shade'; syncUI(); render(); });
+    els.chipRoses.addEventListener('click', () => { state.sectionChip = state.sectionChip === 'Roses' ? '' : 'Roses'; syncUI(); render(); });
+    els.chipDrought.addEventListener('click', () => { state.drought = !state.drought; syncUI(); render(); });
+    els.chipPollinator.addEventListener('click', () => { state.pollinator = !state.pollinator; syncUI(); render(); });
+    els.chipDeer.addEventListener('click', () => { state.deer = !state.deer; syncUI(); render(); });
+    els.chipNative.addEventListener('click', () => { state.native = !state.native; syncUI(); render(); });
+
+    async function loadPlants() {
+      try {
+        els.status.textContent = 'Loading plants…';
+        const response = await fetch('./plants.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (!Array.isArray(data)) throw new Error('plants.json is not an array');
+        plants = data;
+        buildDropdowns();
+        syncUI();
+        render();
+      } catch (err) {
+        console.error(err);
+        els.status.textContent = `Failed to load plants.json: ${err.message}`;
+        els.results.innerHTML = '';
+      }
+    }
+
+    loadPlants();
+  </script>
 </body>
 </html>
