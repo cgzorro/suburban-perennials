@@ -1,81 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Suburban Plant Explorer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+:root{
+  --bg:#1e2736;
+  --panel:#243247;
+  --accent:#3e65c7;
+  --green:#2e4d2a;
+  --text:#e7edf7;
+  --muted:#94a3b8;
+}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+
+.panel{
+  background:var(--panel);
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:20px;
+  overflow:visible;
+}
+
+.search-box{
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  border-radius:10px;
+  border:none;
+  margin-bottom:20px;
+}
+
+.filter-section{
+  margin-top:18px;
+}
+
+.filter-section:first-of-type{
+  margin-top:0;
+}
+
+.filter-label{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--muted);
+  margin-bottom:8px;
+  font-weight:700;
+}
+
+.filters-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+  margin-bottom:20px;
+}
+
+.select-wrap select{
+  width:100%;
+  padding:14px;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
+
+.chip-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.chip-btn{
+  padding:10px 14px;
+  border-radius:20px;
+  border:none;
+  background:#334155;
+  color:white;
+  cursor:pointer;
+}
+
+.meta-bar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:16px;
+}
+
+.pill{
+  padding:10px 14px;
+  border-radius:20px;
+  border:none;
+  background:var(--green);
+  color:white;
+  cursor:pointer;
+}
+
+.button-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:18px;
+}
+
+.action-btn{
+  padding:12px 18px;
+  border:none;
+  border-radius:20px;
+  background:var(--green);
+  color:white;
+  cursor:pointer;
+}
+
+.subtle{
+  margin-top:16px;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:20px;
+}
+
+.card{
+  background:#27364d;
+  border-radius:16px;
+  padding:16px;
+}
+
+.card img{
+  width:100%;
+  border-radius:10px;
+}
+
+.card h3{
+  margin:12px 0 6px 0;
+}
+
+.card .price{
+  color:#a5e3a1;
+}
+
+@media(min-width:760px){
+
+.filters-grid{
+  grid-template-columns:repeat(3,1fr);
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
 <div class="panel">
-  <input
-    id="search"
-    class="search-box"
-    type="text"
-    placeholder="Search plant, SKU, common name, genus..."
-  />
 
-  <div class="filter-section">
-    <div class="filter-label">Quick Traits</div>
-    <div class="chip-row">
-      <button type="button" class="chip-btn" id="chipSun">Sun</button>
-      <button type="button" class="chip-btn" id="chipShade">Shade</button>
-      <button type="button" class="chip-btn" id="chipRoses">Roses</button>
-      <button type="button" class="chip-btn" id="chipDrought">Drought</button>
-      <button type="button" class="chip-btn" id="chipPollinator">Pollinator</button>
-      <button type="button" class="chip-btn" id="chipDeer">Deer Resistant</button>
-      <button type="button" class="chip-btn" id="chipNative">Native</button>
-    </div>
-  </div>
+<input
+id="search"
+class="search-box"
+type="text"
+placeholder="Search plant, SKU, common name, genus..."
+>
 
-  <div class="filter-section">
-    <div class="filter-label">Browse Filters</div>
-    <div class="filters-grid">
-      <div class="select-wrap">
-        <select id="plantGroup">
-          <option value="">All Plant Groups</option>
-        </select>
-      </div>
+<!-- Quick Traits -->
 
-      <div class="select-wrap">
-        <select id="color">
-          <option value="">All Colors</option>
-        </select>
-      </div>
+<div class="filter-section">
+<div class="filter-label">Quick Traits</div>
 
-      <div class="select-wrap">
-        <select id="heightBucket">
-          <option value="">All Heights</option>
-          <option value="under12">Under 12"</option>
-          <option value="12to24">12–24"</option>
-          <option value="24to36">24–36"</option>
-          <option value="36plus">36"+</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <div class="filter-section">
-    <div class="filter-label">View Options</div>
-    <div class="meta-bar">
-      <button type="button" class="pill" id="onlyImages">Only With Images</button>
-      <button type="button" class="pill" id="onlyPriced">Only Priced Items</button>
-      <button type="button" class="pill" id="show24">24</button>
-      <button type="button" class="pill active" id="show48">48</button>
-      <button type="button" class="pill" id="show96">96</button>
-      <button type="button" class="pill" id="showAll">All</button>
-    </div>
-  </div>
-
-  <div class="filter-section">
-    <div class="filter-label">Tools</div>
-    <div class="button-row">
-      <button type="button" class="action-btn" id="clearFilters">Clear Filters</button>
-      <button type="button" class="action-btn" id="showFavorites">Favorites</button>
-      <button type="button" class="action-btn" id="showCompare">Compare</button>
-      <button type="button" class="action-btn" id="toggleScanner">Scan SKU</button>
-    </div>
-  </div>
-
-  <div id="scannerWrap">
-    <video id="scannerVideo" autoplay playsinline></video>
-    <div class="scanner-note">
-      Camera-based scan works best on phones that support barcode detection in the browser. If not, type the SKU in the search box.
-    </div>
-  </div>
-
-  <div class="subtle">
-    Tip: search by SKU like <strong>26170</strong>, common name like <strong>hosta</strong>, or genus like <strong>echinacea</strong>.
-  </div>
+<div class="chip-row">
+<button class="chip-btn">Sun</button>
+<button class="chip-btn">Shade</button>
+<button class="chip-btn">Roses</button>
+<button class="chip-btn">Drought</button>
+<button class="chip-btn">Pollinator</button>
+<button class="chip-btn">Deer Resistant</button>
+<button class="chip-btn">Native</button>
 </div>
+
+</div>
+
+<!-- Browse Filters -->
+
+<div class="filter-section">
+
+<div class="filter-label">Browse Filters</div>
+
+<div class="filters-grid">
+
+<div class="select-wrap">
+<select id="plantGroup">
+<option value="">All Plant Groups</option>
+</select>
+</div>
+
+<div class="select-wrap">
+<select id="color">
+<option value="">All Colors</option>
+</select>
+</div>
+
+<div class="select-wrap">
+<select id="height">
+<option value="">All Heights</option>
+<option value="under12">Under 12"</option>
+<option value="12to24">12–24"</option>
+<option value="24to36">24–36"</option>
+<option value="36plus">36"+</option>
+</select>
+</div>
+
+</div>
+</div>
+
+<!-- View Options -->
+
+<div class="filter-section">
+
+<div class="filter-label">View Options</div>
+
+<div class="meta-bar">
+
+<button class="pill">Only With Images</button>
+<button class="pill">Only Priced Items</button>
+
+<button class="pill">24</button>
+<button class="pill">48</button>
+<button class="pill">96</button>
+<button class="pill">All</button>
+
+</div>
+
+</div>
+
+<!-- Tools -->
+
+<div class="filter-section">
+
+<div class="filter-label">Tools</div>
+
+<div class="button-row">
+
+<button class="action-btn">Clear Filters</button>
+<button class="action-btn">Favorites</button>
+<button class="action-btn">Compare</button>
+<button class="action-btn">Scan SKU</button>
+
+</div>
+
+</div>
+
+<div class="subtle">
+Tip: search by SKU like <b>26170</b>, common name like <b>hosta</b>, or genus like <b>echinacea</b>.
+</div>
+
+</div>
+
+<div id="plantCards" class="cards"></div>
+
+</div>
+
+</body>
+</html>
