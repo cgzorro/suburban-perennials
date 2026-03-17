@@ -13,7 +13,6 @@
       --text-muted: #aeb9b0;
       --border: #243429;
       --accent: #8fc987;
-      --accent-2: #9fd69a;
       --chip-bg: #17311e;
       --chip-text: #d8f1da;
       --shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
@@ -30,7 +29,6 @@
       --text-muted: #5d6a60;
       --border: #d8e0d7;
       --accent: #2f6b3c;
-      --accent-2: #3f8a4f;
       --chip-bg: #e8f2ea;
       --chip-text: #24512e;
       --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
@@ -181,6 +179,10 @@
       cursor: pointer;
       font-weight: 700;
       transition: background-color .18s ease, border-color .18s ease, transform .12s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .btn:active {
@@ -498,11 +500,15 @@
       if (raw.includes("shade") || nameBlob.includes("|psh") || nameBlob.includes("perennials-for-shade")) {
         return "Perennials - Shade";
       }
+      if (raw.includes("rose") || nameBlob.includes("rose") || nameBlob.includes("knock out") || nameBlob.includes("drift")) {
+        return "Roses";
+      }
+      if (raw.includes("hardy vining") || raw.includes("vine") || nameBlob.includes("|vin")) {
+        if (nameBlob.includes("clematis")) return "Clematis";
+        return "Hardy Vining Plants";
+      }
       if (raw.includes("clematis") || nameBlob.includes("clematis")) {
         return "Clematis";
-      }
-      if (raw.includes("honeysuckle") || nameBlob.includes("honeysuckle") || nameBlob.includes("lonicera")) {
-        return "Honeysuckle";
       }
       if (raw.includes("peon") || nameBlob.includes("peon")) {
         return "Peonies";
