@@ -69,9 +69,15 @@
       margin-bottom: 18px;
     }
 
+    .brand h1,
+    .card-title {
+      text-wrap: balance;
+    }
+
     .brand h1 {
       margin: 0;
       font-size: clamp(1.8rem, 3vw, 2.4rem);
+      line-height: 1.05;
     }
 
     .brand p {
@@ -195,14 +201,7 @@
       border-color: var(--accent);
     }
 
-    .clear-btn,
-    .mobile-clear-btn {
-      justify-content: center;
-      text-align: center;
-    }
-
-    .clear-btn.is-confirmed,
-    .mobile-clear-btn.is-confirmed {
+    .clear-btn.is-confirmed {
       background: var(--success);
       border-color: var(--success);
       color: white;
@@ -219,7 +218,7 @@
     .results-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
+      gap: 14px;
     }
 
     .card {
@@ -258,12 +257,19 @@
       padding: 12px;
     }
 
-    .card-body { padding: 14px; }
+    .card-body {
+      padding: 12px;
+    }
 
     .card-title {
-      margin: 0 0 6px;
+      margin: 0 0 4px;
       font-size: 1.05rem;
-      line-height: 1.25;
+      line-height: 1.2;
+    }
+
+    .card-meta,
+    .small {
+      overflow-wrap: anywhere;
     }
 
     .card-meta {
@@ -276,7 +282,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin: 10px 0;
+      margin: 8px 0;
     }
 
     .tag {
@@ -291,7 +297,7 @@
     .price {
       font-weight: 800;
       color: var(--accent);
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     .small { font-size: .88rem; }
@@ -305,39 +311,148 @@
       background: var(--bg-soft);
     }
 
-    .mobile-clear-btn {
-      display: none;
-    }
-
     @media (max-width: 980px) {
-      .layout { grid-template-columns: 1fr; }
+      .container {
+        width: min(100%, calc(100% - 16px));
+        padding: 12px 0 20px;
+      }
+
+      .topbar {
+        gap: 10px;
+        margin-bottom: 12px;
+        align-items: center;
+      }
+
+      .brand h1 {
+        font-size: 1.35rem;
+      }
+
+      .brand p {
+        margin-top: 4px;
+        font-size: 0.9rem;
+        line-height: 1.2;
+      }
+
+      .theme-toggle {
+        padding: 8px 12px;
+        font-size: 0.88rem;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .panel,
+      .results-panel {
+        border-radius: 18px;
+      }
 
       .panel {
         position: static;
         max-height: none;
         overflow: visible;
+        padding: 14px;
       }
 
-      .mobile-clear-btn {
-        display: block;
-        position: fixed;
-        left: 16px;
-        right: 16px;
-        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-        z-index: 999;
-        border: 1px solid var(--border);
-        background: var(--accent);
-        color: white;
+      .results-panel {
+        padding: 14px;
+      }
+
+      .section-title {
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+      }
+
+      .search-row,
+      .control-row {
+        margin-bottom: 12px;
+        gap: 8px;
+      }
+
+      .sidebar-toolbar {
+        margin-bottom: 14px;
+      }
+
+      .search,
+      .select {
+        padding: 12px 14px;
         border-radius: 14px;
-        padding: 14px 16px;
-        font-size: 1rem;
-        font-weight: 800;
-        box-shadow: var(--shadow);
-        cursor: pointer;
+        font-size: 0.95rem;
       }
 
-      body {
-        padding-bottom: 88px;
+      .chips {
+        gap: 8px;
+        margin: 8px 0 14px;
+      }
+
+      .chip {
+        padding: 8px 11px;
+        font-size: 0.84rem;
+      }
+
+      .clear-btn {
+        width: auto;
+        min-width: 150px;
+        padding: 10px 14px;
+        font-size: 0.92rem;
+        border-radius: 12px;
+      }
+
+      .results-head {
+        margin-bottom: 10px;
+        align-items: flex-start;
+      }
+
+      .results-head strong {
+        font-size: 1rem;
+        line-height: 1.1;
+      }
+
+      .results-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .card {
+        border-radius: 16px;
+      }
+
+      .card-image {
+        aspect-ratio: 16 / 10;
+      }
+
+      .card-body {
+        padding: 12px;
+      }
+
+      .card-title {
+        font-size: 0.98rem;
+      }
+
+      .card-meta,
+      .small {
+        font-size: 0.83rem;
+        line-height: 1.25;
+      }
+
+      .card-tags {
+        gap: 5px;
+      }
+
+      .tag {
+        font-size: 0.72rem;
+        padding: 4px 7px;
+      }
+
+      .price {
+        font-size: 0.98rem;
+      }
+
+      .btn {
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -399,8 +514,6 @@
     </div>
   </div>
 
-  <button id="mobileClearFilters" class="mobile-clear-btn" type="button">Clear Filters</button>
-
   <script>
     const state = {
       plants: [],
@@ -420,7 +533,6 @@
       colorFilter: document.getElementById("colorFilter"),
       heightFilter: document.getElementById("heightFilter"),
       clearFilters: document.getElementById("clearFilters"),
-      mobileClearFilters: document.getElementById("mobileClearFilters"),
       results: document.getElementById("results"),
       resultCount: document.getElementById("resultCount"),
       traitChips: document.getElementById("traitChips")
@@ -649,19 +761,14 @@
     }
 
     function flashClearConfirmation() {
-      const buttons = [els.clearFilters, els.mobileClearFilters].filter(Boolean);
-
-      for (const btn of buttons) {
-        btn.classList.add("is-confirmed");
-        btn.textContent = "Filters Cleared";
-      }
+      const btn = els.clearFilters;
+      btn.classList.add("is-confirmed");
+      btn.textContent = "Filters Cleared";
 
       window.clearTimeout(state.clearFlashTimer);
       state.clearFlashTimer = window.setTimeout(() => {
-        for (const btn of buttons) {
-          btn.classList.remove("is-confirmed");
-          btn.textContent = "Clear Filters";
-        }
+        btn.classList.remove("is-confirmed");
+        btn.textContent = "Clear Filters";
       }, 1200);
     }
 
@@ -744,7 +851,6 @@
       els.colorFilter.addEventListener("change", applyFilters);
       els.heightFilter.addEventListener("change", applyFilters);
       els.clearFilters.addEventListener("click", clearFilters);
-      els.mobileClearFilters.addEventListener("click", clearFilters);
     }
 
     setTheme(state.theme);
