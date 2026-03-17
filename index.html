@@ -140,22 +140,6 @@
       margin-bottom: 16px;
     }
 
-    .sidebar-meta {
-      margin: 0 0 14px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-    }
-
-    .sidebar-count {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      padding: 6px 10px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: var(--bg-soft);
-    }
-
     .sidebar-toolbar {
       margin: 0 0 18px;
       display: flex;
@@ -321,19 +305,13 @@
       background: var(--bg-soft);
     }
 
-    .footer-note {
-      margin-top: 12px;
-      color: var(--text-muted);
-      font-size: .88rem;
-      line-height: 1.45;
-    }
-
     .mobile-clear-btn {
       display: none;
     }
 
     @media (max-width: 980px) {
       .layout { grid-template-columns: 1fr; }
+
       .panel {
         position: static;
         max-height: none;
@@ -381,10 +359,6 @@
           <input id="searchInput" class="search" type="text" placeholder="Search by SKU, common name, genus, or keyword…" />
         </div>
 
-        <div class="sidebar-meta">
-          <span id="sidebarCount" class="sidebar-count">0 plants</span>
-        </div>
-
         <div class="sidebar-toolbar">
           <button id="clearFilters" class="btn primary clear-btn" type="button">Clear Filters</button>
         </div>
@@ -408,10 +382,6 @@
             <option value="36plus">36"+</option>
           </select>
         </div>
-
-        <div class="footer-note">
-          Tip: search by SKU like 26170, common name like hosta, or genus like echinacea.
-        </div>
       </aside>
 
       <main>
@@ -419,7 +389,7 @@
           <div class="results-head">
             <div>
               <strong id="resultCount">Loading plants…</strong>
-              <div class="muted small">Client-side inventory explorer</div>
+              <div class="muted small">Showing current filtered results</div>
             </div>
           </div>
 
@@ -453,7 +423,6 @@
       mobileClearFilters: document.getElementById("mobileClearFilters"),
       results: document.getElementById("results"),
       resultCount: document.getElementById("resultCount"),
-      sidebarCount: document.getElementById("sidebarCount"),
       traitChips: document.getElementById("traitChips")
     };
 
@@ -709,7 +678,6 @@
 
     function renderResults() {
       els.resultCount.textContent = `${state.filtered.length} plants`;
-      els.sidebarCount.textContent = `${state.filtered.length} plants`;
       els.results.innerHTML = "";
 
       if (!state.filtered.length) {
@@ -765,7 +733,6 @@
         applyFilters();
       } catch (err) {
         els.resultCount.textContent = "Failed to load plants";
-        els.sidebarCount.textContent = "0 plants";
         els.results.innerHTML = `<div class="empty">Could not load <code>plants.json</code>. ${err.message}</div>`;
       }
     }
