@@ -488,12 +488,6 @@
           <input id="searchInput" class="search" type="text" placeholder="Search by SKU, common name, genus, or keyword…" />
         </div>
 
-        <h2 class="section-title">Scan SKU</h2>
-        <div class="scan-row">
-          <input id="scanSkuInput" class="scan-input" type="text" inputmode="numeric" placeholder="Enter or scan SKU…" />
-          <button id="scanSkuBtn" class="btn scan-btn" type="button">Scan SKU</button>
-        </div>
-
         <div class="sidebar-toolbar">
           <button id="clearFilters" class="btn primary clear-btn" type="button">Clear Filters</button>
         </div>
@@ -516,6 +510,12 @@
             <option value="24to36">24–36"</option>
             <option value="36plus">36"+</option>
           </select>
+        </div>
+
+        <h2 class="section-title">Scan SKU</h2>
+        <div class="scan-row">
+          <input id="scanSkuInput" class="scan-input" type="text" inputmode="numeric" placeholder="Enter or scan SKU…" />
+          <button id="scanSkuBtn" class="btn scan-btn" type="button">Scan SKU</button>
         </div>
       </aside>
 
@@ -667,7 +667,6 @@
       if (badHints.some(h => lower.includes(h))) return "";
       if (lower.includes("getimage.php")) return img;
       if (/\.(jpg|jpeg|png|webp)(\?|$)/i.test(img)) return img;
-
       return "";
     }
 
@@ -836,7 +835,7 @@
         card.innerHTML = `
           <div class="card-image">
             ${img
-              ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" referrerpolicy="no-referrer">`
+              ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy">`
               : `<div class="no-image">No image available</div>`
             }
           </div>
