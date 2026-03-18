@@ -130,7 +130,7 @@
 
     .muted { color: var(--text-muted); }
 
-    .search, .select {
+    .search, .select, .scan-input {
       width: 100%;
       background: var(--input-bg);
       color: var(--text);
@@ -140,16 +140,22 @@
       outline: none;
     }
 
-    .search-row, .control-row {
+    .search-row, .control-row, .scan-row {
       display: grid;
       gap: 12px;
       margin-bottom: 16px;
+    }
+
+    .scan-row {
+      grid-template-columns: 1fr auto;
+      align-items: stretch;
     }
 
     .sidebar-toolbar {
       margin: 0 0 18px;
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .chips {
@@ -189,6 +195,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      white-space: nowrap;
     }
 
     .btn:active {
@@ -201,7 +208,8 @@
       border-color: var(--accent);
     }
 
-    .clear-btn.is-confirmed {
+    .clear-btn.is-confirmed,
+    .scan-btn.is-confirmed {
       background: var(--success);
       border-color: var(--success);
       color: white;
@@ -365,9 +373,14 @@
       }
 
       .search-row,
-      .control-row {
+      .control-row,
+      .scan-row {
         margin-bottom: 12px;
         gap: 8px;
+      }
+
+      .scan-row {
+        grid-template-columns: 1fr;
       }
 
       .sidebar-toolbar {
@@ -375,7 +388,8 @@
       }
 
       .search,
-      .select {
+      .select,
+      .scan-input {
         padding: 12px 14px;
         border-radius: 14px;
         font-size: 0.95rem;
@@ -391,9 +405,9 @@
         font-size: 0.84rem;
       }
 
-      .clear-btn {
-        width: auto;
-        min-width: 150px;
+      .clear-btn,
+      .scan-btn {
+        width: 100%;
         padding: 10px 14px;
         font-size: 0.92rem;
         border-radius: 12px;
@@ -474,6 +488,12 @@
           <input id="searchInput" class="search" type="text" placeholder="Search by SKU, common name, genus, or keyword…" />
         </div>
 
+        <h2 class="section-title">Scan SKU</h2>
+        <div class="scan-row">
+          <input id="scanSkuInput" class="scan-input" type="text" inputmode="numeric" placeholder="Enter or scan SKU…" />
+          <button id="scanSkuBtn" class="btn scan-btn" type="button">Scan SKU</button>
+        </div>
+
         <div class="sidebar-toolbar">
           <button id="clearFilters" class="btn primary clear-btn" type="button">Clear Filters</button>
         </div>
@@ -520,7 +540,8 @@
       filtered: [],
       activeTraits: new Set(),
       theme: localStorage.getItem("suburban-theme") || "dark",
-      clearFlashTimer: null
+      clearFlashTimer: null,
+      scanFlashTimer: null
     };
 
     const TRAITS = ["sun", "shade", "drought", "pollinator", "deer resistant", "native"];
@@ -529,6 +550,8 @@
       html: document.documentElement,
       themeToggle: document.getElementById("themeToggle"),
       searchInput: document.getElementById("searchInput"),
+      scanSkuInput: document.getElementById("scanSkuInput"),
+      scanSkuBtn: document.getElementById("scanSkuBtn"),
       groupFilter: document.getElementById("groupFilter"),
       colorFilter: document.getElementById("colorFilter"),
       heightFilter: document.getElementById("heightFilter"),
@@ -551,6 +574,10 @@
 
     function normalizeText(v) {
       return (v || "").toString().trim().toLowerCase();
+    }
+
+    function normalizeSku(v) {
+      return (v || "").toString().replace(/\s+/g, "").trim().toLowerCase();
     }
 
     function parseHeightToInches(heightText) {
@@ -582,49 +609,12 @@
     }
 
     function getPlantGroup(plant) {
-      const raw = (
+      return (
         plant.plant_group ||
         plant.category ||
         plant.section ||
-        ""
-      ).toLowerCase();
-
-      const nameBlob = [
-        plant.name,
-        plant.common,
-        plant.genus,
-        plant.link
-      ].join(" ").toLowerCase();
-
-      if (raw.includes("sun") || nameBlob.includes("|psu") || nameBlob.includes("perennials-for-sun")) {
-        return "Perennials - Sun";
-      }
-      if (raw.includes("shade") || nameBlob.includes("|psh") || nameBlob.includes("perennials-for-shade")) {
-        return "Perennials - Shade";
-      }
-      if (raw.includes("rose") || nameBlob.includes("rose") || nameBlob.includes("knock out") || nameBlob.includes("drift")) {
-        return "Roses";
-      }
-      if (raw.includes("hardy vining") || raw.includes("vine") || nameBlob.includes("|vin")) {
-        if (nameBlob.includes("clematis")) return "Clematis";
-        return "Hardy Vining Plants";
-      }
-      if (raw.includes("clematis") || nameBlob.includes("clematis")) {
-        return "Clematis";
-      }
-      if (raw.includes("peon") || nameBlob.includes("peon")) {
-        return "Peonies";
-      }
-      if (raw.includes("grape") || raw.includes("berries") || nameBlob.includes("grape") || nameBlob.includes("berry")) {
-        return "Grapes & Berries";
-      }
-      if (raw.includes("ground") || nameBlob.includes("ground cover") || nameBlob.includes("groundcover") || nameBlob.includes("vinca") || nameBlob.includes("pachysandra")) {
-        return "Ground Covers";
-      }
-      if (raw.includes("native") || nameBlob.includes("|pna")) {
-        return "Native Perennials";
-      }
-      return "Perennials";
+        "Perennials"
+      );
     }
 
     function inferTraits(plant) {
@@ -654,6 +644,8 @@
 
     function imageFor(plant) {
       const img = plant.image || "";
+      const lower = String(img).toLowerCase();
+
       const badHints = [
         "mail-link",
         "subscribe",
@@ -671,10 +663,12 @@
         "default"
       ];
 
-      const lower = String(img).toLowerCase();
       if (!img) return "";
       if (badHints.some(h => lower.includes(h))) return "";
-      return img;
+      if (lower.includes("getimage.php")) return img;
+      if (/\.(jpg|jpeg|png|webp)(\?|$)/i.test(img)) return img;
+
+      return "";
     }
 
     function populateFilters(plants) {
@@ -772,8 +766,21 @@
       }, 1200);
     }
 
+    function flashScanConfirmation(foundCount) {
+      const btn = els.scanSkuBtn;
+      btn.classList.add("is-confirmed");
+      btn.textContent = foundCount > 0 ? `Found ${foundCount}` : "No Match";
+
+      window.clearTimeout(state.scanFlashTimer);
+      state.scanFlashTimer = window.setTimeout(() => {
+        btn.classList.remove("is-confirmed");
+        btn.textContent = "Scan SKU";
+      }, 1400);
+    }
+
     function clearFilters() {
       els.searchInput.value = "";
+      els.scanSkuInput.value = "";
       els.groupFilter.value = "";
       els.colorFilter.value = "";
       els.heightFilter.value = "";
@@ -781,6 +788,33 @@
       renderTraitChips();
       applyFilters();
       flashClearConfirmation();
+    }
+
+    function scanSku() {
+      const sku = normalizeSku(els.scanSkuInput.value);
+      if (!sku) {
+        flashScanConfirmation(0);
+        return;
+      }
+
+      els.searchInput.value = "";
+      els.groupFilter.value = "";
+      els.colorFilter.value = "";
+      els.heightFilter.value = "";
+      state.activeTraits.clear();
+      renderTraitChips();
+
+      state.filtered = state.plants.filter(plant => normalizeSku(plant.sku) === sku);
+
+      if (state.filtered.length === 0) {
+        state.filtered = state.plants.filter(plant => normalizeSku(plant.sku).includes(sku));
+      }
+
+      renderResults();
+      flashScanConfirmation(state.filtered.length);
+
+      const panel = document.querySelector(".results-panel");
+      if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function renderResults() {
@@ -802,7 +836,7 @@
         card.innerHTML = `
           <div class="card-image">
             ${img
-              ? `<img src="${img}" alt="${plant.name || "Plant"}">`
+              ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" referrerpolicy="no-referrer">`
               : `<div class="no-image">No image available</div>`
             }
           </div>
@@ -851,6 +885,13 @@
       els.colorFilter.addEventListener("change", applyFilters);
       els.heightFilter.addEventListener("change", applyFilters);
       els.clearFilters.addEventListener("click", clearFilters);
+      els.scanSkuBtn.addEventListener("click", scanSku);
+      els.scanSkuInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          scanSku();
+        }
+      });
     }
 
     setTheme(state.theme);
