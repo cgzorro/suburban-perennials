@@ -1,892 +1,596 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Suburban Perennials</title>
   <style>
     :root {
-      --bg: #f6f7f9;
-      --panel: #ffffff;
-      --panel-2: #f0f2f5;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --border: #d8dee6;
-      --accent: #2f6f4f;
-      --accent-2: #3e8a63;
-      --chip: #eef6f1;
-      --shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
-      --danger: #a94442;
+      --bg: #07111f;
+      --bg-2: #0b1627;
+      --panel: #132033;
+      --panel-2: #1a2940;
+      --text: #f3f7fb;
+      --muted: #b7c4d5;
+      --line: rgba(140, 168, 210, 0.22);
+      --accent: #8ac48e;
+      --accent-2: #65b36f;
+      --chip: #1c2b42;
+      --chip-2: #20314b;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+      --ok-bg: rgba(138, 196, 142, 0.14);
+      --ok-text: #b8edbd;
+      --warn-bg: rgba(255, 211, 117, 0.12);
+      --warn-text: #ffe09b;
     }
 
-    html[data-theme="dark"] {
-      --bg: #0f1419;
-      --panel: #172029;
-      --panel-2: #1d2933;
-      --text: #e8edf2;
-      --muted: #9fb0be;
-      --border: #2c3a47;
-      --accent: #71b388;
-      --accent-2: #8fcc9f;
-      --chip: #203227;
-      --shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
-      --danger: #ff8f8f;
+    html[data-theme="light"] {
+      --bg: #eef4fb;
+      --bg-2: #e7eef8;
+      --panel: #ffffff;
+      --panel-2: #f3f7fc;
+      --text: #132033;
+      --muted: #5d6f84;
+      --line: rgba(28, 56, 95, 0.12);
+      --accent: #4f9b5d;
+      --accent-2: #3d844b;
+      --chip: #edf3fb;
+      --chip-2: #e7eef8;
+      --shadow: 0 16px 34px rgba(17, 35, 60, 0.10);
+      --ok-bg: rgba(79, 155, 93, 0.12);
+      --ok-text: #2e6a38;
+      --warn-bg: rgba(198, 139, 0, 0.12);
+      --warn-text: #8c5d00;
     }
 
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: Inter, Arial, Helvetica, sans-serif;
-      background: var(--bg);
       color: var(--text);
+      background:
+        radial-gradient(circle at top center, rgba(44, 82, 140, 0.12), transparent 38%),
+        linear-gradient(180deg, var(--bg-2), var(--bg));
     }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
     .app {
-      max-width: 1440px;
+      max-width: 1540px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 24px;
     }
-
-    .topbar {
-      display: grid;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .hero {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      background: linear-gradient(135deg, var(--panel), var(--panel-2));
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 20px;
+    .hero, .controls, .toolbar, .card {
+      border: 1px solid var(--line);
       box-shadow: var(--shadow);
     }
-
+    .hero {
+      background: linear-gradient(120deg, var(--panel), var(--panel-2));
+      border-radius: 28px;
+      padding: 24px;
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      align-items: start;
+    }
     .hero h1 {
       margin: 0 0 8px;
-      font-size: clamp(1.6rem, 3vw, 2.4rem);
-      line-height: 1.1;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
     }
-
     .hero p {
       margin: 0;
+      max-width: 980px;
       color: var(--muted);
-      max-width: 760px;
+      font-size: clamp(1rem, 1.5vw, 1.1rem);
+      line-height: 1.45;
     }
-
-    .theme-btn {
-      border: 1px solid var(--border);
+    .theme-btn, .action-btn {
+      border-radius: 18px;
+      border: 1px solid var(--line);
       background: var(--panel);
       color: var(--text);
-      border-radius: 14px;
-      padding: 12px 14px;
-      cursor: pointer;
       font-weight: 700;
-      min-width: 120px;
+      font-size: 0.98rem;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+      white-space: nowrap;
     }
-
+    .theme-btn:hover, .action-btn:hover { transform: translateY(-1px); }
+    .action-btn.primary {
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      color: white;
+      border-color: transparent;
+    }
+    .action-btn.ghost { background: var(--panel-2); }
     .controls {
+      margin-top: 18px;
+      background: rgba(19, 32, 51, 0.72);
+      backdrop-filter: blur(8px);
+      border-radius: 28px;
+      padding: 18px;
       display: grid;
-      grid-template-columns: 1.5fr repeat(4, minmax(140px, 1fr));
-      gap: 12px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 14px;
-      box-shadow: var(--shadow);
+      grid-template-columns: 1.45fr 1.1fr 1.05fr 1fr 1fr auto;
+      gap: 14px;
+      align-items: end;
     }
-
     .control {
       display: grid;
-      gap: 6px;
+      gap: 8px;
     }
-
     .control label {
-      font-size: 0.82rem;
+      font-size: 0.92rem;
+      font-weight: 800;
       color: var(--muted);
-      font-weight: 700;
     }
-
-    .control input,
-    .control select {
+    .control input, .control select {
       width: 100%;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: var(--panel);
       color: var(--text);
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 0.96rem;
+      padding: 16px 18px;
+      font-size: 1rem;
       outline: none;
     }
-
-    .meta {
+    .scan-wrap {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+    .toolbar {
+      margin-top: 18px;
+      background: rgba(19, 32, 51, 0.62);
+      border-radius: 24px;
+      padding: 14px 16px;
       display: flex;
       flex-wrap: wrap;
+      gap: 10px 14px;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      margin: 12px 0 18px;
     }
-
     .stats {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
+      align-items: center;
     }
-
-    .stat {
-      background: var(--panel);
-      border: 1px solid var(--border);
+    .stat, .flash {
       border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 0.92rem;
+      padding: 12px 18px;
+      background: rgba(19, 32, 51, 0.8);
+      border: 1px solid var(--line);
       color: var(--muted);
+      font-size: 0.98rem;
     }
-
-    .status {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .error {
-      background: rgba(169, 68, 66, 0.08);
-      color: var(--danger);
-      border: 1px solid rgba(169, 68, 66, 0.2);
-      padding: 14px 16px;
-      border-radius: 16px;
-      margin-bottom: 16px;
+    .flash {
+      background: var(--ok-bg);
+      color: var(--ok-text);
       display: none;
     }
-
+    .flash.show { display: inline-flex; }
+    .status {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.98rem;
+    }
     .grid {
+      margin-top: 18px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
       gap: 18px;
     }
-
     .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(19, 32, 51, 0.96), rgba(18, 29, 46, 0.96));
+      border-radius: 28px;
       overflow: hidden;
-      box-shadow: var(--shadow);
       display: flex;
       flex-direction: column;
       min-height: 100%;
     }
-
     .media {
       aspect-ratio: 4 / 3;
       background: var(--panel-2);
+      display: grid;
+      place-items: center;
       overflow: hidden;
-      position: relative;
+      border-bottom: 1px solid var(--line);
     }
-
     .media img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
-      background: var(--panel-2);
     }
-
     .media-placeholder {
-      width: 100%;
-      height: 100%;
-      display: grid;
-      place-items: center;
       color: var(--muted);
-      font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: 0.02em;
+      font-size: 1rem;
+      font-weight: 800;
     }
-
-    .card-body {
-      padding: 14px;
+    .body {
+      padding: 18px;
       display: grid;
-      gap: 10px;
+      gap: 12px;
     }
-
     .title {
       margin: 0;
-      font-size: 1rem;
-      line-height: 1.35;
+      font-size: 1.08rem;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
     }
-
-    .badges {
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.35;
+      min-height: 1.25em;
+    }
+    .chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
     }
-
-    .badge {
-      background: var(--chip);
-      color: var(--accent);
-      border: 1px solid rgba(47, 111, 79, 0.15);
+    .chip {
       border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 0.78rem;
-      font-weight: 700;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      background: var(--chip);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 800;
     }
-
-    .badge.neutral {
-      background: var(--panel-2);
+    .chip.light {
+      background: var(--ok-bg);
+      color: var(--ok-text);
+    }
+    .chip.dim {
+      background: var(--chip-2);
       color: var(--muted);
-      border-color: var(--border);
     }
-
     .details {
       display: grid;
-      gap: 6px;
+      gap: 7px;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.92rem;
+      line-height: 1.35;
     }
-
+    .details strong { color: var(--text); }
     .price-row {
       display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-top: 4px;
+      align-items: end;
+      margin-top: 2px;
     }
-
     .price {
-      font-weight: 800;
-      font-size: 1.05rem;
+      font-size: 1.15rem;
+      font-weight: 900;
       color: var(--text);
     }
-
     .sku {
+      font-size: 0.88rem;
       color: var(--muted);
-      font-size: 0.82rem;
+      text-align: right;
       word-break: break-word;
     }
-
     .actions {
       display: flex;
       gap: 10px;
-      margin-top: 4px;
+      margin-top: 2px;
     }
-
     .btn {
       flex: 1;
       text-align: center;
-      border-radius: 12px;
-      padding: 11px 12px;
+      text-decoration: none;
+      border-radius: 18px;
+      padding: 15px 16px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      color: white;
+      font-weight: 900;
+      border: 0;
+    }
+    .result-banner {
+      margin-top: 14px;
+      border-radius: 20px;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      background: var(--warn-bg);
+      color: var(--warn-text);
       font-weight: 800;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
-      color: var(--text);
+      display: none;
     }
-
-    .btn.primary {
-      background: var(--accent);
-      color: #fff;
-      border-color: transparent;
-    }
-
+    .result-banner.show { display: block; }
     .empty {
-      background: var(--panel);
-      border: 1px dashed var(--border);
-      border-radius: 20px;
-      padding: 28px;
-      text-align: center;
-      color: var(--muted);
-    }
-
-    .loading {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 28px;
-      text-align: center;
-      color: var(--muted);
-    }
-
-    .footer-note {
       margin-top: 18px;
+      border-radius: 28px;
+      border: 1px dashed var(--line);
+      padding: 34px;
       color: var(--muted);
-      font-size: 0.85rem;
+      text-align: center;
+      background: rgba(19, 32, 51, 0.36);
     }
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .hidden { display: none !important; }
 
-    @media (max-width: 980px) {
+    @media (max-width: 1220px) {
       .controls {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .hero {
-        flex-direction: column;
+        grid-template-columns: 1fr 1fr 1fr;
       }
     }
-
-    @media (max-width: 640px) {
-      .app {
-        padding: 14px;
-      }
-
-      .controls {
-        grid-template-columns: 1fr;
-      }
-
-      .price-row,
-      .actions {
-        flex-direction: column;
-        align-items: stretch;
-      }
+    @media (max-width: 760px) {
+      .app { padding: 14px; }
+      .controls { grid-template-columns: 1fr; }
+      .hero { flex-direction: column; }
+      .price-row, .actions { flex-direction: column; align-items: stretch; }
+      .sku { text-align: left; }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="topbar">
-      <section class="hero">
-        <div>
-          <h1>Suburban Perennials</h1>
-          <p>
-            Clean local catalog for sun and shade perennials, with deduped records, repaired image handling,
-            normalized categories, cleaner pricing, and a working dark/light toggle.
-          </p>
+    <section class="hero">
+      <div>
+        <h1>Suburban Perennials</h1>
+        <p>
+          Search by plant name, exact SKU, light needs, or plant group. Cards now show size and mature height × width,
+          filters can be cleared in one click, and SKU scan is tuned for exact product lookup.
+        </p>
+      </div>
+      <button id="themeToggle" class="theme-btn" type="button">Toggle Theme</button>
+    </section>
+
+    <section class="controls">
+      <div class="control">
+        <label for="searchInput">Search catalog</label>
+        <input id="searchInput" type="text" placeholder="Name, common name, genus, SKU, plant group..." />
+      </div>
+
+      <div class="control">
+        <label for="skuInput">Scan SKU / exact product ID</label>
+        <div class="scan-wrap">
+          <input id="skuInput" type="text" placeholder="Example: PEONYIJR3" />
+          <button id="scanSkuBtn" class="action-btn primary" type="button">Scan SKU</button>
         </div>
-        <button id="themeToggle" class="theme-btn" type="button" aria-label="Toggle dark mode">
-          Toggle Theme
-        </button>
-      </section>
+      </div>
 
-      <section class="controls">
-        <div class="control">
-          <label for="searchInput">Search</label>
-          <input id="searchInput" type="text" placeholder="Search plants, SKU, group, exposure..." />
-        </div>
+      <div class="control">
+        <label for="exposureFilter">Exposure</label>
+        <select id="exposureFilter">
+          <option value="all">All exposures</option>
+          <option value="sun">Sun</option>
+          <option value="shade">Shade</option>
+          <option value="mixed">Mixed</option>
+          <option value="unknown">Unknown</option>
+        </select>
+      </div>
 
-        <div class="control">
-          <label for="exposureFilter">Exposure</label>
-          <select id="exposureFilter">
-            <option value="all">All exposures</option>
-            <option value="sun">Sun</option>
-            <option value="shade">Shade</option>
-            <option value="mixed">Mixed / partial</option>
-            <option value="unknown">Unknown</option>
-          </select>
-        </div>
+      <div class="control">
+        <label for="groupFilter">Plant group</label>
+        <select id="groupFilter">
+          <option value="all">All groups</option>
+        </select>
+      </div>
 
-        <div class="control">
-          <label for="groupFilter">Plant group</label>
-          <select id="groupFilter">
-            <option value="all">All groups</option>
-          </select>
-        </div>
+      <div class="control">
+        <label for="sortSelect">Sort</label>
+        <select id="sortSelect">
+          <option value="name-asc">Plant name A–Z</option>
+          <option value="name-desc">Plant name Z–A</option>
+          <option value="price-asc">Price low–high</option>
+          <option value="price-desc">Price high–low</option>
+          <option value="group-asc">Plant group A–Z</option>
+        </select>
+      </div>
 
-        <div class="control">
-          <label for="sortSelect">Sort</label>
-          <select id="sortSelect">
-            <option value="name-asc">Name A–Z</option>
-            <option value="name-desc">Name Z–A</option>
-            <option value="price-asc">Price low–high</option>
-            <option value="price-desc">Price high–low</option>
-            <option value="group-asc">Group A–Z</option>
-          </select>
-        </div>
+      <div class="control">
+        <label for="itemsPerPage">Show</label>
+        <select id="itemsPerPage">
+          <option value="24">24 cards</option>
+          <option value="48" selected>48 cards</option>
+          <option value="96">96 cards</option>
+          <option value="99999">All cards</option>
+        </select>
+      </div>
 
-        <div class="control">
-          <label for="itemsPerPage">Show</label>
-          <select id="itemsPerPage">
-            <option value="24">24 cards</option>
-            <option value="48" selected>48 cards</option>
-            <option value="96">96 cards</option>
-            <option value="99999">All cards</option>
-          </select>
-        </div>
-      </section>
-    </div>
+      <div class="control">
+        <label>&nbsp;</label>
+        <button id="clearFiltersBtn" class="action-btn ghost" type="button">Clear filters</button>
+      </div>
+    </section>
 
-    <div id="errorBox" class="error"></div>
+    <div id="resultBanner" class="result-banner"></div>
 
-    <section class="meta">
+    <section class="toolbar">
       <div class="stats">
         <div class="stat"><span id="loadedCount">0</span> loaded</div>
         <div class="stat"><span id="visibleCount">0</span> showing</div>
         <div class="stat"><span id="sunCount">0</span> sun</div>
         <div class="stat"><span id="shadeCount">0</span> shade</div>
+        <div id="flashMsg" class="flash">Filters cleared</div>
       </div>
-      <div id="statusText" class="status">Loading plants…</div>
+      <div id="statusText" class="status">Loading catalog…</div>
     </section>
 
     <main id="content">
-      <div class="loading">Loading plants…</div>
+      <div class="empty">Loading catalog…</div>
     </main>
 
     <div class="footer-note">
-      Reading from <strong>plants.json</strong>. Images are expected in a local <strong>images</strong> folder when the path starts with <strong>./images/</strong>.
+      Tip: exact SKU scan matches the whole product code. General search still works for partial SKUs and plant names.
     </div>
   </div>
 
   <script>
     const state = {
-      rawPlants: [],
       plants: [],
-      filtered: []
+      filtered: [],
+      exactSku: "",
+      flashTimer: null
     };
 
     const els = {
       themeToggle: document.getElementById("themeToggle"),
       searchInput: document.getElementById("searchInput"),
+      skuInput: document.getElementById("skuInput"),
+      scanSkuBtn: document.getElementById("scanSkuBtn"),
       exposureFilter: document.getElementById("exposureFilter"),
       groupFilter: document.getElementById("groupFilter"),
       sortSelect: document.getElementById("sortSelect"),
       itemsPerPage: document.getElementById("itemsPerPage"),
+      clearFiltersBtn: document.getElementById("clearFiltersBtn"),
       loadedCount: document.getElementById("loadedCount"),
       visibleCount: document.getElementById("visibleCount"),
       sunCount: document.getElementById("sunCount"),
       shadeCount: document.getElementById("shadeCount"),
       statusText: document.getElementById("statusText"),
       content: document.getElementById("content"),
-      errorBox: document.getElementById("errorBox")
+      resultBanner: document.getElementById("resultBanner"),
+      flashMsg: document.getElementById("flashMsg")
     };
 
-    function firstValue(...values) {
-      for (const value of values) {
-        if (value === null || value === undefined) continue;
-        if (typeof value === "string" && value.trim() === "") continue;
-        return value;
-      }
-      return "";
+    function text(v) {
+      if (v === null || v === undefined) return "";
+      return String(v).replace(/\s+/g, " ").trim();
     }
 
-    function toText(value) {
-      if (value === null || value === undefined) return "";
-      if (Array.isArray(value)) return value.map(toText).filter(Boolean).join(" • ");
-      if (typeof value === "object") return "";
-      return String(value).replace(/\s+/g, " ").trim();
+    function stripHtml(v) {
+      return text(v).replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").trim();
     }
 
-    function stripHtml(value) {
-      return toText(value)
-        .replace(/<[^>]*>/g, " ")
-        .replace(/&amp;/g, "&")
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
-        .replace(/&nbsp;/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
-
-    function titleCase(value) {
-      return stripHtml(value)
-        .toLowerCase()
-        .replace(/\b\w/g, char => char.toUpperCase());
-    }
-
-    function cleanUrl(url) {
-      const text = toText(url);
-      if (!text) return "";
-      try {
-        const u = new URL(text, window.location.href);
-        u.hash = "";
-        u.search = "";
-        return u.toString();
-      } catch {
-        return text.split("#")[0].split("?")[0];
-      }
-    }
-
-    function safeSlug(value) {
-      return stripHtml(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-    }
-
-    function parsePrice(raw) {
-      if (raw === null || raw === undefined || raw === "") return null;
-      if (typeof raw === "number" && Number.isFinite(raw)) return raw;
-
-      const text = String(raw).trim();
-      if (!text) return null;
-
-      const match = text.replace(/,/g, "").match(/-?\d+(\.\d+)?/);
-      if (!match) return null;
-
-      const num = Number(match[0]);
-      return Number.isFinite(num) ? num : null;
-    }
-
-    function formatPrice(value) {
-      if (value === null || value === undefined || Number.isNaN(value)) return "Price unavailable";
-      return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
-    }
-
-    function normalizeImagePath(raw) {
-      const text = toText(raw);
-      if (!text) return "";
-
-      if (/^https?:\/\//i.test(text)) return text;
-
-      let path = text.replace(/\\/g, "/").trim();
-
-      if (path.startsWith("./")) path = path.slice(2);
-      if (path.startsWith("/")) path = path.slice(1);
-
-      if (/^images\//i.test(path)) return path;
-
-      if (/\.(jpg|jpeg|png|webp|gif|avif)(\?.*)?$/i.test(path)) {
-        return "images/" + path.split("/").pop();
-      }
-
-      return "";
-    }
-
-    function normalizeExposure(raw) {
-      const joined = [
-        raw.exposure,
-        raw.light,
-        raw.sun_shade,
-        raw.sunshade,
-        raw.department,
-        raw.department_name,
-        raw.category,
-        raw.subcategory,
-        raw.collection,
-        raw.group,
-        raw.group_name,
-        raw.plant_group,
-        raw.title,
-        raw.name,
-        raw.url
-      ]
-      .map(stripHtml)
-      .join(" | ")
-      .toLowerCase();
-
-      const hasSun = /\bsun\b/.test(joined);
-      const hasShade = /\bshade\b/.test(joined);
-      const hasPartial = /\bpart sun\b|\bpart shade\b|\bpartial\b/.test(joined);
-
-      if ((hasSun && hasShade) || hasPartial) return "Mixed";
-      if (hasSun) return "Sun";
-      if (hasShade) return "Shade";
-      return "Unknown";
-    }
-
-    function normalizeGroup(raw, exposure) {
-      const candidates = [
-        raw.plant_group,
-        raw.group_name,
-        raw.group,
-        raw.subcategory,
-        raw.collection,
-        raw.department_name,
-        raw.department,
-        raw.type,
-        raw.family
-      ].map(stripHtml).filter(Boolean);
-
-      for (const candidate of candidates) {
-        const lower = candidate.toLowerCase();
-
-        if (lower.includes("perennials for sun")) return "Sun Perennials";
-        if (lower.includes("perennials for shade")) return "Shade Perennials";
-
-        if (
-          lower !== "perennials" &&
-          lower !== "plants" &&
-          lower !== "all plants" &&
-          lower !== "department"
-        ) {
-          return titleCase(candidate);
-        }
-      }
-
-      if (exposure === "Sun") return "Sun Perennials";
-      if (exposure === "Shade") return "Shade Perennials";
-      if (exposure === "Mixed") return "Mixed Perennials";
-      return "Perennials";
-    }
-
-    function normalizeCategory(raw) {
-      const candidates = [
-        raw.root_category,
-        raw.category,
-        raw.department,
-        raw.department_name,
-        raw.main_category
-      ].map(stripHtml).filter(Boolean);
-
-      for (const candidate of candidates) {
-        const lower = candidate.toLowerCase();
-        if (lower.includes("perennial")) return "Perennials";
-        if (lower.includes("vine")) return "Vines";
-        if (lower.includes("berry") || lower.includes("grape")) return "Grapes & Berries";
-      }
-
-      return "Perennials";
-    }
-
-    function normalizePlant(raw, index) {
-      const name = stripHtml(firstValue(raw.name, raw.title, raw.product_name, raw.productTitle, raw.product_title));
-      const sku = stripHtml(firstValue(raw.sku, raw.SKU, raw.item_number, raw.item, raw.product_code, raw.id));
-      const url = cleanUrl(firstValue(raw.url, raw.link, raw.product_url, raw.href));
-      const image = normalizeImagePath(firstValue(raw.image, raw.image_url, raw.img, raw.photo, raw.imagePath, raw.local_image));
-      const exposure = normalizeExposure(raw);
-      const group = normalizeGroup(raw, exposure);
-      const category = normalizeCategory(raw);
-      const description = stripHtml(firstValue(raw.description, raw.short_description, raw.summary, raw.teaser, raw.details));
-      const priceValue = parsePrice(firstValue(raw.price, raw.sale_price, raw.current_price, raw.unit_price, raw.price_value));
-      const availability = stripHtml(firstValue(raw.stock_status, raw.availability, raw.in_stock, raw.inventory_status));
-      const location = stripHtml(firstValue(raw.location, raw.store, raw.store_name));
-
-      return {
-        _index: index,
-        id: sku || url || safeSlug(name) || "plant-" + index,
-        name: name || "Unnamed Plant",
-        sku: sku || "",
-        url: url || "",
-        image: image || "",
-        exposure,
-        group,
-        category,
-        description,
-        priceValue,
-        priceText: formatPrice(priceValue),
-        availability,
-        location
-      };
-    }
-
-    function dedupePlants(plants) {
-      const map = new Map();
-
-      for (const plant of plants) {
-        const key = [
-          plant.sku ? "sku:" + plant.sku.toLowerCase() : "",
-          plant.url ? "url:" + plant.url.toLowerCase() : "",
-          "name:" + plant.name.toLowerCase()
-        ].filter(Boolean)[0];
-
-        if (!key) continue;
-
-        if (!map.has(key)) {
-          map.set(key, plant);
-          continue;
-        }
-
-        const existing = map.get(key);
-        const existingScore =
-          (existing.image ? 3 : 0) +
-          (existing.priceValue !== null ? 2 : 0) +
-          (existing.url ? 2 : 0) +
-          (existing.sku ? 1 : 0) +
-          (existing.description ? 1 : 0);
-
-        const newScore =
-          (plant.image ? 3 : 0) +
-          (plant.priceValue !== null ? 2 : 0) +
-          (plant.url ? 2 : 0) +
-          (plant.sku ? 1 : 0) +
-          (plant.description ? 1 : 0);
-
-        if (newScore > existingScore) {
-          map.set(key, plant);
-        }
-      }
-
-      return Array.from(map.values());
-    }
-
-    function sortPlants(plants, sortValue) {
-      const list = [...plants];
-
-      list.sort((a, b) => {
-        switch (sortValue) {
-          case "name-desc":
-            return b.name.localeCompare(a.name);
-          case "price-asc":
-            return (a.priceValue ?? Infinity) - (b.priceValue ?? Infinity);
-          case "price-desc":
-            return (b.priceValue ?? -Infinity) - (a.priceValue ?? -Infinity);
-          case "group-asc":
-            return a.group.localeCompare(b.group) || a.name.localeCompare(b.name);
-          case "name-asc":
-          default:
-            return a.name.localeCompare(b.name);
-        }
-      });
-
-      return list;
-    }
-
-    function buildGroupOptions(plants) {
-      const groups = Array.from(new Set(plants.map(p => p.group).filter(Boolean))).sort((a, b) => a.localeCompare(b));
-      els.groupFilter.innerHTML = `<option value="all">All groups</option>` +
-        groups.map(group => `<option value="${escapeHtml(group)}">${escapeHtml(group)}</option>`).join("");
-    }
-
-    function escapeHtml(value) {
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
+    function escapeHtml(v) {
+      return String(v)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
     }
 
-    function applyFilters() {
-      const query = els.searchInput.value.trim().toLowerCase();
-      const exposure = els.exposureFilter.value;
-      const group = els.groupFilter.value;
-      const limit = Number(els.itemsPerPage.value || 48);
-      const sortValue = els.sortSelect.value;
-
-      let list = state.plants.filter(plant => {
-        const matchesQuery =
-          !query ||
-          plant.name.toLowerCase().includes(query) ||
-          plant.sku.toLowerCase().includes(query) ||
-          plant.group.toLowerCase().includes(query) ||
-          plant.category.toLowerCase().includes(query) ||
-          plant.exposure.toLowerCase().includes(query) ||
-          plant.description.toLowerCase().includes(query);
-
-        const matchesExposure =
-          exposure === "all" ||
-          (exposure === "sun" && plant.exposure === "Sun") ||
-          (exposure === "shade" && plant.exposure === "Shade") ||
-          (exposure === "mixed" && plant.exposure === "Mixed") ||
-          (exposure === "unknown" && plant.exposure === "Unknown");
-
-        const matchesGroup = group === "all" || plant.group === group;
-
-        return matchesQuery && matchesExposure && matchesGroup;
-      });
-
-      list = sortPlants(list, sortValue);
-      state.filtered = list;
-
-      renderPlants(limit >= 99999 ? list : list.slice(0, limit));
-      updateMeta();
+    function normalizeKey(v) {
+      return text(v).toUpperCase().replace(/[^A-Z0-9]/g, "");
     }
 
-    function updateMeta() {
-      const total = state.plants.length;
-      const visible = state.filtered.length;
-      const sun = state.plants.filter(p => p.exposure === "Sun").length;
-      const shade = state.plants.filter(p => p.exposure === "Shade").length;
-
-      els.loadedCount.textContent = total.toLocaleString();
-      els.visibleCount.textContent = visible.toLocaleString();
-      els.sunCount.textContent = sun.toLocaleString();
-      els.shadeCount.textContent = shade.toLocaleString();
-      els.statusText.textContent = `${visible.toLocaleString()} result${visible === 1 ? "" : "s"} shown`;
+    function titleCase(v) {
+      return stripHtml(v).toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
     }
 
-    function createMedia(plant) {
-      const media = document.createElement("div");
-      media.className = "media";
-
-      if (plant.image) {
-        const img = document.createElement("img");
-        img.loading = "lazy";
-        img.alt = plant.name;
-        img.src = plant.image;
-        img.onerror = () => {
-          media.innerHTML = `<div class="media-placeholder">No Image</div>`;
-        };
-        media.appendChild(img);
-      } else {
-        media.innerHTML = `<div class="media-placeholder">No Image</div>`;
-      }
-
-      return media;
+    function normalizeImagePath(raw) {
+      const value = text(raw);
+      if (!value) return "";
+      if (/^https?:\/\//i.test(value)) return value;
+      let p = value.replace(/\\/g, "/");
+      if (p.startsWith("./")) p = p.slice(2);
+      if (p.startsWith("/")) p = p.slice(1);
+      if (/^images\//i.test(p)) return p;
+      const bits = p.split("/");
+      return "images/" + bits[bits.length - 1];
     }
 
-    function renderPlants(plantsToRender) {
-      if (!plantsToRender.length) {
-        els.content.innerHTML = `<div class="empty">No plants match those filters.</div>`;
+    function parsePrice(raw) {
+      const m = text(raw).replace(/,/g, "").match(/-?\d+(\.\d+)?/);
+      return m ? Number(m[0]) : null;
+    }
+
+    function formatPrice(num) {
+      if (num === null || Number.isNaN(num)) return "Price unavailable";
+      return num.toLocaleString("en-US", { style: "currency", currency: "USD" });
+    }
+
+    function inferExposure(raw) {
+      const light = text(raw.light).toLowerCase();
+      if (!light) return "Unknown";
+      if (light.includes("shade") && light.includes("sun")) return "Mixed";
+      if (light.includes("part")) return "Mixed";
+      if (light.includes("shade")) return "Shade";
+      if (light.includes("sun")) return "Sun";
+      return titleCase(raw.light);
+    }
+
+    function inferGroup(raw) {
+      const name = text(raw.name).toLowerCase();
+      const link = text(raw.link || raw.url).toLowerCase();
+      const group = text(raw.plant_group).toLowerCase();
+      const category = text(raw.category).toLowerCase();
+      const blob = `${name} ${link} ${group} ${category}`;
+
+      if (blob.includes("peony")) return "Peonies";
+      if (blob.includes("clematis")) return "Clematis";
+      if (blob.includes("grape") || blob.includes("berry") || blob.includes("blueberry") || blob.includes("blackberry") || blob.includes("raspberry")) return "Grapes & Berries";
+      if (blob.includes("ground cover")) return "Ground Covers";
+      if (blob.includes("vine")) return "Hardy Vining Plants";
+      if (group === "native perennials" || category === "native perennials") return "Native Perennials";
+      if (group === "perennials - sun" || group === "perennials - shade" || category === "perennials - sun" || category === "perennials - shade") return "Perennials";
+      if (group === "roses" && blob.includes("rosemoor clematis")) return "Clematis";
+      if (group === "roses" && blob.includes("primrose")) return "Perennials";
+      if (group && group !== "roses") return titleCase(raw.plant_group);
+      if (category && category !== "roses") return titleCase(raw.category);
+      return "Perennials";
+    }
+
+    function cleanSubtitle(raw) {
+      const parts = [];
+      const common = titleCase(raw.common || "");
+      const genus = titleCase(raw.genus || "");
+      if (common && common.toLowerCase() !== "rose") parts.push(common);
+      if (genus && genus.toLowerCase() !== "rosa") parts.push(genus);
+      return parts.filter(Boolean).slice(0, 2).join(" • ");
+    }
+
+    function sizeHeightWidth(raw) {
+      const parts = [];
+      const size = text(raw.size);
+      const h = text(raw.height);
+      const w = text(raw.width);
+      if (size) parts.push(`Size: ${size}`);
+      if (h || w) parts.push(`Mature size: ${h || "—"} × ${w || "—"}`);
+      return parts;
+    }
+
+    function normalizePlant(raw, idx) {
+      const priceValue = parsePrice(raw.price);
+      const sku = text(raw.sku);
+      return {
+        id: sku || `plant-${idx}`,
+        sku,
+        skuKey: normalizeKey(sku),
+        name: text(raw.name) || "Unnamed Plant",
+        subtitle: cleanSubtitle(raw),
+        priceValue,
+        priceText: formatPrice(priceValue),
+        url: text(raw.link || raw.url),
+        image: normalizeImagePath(raw.image),
+        exposure: inferExposure(raw),
+        group: inferGroup(raw),
+        size: text(raw.size),
+        common: text(raw.common),
+        genus: text(raw.genus),
+        height: text(raw.height),
+        width: text(raw.width),
+        detailsLines: sizeHeightWidth(raw)
+      };
+    }
+
+    function buildGroupOptions(plants) {
+      const groups = [...new Set(plants.map(p => p.group).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      els.groupFilter.innerHTML = '<option value="all">All groups</option>' +
+        groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join("");
+    }
+
+    function showFlash(message) {
+      clearTimeout(state.flashTimer);
+      els.flashMsg.textContent = message;
+      els.flashMsg.classList.add("show");
+      state.flashTimer = setTimeout(() => els.flashMsg.classList.remove("show"), 2200);
+    }
+
+    function setBanner(message) {
+      if (!message) {
+        els.resultBanner.classList.remove("show");
+        els.resultBanner.textContent = "";
         return;
       }
-
-      const grid = document.createElement("div");
-      grid.className = "grid";
-
-      for (const plant of plantsToRender) {
-        const card = document.createElement("article");
-        card.className = "card";
-
-        const media = createMedia(plant);
-
-        const body = document.createElement("div");
-        body.className = "card-body";
-
-        const title = document.createElement("h2");
-        title.className = "title";
-        title.textContent = plant.name;
-
-        const badges = document.createElement("div");
-        badges.className = "badges";
-        badges.innerHTML = `
-          <span class="badge">${escapeHtml(plant.exposure)}</span>
-          <span class="badge neutral">${escapeHtml(plant.group)}</span>
-          <span class="badge neutral">${escapeHtml(plant.category)}</span>
-        `;
-
-        const details = document.createElement("div");
-        details.className = "details";
-
-        const extraLines = [];
-        if (plant.description) extraLines.push(`<div>${escapeHtml(plant.description)}</div>`);
-        if (plant.location) extraLines.push(`<div>Location: ${escapeHtml(plant.location)}</div>`);
-        if (plant.availability) extraLines.push(`<div>Availability: ${escapeHtml(plant.availability)}</div>`);
-
-        details.innerHTML = extraLines.join("");
-
-        const priceRow = document.createElement("div");
-        priceRow.className = "price-row";
-        priceRow.innerHTML = `
-          <div class="price">${escapeHtml(plant.priceText)}</div>
-          <div class="sku">${plant.sku ? `SKU: ${escapeHtml(plant.sku)}` : ""}</div>
-        `;
-
-        const actions = document.createElement("div");
-        actions.className = "actions";
-
-        if (plant.url) {
-          actions.innerHTML = `
-            <a class="btn primary" href="${escapeHtml(plant.url)}" target="_blank" rel="noopener noreferrer">View Product</a>
-          `;
-        } else {
-          actions.innerHTML = `
-            <span class="btn">Local Record</span>
-          `;
-        }
-
-        body.appendChild(title);
-        body.appendChild(badges);
-        if (extraLines.length) body.appendChild(details);
-        body.appendChild(priceRow);
-        body.appendChild(actions);
-
-        card.appendChild(media);
-        card.appendChild(body);
-        grid.appendChild(card);
-      }
-
-      els.content.innerHTML = "";
-      els.content.appendChild(grid);
-    }
-
-    function showError(message) {
-      els.errorBox.style.display = "block";
-      els.errorBox.textContent = message;
-    }
-
-    function hideError() {
-      els.errorBox.style.display = "none";
-      els.errorBox.textContent = "";
+      els.resultBanner.textContent = message;
+      els.resultBanner.classList.add("show");
     }
 
     function applyTheme(theme) {
@@ -900,51 +604,231 @@
       applyTheme(saved || (prefersDark ? "dark" : "light"));
     }
 
-    function bindEvents() {
-      els.themeToggle.addEventListener("click", () => {
-        const current = document.documentElement.getAttribute("data-theme") || "light";
-        applyTheme(current === "dark" ? "light" : "dark");
+    function sortPlants(plants, mode) {
+      const list = [...plants];
+      list.sort((a, b) => {
+        switch (mode) {
+          case "name-desc":
+            return b.name.localeCompare(a.name);
+          case "price-asc":
+            return (a.priceValue ?? Number.MAX_SAFE_INTEGER) - (b.priceValue ?? Number.MAX_SAFE_INTEGER) || a.name.localeCompare(b.name);
+          case "price-desc":
+            return (b.priceValue ?? -1) - (a.priceValue ?? -1) || a.name.localeCompare(b.name);
+          case "group-asc":
+            return a.group.localeCompare(b.group) || a.name.localeCompare(b.name);
+          default:
+            return a.name.localeCompare(b.name);
+        }
+      });
+      return list;
+    }
+
+    function updateMeta() {
+      const total = state.plants.length;
+      const visible = state.filtered.length;
+      const sun = state.plants.filter(p => p.exposure === "Sun").length;
+      const shade = state.plants.filter(p => p.exposure === "Shade").length;
+      els.loadedCount.textContent = total.toLocaleString();
+      els.visibleCount.textContent = visible.toLocaleString();
+      els.sunCount.textContent = sun.toLocaleString();
+      els.shadeCount.textContent = shade.toLocaleString();
+    }
+
+    function renderPlants(plantsToRender) {
+      if (!plantsToRender.length) {
+        els.content.innerHTML = '<div class="empty">No plants matched those filters. Clear filters or try a broader search.</div>';
+        return;
+      }
+
+      const grid = document.createElement("div");
+      grid.className = "grid";
+
+      plantsToRender.forEach(plant => {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.id = `card-${plant.skuKey || plant.id}`;
+
+        const media = document.createElement("div");
+        media.className = "media";
+        if (plant.image) {
+          const img = document.createElement("img");
+          img.loading = "lazy";
+          img.alt = plant.name;
+          img.src = plant.image;
+          img.onerror = () => {
+            media.innerHTML = '<div class="media-placeholder">No Image</div>';
+          };
+          media.appendChild(img);
+        } else {
+          media.innerHTML = '<div class="media-placeholder">No Image</div>';
+        }
+
+        const body = document.createElement("div");
+        body.className = "body";
+
+        const title = document.createElement("h2");
+        title.className = "title";
+        title.textContent = plant.name;
+
+        const subtitle = document.createElement("div");
+        subtitle.className = "subtitle";
+        subtitle.textContent = plant.subtitle || " ";
+
+        const chips = document.createElement("div");
+        chips.className = "chips";
+        chips.innerHTML = `
+          <span class="chip light">${escapeHtml(plant.exposure)}</span>
+          <span class="chip">${escapeHtml(plant.group)}</span>
+          ${plant.size ? `<span class="chip dim">${escapeHtml(plant.size)}</span>` : ""}
+        `;
+
+        const details = document.createElement("div");
+        details.className = "details";
+        details.innerHTML = plant.detailsLines.map(line => `<div>${escapeHtml(line)}</div>`).join("");
+
+        const priceRow = document.createElement("div");
+        priceRow.className = "price-row";
+        priceRow.innerHTML = `
+          <div class="price">${escapeHtml(plant.priceText)}</div>
+          <div class="sku">SKU: ${escapeHtml(plant.sku || "—")}</div>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        actions.innerHTML = plant.url
+          ? `<a class="btn" href="${escapeHtml(plant.url)}" target="_blank" rel="noopener noreferrer">View Product</a>`
+          : `<span class="btn">Local Record</span>`;
+
+        body.append(title, subtitle, chips);
+        if (plant.detailsLines.length) body.append(details);
+        body.append(priceRow, actions);
+        card.append(media, body);
+        grid.append(card);
       });
 
-      els.searchInput.addEventListener("input", applyFilters);
+      els.content.innerHTML = "";
+      els.content.append(grid);
+    }
+
+    function runExactSkuScan() {
+      const raw = els.skuInput.value;
+      const key = normalizeKey(raw);
+      state.exactSku = key;
+
+      if (!key) {
+        setBanner("");
+        applyFilters();
+        return;
+      }
+
+      const hit = state.plants.find(p => p.skuKey === key);
+      if (hit) {
+        els.searchInput.value = "";
+        els.exposureFilter.value = "all";
+        els.groupFilter.value = "all";
+        els.sortSelect.value = "name-asc";
+        state.filtered = [hit];
+        renderPlants([hit]);
+        updateMeta();
+        setBanner(`Exact SKU match found: ${hit.sku} — ${hit.name}`);
+        els.statusText.textContent = `Showing exact SKU match for ${hit.sku}`;
+        requestAnimationFrame(() => {
+          document.getElementById(`card-${hit.skuKey}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      } else {
+        state.filtered = [];
+        renderPlants([]);
+        updateMeta();
+        setBanner(`No exact SKU match found for ${raw}. Clear filters to return to the full catalog.`);
+        els.statusText.textContent = `No exact SKU match for ${raw}`;
+      }
+    }
+
+    function clearFilters() {
+      els.searchInput.value = "";
+      els.skuInput.value = "";
+      els.exposureFilter.value = "all";
+      els.groupFilter.value = "all";
+      els.sortSelect.value = "name-asc";
+      els.itemsPerPage.value = "48";
+      state.exactSku = "";
+      setBanner("");
+      applyFilters();
+      showFlash("Filters cleared");
+      els.statusText.textContent = "Filters cleared. Showing default catalog view.";
+    }
+
+    function applyFilters() {
+      if (state.exactSku) {
+        return runExactSkuScan();
+      }
+
+      const query = text(els.searchInput.value).toLowerCase();
+      const exposure = els.exposureFilter.value;
+      const group = els.groupFilter.value;
+      const sort = els.sortSelect.value;
+      const limit = Number(els.itemsPerPage.value || 48);
+
+      let list = state.plants.filter(plant => {
+        const hay = [
+          plant.name, plant.sku, plant.group, plant.exposure, plant.subtitle,
+          plant.common, plant.genus, plant.size, plant.height, plant.width
+        ].join(" ").toLowerCase();
+
+        const matchesQuery = !query || hay.includes(query);
+        const matchesExposure =
+          exposure === "all" ||
+          (exposure === "sun" && plant.exposure === "Sun") ||
+          (exposure === "shade" && plant.exposure === "Shade") ||
+          (exposure === "mixed" && plant.exposure === "Mixed") ||
+          (exposure === "unknown" && plant.exposure === "Unknown");
+        const matchesGroup = group === "all" || plant.group === group;
+        return matchesQuery && matchesExposure && matchesGroup;
+      });
+
+      list = sortPlants(list, sort);
+      state.filtered = list;
+      renderPlants(limit >= 99999 ? list : list.slice(0, limit));
+      updateMeta();
+      els.statusText.textContent = `${list.length.toLocaleString()} result${list.length === 1 ? "" : "s"} shown`;
+      setBanner("");
+    }
+
+    async function loadPlants() {
+      els.content.innerHTML = '<div class="empty">Loading catalog…</div>';
+      try {
+        const res = await fetch("plants.json", { cache: "no-store" });
+        const json = await res.json();
+        const raw = Array.isArray(json) ? json : (json.plants || json.items || json.products || []);
+        state.plants = raw.map(normalizePlant);
+        buildGroupOptions(state.plants);
+        applyFilters();
+      } catch (err) {
+        els.content.innerHTML = '<div class="empty">Could not load plants.json.</div>';
+        els.statusText.textContent = "Load failed";
+        console.error(err);
+      }
+    }
+
+    function bindEvents() {
+      els.themeToggle.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme") || "dark";
+        applyTheme(current === "dark" ? "light" : "dark");
+      });
+      els.searchInput.addEventListener("input", () => {
+        state.exactSku = "";
+        setBanner("");
+        applyFilters();
+      });
       els.exposureFilter.addEventListener("change", applyFilters);
       els.groupFilter.addEventListener("change", applyFilters);
       els.sortSelect.addEventListener("change", applyFilters);
       els.itemsPerPage.addEventListener("change", applyFilters);
-    }
-
-    async function loadPlants() {
-      hideError();
-      els.statusText.textContent = "Loading plants…";
-      els.content.innerHTML = `<div class="loading">Loading plants…</div>`;
-
-      try {
-        const response = await fetch("plants.json", { cache: "no-store" });
-        if (!response.ok) throw new Error(`plants.json returned ${response.status}`);
-
-        const json = await response.json();
-        const rawList = Array.isArray(json) ? json : (json.plants || json.items || json.products || []);
-
-        if (!Array.isArray(rawList)) {
-          throw new Error("plants.json is not an array and does not contain a plants/items/products array.");
-        }
-
-        state.rawPlants = rawList;
-
-        const normalized = rawList
-          .map((raw, index) => normalizePlant(raw, index))
-          .filter(plant => plant.name && plant.name !== "Unnamed Plant");
-
-        state.plants = dedupePlants(normalized);
-
-        buildGroupOptions(state.plants);
-        applyFilters();
-      } catch (error) {
-        console.error(error);
-        showError(`Could not load plants.json. ${error.message}`);
-        els.content.innerHTML = `<div class="empty">Could not load plants.json.</div>`;
-        els.statusText.textContent = "Load failed";
-      }
+      els.clearFiltersBtn.addEventListener("click", clearFilters);
+      els.scanSkuBtn.addEventListener("click", runExactSkuScan);
+      els.skuInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") runExactSkuScan();
+      });
     }
 
     initTheme();
