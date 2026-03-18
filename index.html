@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -55,7 +56,7 @@
         linear-gradient(180deg, var(--bg-2), var(--bg));
     }
     .app {
-      max-width: 1600px;
+      max-width: 1640px;
       margin: 0 auto;
       padding: 24px;
     }
@@ -108,6 +109,7 @@
       outline: none;
       box-shadow: 0 0 0 4px var(--focus);
     }
+
     .controls {
       margin-top: 18px;
       background: rgba(19, 32, 51, 0.72);
@@ -115,7 +117,7 @@
       border-radius: 28px;
       padding: 18px;
       display: grid;
-      grid-template-columns: 1.45fr 1.35fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
+      grid-template-columns: 1.35fr 1fr 1fr 1fr 0.9fr 0.9fr 0.95fr 0.8fr auto 1.2fr;
       gap: 14px;
       align-items: end;
     }
@@ -144,6 +146,12 @@
       letter-spacing: 0.03em;
       font-weight: 800;
     }
+    .scan-panel {
+      display: grid;
+      gap: 8px;
+      padding-left: 8px;
+      border-left: 1px solid var(--line);
+    }
     .scan-wrap {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -155,6 +163,7 @@
       color: var(--muted);
       line-height: 1.35;
     }
+
     .toolbar {
       margin-top: 18px;
       background: rgba(19, 32, 51, 0.62);
@@ -331,14 +340,26 @@
       line-height: 1.45;
     }
 
-    @media (max-width: 1520px) {
+    @media (max-width: 1560px) {
       .controls {
-        grid-template-columns: 1.45fr 1.35fr 1fr 1fr 1fr 1fr;
+        grid-template-columns: 1.35fr 1fr 1fr 1fr 0.9fr 0.9fr 0.95fr 0.8fr auto;
+      }
+      .scan-panel {
+        grid-column: 1 / -1;
+        padding-left: 0;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        padding-top: 14px;
       }
     }
-    @media (max-width: 1120px) {
+    @media (max-width: 1180px) {
       .controls {
         grid-template-columns: 1fr 1fr 1fr;
+      }
+      .scan-panel {
+        grid-column: auto;
+        border-top: 0;
+        padding-top: 0;
       }
     }
     @media (max-width: 760px) {
@@ -347,6 +368,10 @@
       .hero { flex-direction: column; }
       .price-row, .actions { flex-direction: column; align-items: stretch; }
       .sku { text-align: left; }
+      .scan-panel {
+        padding-left: 0;
+        border-left: 0;
+      }
     }
   </style>
 </head>
@@ -367,15 +392,6 @@
       <div class="control">
         <label for="searchInput">Search catalog</label>
         <input id="searchInput" type="text" placeholder="Name, common name, genus, SKU, plant group..." />
-      </div>
-
-      <div class="control">
-        <label for="skuInput">Scan SKU / EXACT ID</label>
-        <div class="scan-wrap">
-          <input id="skuInput" type="text" placeholder="PEONYIJR3" />
-          <button id="scanSkuBtn" class="action-btn primary" type="button">Scan ID</button>
-        </div>
-        <div class="tiny-note">Caps are shown for clarity. Exact ID scan still works if you type lowercase.</div>
       </div>
 
       <div class="control">
@@ -404,7 +420,7 @@
       </div>
 
       <div class="control">
-        <label for="heightFilter">Mature height</label>
+        <label for="heightFilter">Height</label>
         <select id="heightFilter">
           <option value="all">All heights</option>
           <option value="under12">Under 12"</option>
@@ -416,7 +432,7 @@
       </div>
 
       <div class="control">
-        <label for="widthFilter">Mature width</label>
+        <label for="widthFilter">Width</label>
         <select id="widthFilter">
           <option value="all">All widths</option>
           <option value="under12">Under 12"</option>
@@ -451,6 +467,17 @@
       <div class="control">
         <label>&nbsp;</label>
         <button id="clearFiltersBtn" class="action-btn ghost" type="button">Clear filters</button>
+      </div>
+
+      <div class="scan-panel">
+        <div class="control">
+          <label for="skuInput">Scan SKU / EXACT ID</label>
+          <div class="scan-wrap">
+            <input id="skuInput" type="text" placeholder="PEONYIJR3" />
+            <button id="scanSkuBtn" class="action-btn primary" type="button">Scan ID</button>
+          </div>
+          <div class="tiny-note">ID lookup not case sensitive.</div>
+        </div>
       </div>
     </section>
 
@@ -566,13 +593,8 @@
       const inchesOnly = [...value.matchAll(/(\d+(?:\.\d+)?)\s*"/g)];
       const bareNumbers = [...value.matchAll(/\d+(?:\.\d+)?/g)].map(m => Number(m[0]));
 
-      if (feetOnly.length) {
-        feetOnly.forEach(m => values.push(Number(m[1]) * 12));
-      }
-      if (inchesOnly.length) {
-        inchesOnly.forEach(m => values.push(Number(m[1])));
-      }
-
+      if (feetOnly.length) feetOnly.forEach(m => values.push(Number(m[1]) * 12));
+      if (inchesOnly.length) inchesOnly.forEach(m => values.push(Number(m[1])));
       if (!values.length && bareNumbers.length) {
         if (value.includes("ft") || value.includes("foot") || value.includes("feet")) {
           bareNumbers.forEach(n => values.push(n * 12));
@@ -580,9 +602,7 @@
           bareNumbers.forEach(n => values.push(n));
         }
       }
-
-      if (!values.length) return null;
-      return Math.max(...values);
+      return values.length ? Math.max(...values) : null;
     }
 
     function bucketDimension(inches) {
@@ -648,7 +668,6 @@
       const priceValue = parsePrice(raw.price);
       const sku = text(raw.sku);
       const color = normalizeColor(raw);
-
       const plant = {
         id: sku || `plant-${idx}`,
         sku,
@@ -668,13 +687,11 @@
         height: text(raw.height),
         width: text(raw.width)
       };
-
       plant.heightInches = parseDimensionToInches(plant.height);
       plant.widthInches = parseDimensionToInches(plant.width);
       plant.heightBucket = bucketDimension(plant.heightInches);
       plant.widthBucket = bucketDimension(plant.widthInches);
       plant.detailsLines = detailLines(plant);
-
       return plant;
     }
 
@@ -769,9 +786,7 @@
           img.loading = "lazy";
           img.alt = plant.name;
           img.src = plant.image;
-          img.onerror = () => {
-            media.innerHTML = '<div class="media-placeholder">No Image</div>';
-          };
+          img.onerror = () => { media.innerHTML = '<div class="media-placeholder">No Image</div>'; };
           media.appendChild(img);
         } else {
           media.innerHTML = '<div class="media-placeholder">No Image</div>';
@@ -880,9 +895,7 @@
     }
 
     function applyFilters() {
-      if (state.exactSku) {
-        return runExactSkuScan();
-      }
+      if (state.exactSku) return runExactSkuScan();
 
       const query = text(els.searchInput.value).toLowerCase();
       const exposure = els.exposureFilter.value;
@@ -907,10 +920,7 @@
           (exposure === "mixed" && plant.exposure === "Mixed") ||
           (exposure === "unknown" && plant.exposure === "Unknown");
         const matchesGroup = group === "all" || plant.group === group;
-        const matchesColor =
-          color === "all" ||
-          (color === "__blank__" && !plant.color) ||
-          plant.color === color;
+        const matchesColor = color === "all" || plant.color === color;
         const matchesHeight = height === "all" || plant.heightBucket === height;
         const matchesWidth = width === "all" || plant.widthBucket === width;
 
@@ -967,7 +977,6 @@
       els.itemsPerPage.addEventListener("change", applyFilters);
       els.clearFiltersBtn.addEventListener("click", clearFilters);
       els.scanSkuBtn.addEventListener("click", runExactSkuScan);
-
       els.skuInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") runExactSkuScan();
       });
