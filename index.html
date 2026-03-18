@@ -22,6 +22,7 @@
       --ok-text: #b8edbd;
       --warn-bg: rgba(255, 211, 117, 0.12);
       --warn-text: #ffe09b;
+      --focus: rgba(118, 191, 255, 0.45);
     }
 
     html[data-theme="light"] {
@@ -41,6 +42,7 @@
       --ok-text: #2e6a38;
       --warn-bg: rgba(198, 139, 0, 0.12);
       --warn-text: #8c5d00;
+      --focus: rgba(77, 145, 255, 0.28);
     }
 
     * { box-sizing: border-box; }
@@ -53,7 +55,7 @@
         linear-gradient(180deg, var(--bg-2), var(--bg));
     }
     .app {
-      max-width: 1540px;
+      max-width: 1600px;
       margin: 0 auto;
       padding: 24px;
     }
@@ -102,6 +104,10 @@
       border-color: transparent;
     }
     .action-btn.ghost { background: var(--panel-2); }
+    .control input:focus, .control select:focus, .theme-btn:focus, .action-btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 4px var(--focus);
+    }
     .controls {
       margin-top: 18px;
       background: rgba(19, 32, 51, 0.72);
@@ -109,18 +115,20 @@
       border-radius: 28px;
       padding: 18px;
       display: grid;
-      grid-template-columns: 1.45fr 1.1fr 1.05fr 1fr 1fr auto;
+      grid-template-columns: 1.45fr 1.35fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
       gap: 14px;
       align-items: end;
     }
     .control {
       display: grid;
       gap: 8px;
+      min-width: 0;
     }
     .control label {
       font-size: 0.92rem;
       font-weight: 800;
       color: var(--muted);
+      letter-spacing: 0.01em;
     }
     .control input, .control select {
       width: 100%;
@@ -130,12 +138,22 @@
       color: var(--text);
       padding: 16px 18px;
       font-size: 1rem;
-      outline: none;
+    }
+    #skuInput {
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-weight: 800;
     }
     .scan-wrap {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 10px;
+    }
+    .tiny-note {
+      margin-top: 2px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.35;
     }
     .toolbar {
       margin-top: 18px;
@@ -252,7 +270,6 @@
       font-size: 0.92rem;
       line-height: 1.35;
     }
-    .details strong { color: var(--text); }
     .price-row {
       display: flex;
       justify-content: space-between;
@@ -311,10 +328,15 @@
       margin-top: 16px;
       color: var(--muted);
       font-size: 0.88rem;
+      line-height: 1.45;
     }
-    .hidden { display: none !important; }
 
-    @media (max-width: 1220px) {
+    @media (max-width: 1520px) {
+      .controls {
+        grid-template-columns: 1.45fr 1.35fr 1fr 1fr 1fr 1fr;
+      }
+    }
+    @media (max-width: 1120px) {
       .controls {
         grid-template-columns: 1fr 1fr 1fr;
       }
@@ -334,8 +356,8 @@
       <div>
         <h1>Suburban Perennials</h1>
         <p>
-          Search by plant name, exact SKU, light needs, or plant group. Cards now show size and mature height × width,
-          filters can be cleared in one click, and SKU scan is tuned for exact product lookup.
+          Search by plant name or exact SKU, then refine by exposure, plant group, bloom color, and mature height or width.
+          Cards surface size and mature dimensions clearly, while exact ID scan jumps straight to the matching product.
         </p>
       </div>
       <button id="themeToggle" class="theme-btn" type="button">Toggle Theme</button>
@@ -348,11 +370,12 @@
       </div>
 
       <div class="control">
-        <label for="skuInput">Scan SKU / exact product ID</label>
+        <label for="skuInput">Scan SKU / EXACT ID</label>
         <div class="scan-wrap">
-          <input id="skuInput" type="text" placeholder="Example: PEONYIJR3" />
-          <button id="scanSkuBtn" class="action-btn primary" type="button">Scan SKU</button>
+          <input id="skuInput" type="text" placeholder="PEONYIJR3" />
+          <button id="scanSkuBtn" class="action-btn primary" type="button">Scan ID</button>
         </div>
+        <div class="tiny-note">Caps are shown for clarity. Exact ID scan still works if you type lowercase.</div>
       </div>
 
       <div class="control">
@@ -370,6 +393,37 @@
         <label for="groupFilter">Plant group</label>
         <select id="groupFilter">
           <option value="all">All groups</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="colorFilter">Bloom color</label>
+        <select id="colorFilter">
+          <option value="all">All colors</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="heightFilter">Mature height</label>
+        <select id="heightFilter">
+          <option value="all">All heights</option>
+          <option value="under12">Under 12"</option>
+          <option value="12to24">12–24"</option>
+          <option value="24to36">24–36"</option>
+          <option value="36plus">36"+</option>
+          <option value="unknown">Unknown</option>
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="widthFilter">Mature width</label>
+        <select id="widthFilter">
+          <option value="all">All widths</option>
+          <option value="under12">Under 12"</option>
+          <option value="12to24">12–24"</option>
+          <option value="24to36">24–36"</option>
+          <option value="36plus">36"+</option>
+          <option value="unknown">Unknown</option>
         </select>
       </div>
 
@@ -418,7 +472,7 @@
     </main>
 
     <div class="footer-note">
-      Tip: exact SKU scan matches the whole product code. General search still works for partial SKUs and plant names.
+      Exact ID scan isolates one product by full SKU. General search still supports partial SKUs, names, color, genus, and plant group text.
     </div>
   </div>
 
@@ -437,6 +491,9 @@
       scanSkuBtn: document.getElementById("scanSkuBtn"),
       exposureFilter: document.getElementById("exposureFilter"),
       groupFilter: document.getElementById("groupFilter"),
+      colorFilter: document.getElementById("colorFilter"),
+      heightFilter: document.getElementById("heightFilter"),
+      widthFilter: document.getElementById("widthFilter"),
       sortSelect: document.getElementById("sortSelect"),
       itemsPerPage: document.getElementById("itemsPerPage"),
       clearFiltersBtn: document.getElementById("clearFiltersBtn"),
@@ -487,7 +544,7 @@
     }
 
     function parsePrice(raw) {
-      const m = text(raw).replace(/,/g, "").match(/-?\d+(\.\d+)?/);
+      const m = text(raw).replace(/,/g, "").match(/-?\d+(?:\.\d+)?/);
       return m ? Number(m[0]) : null;
     }
 
@@ -496,11 +553,50 @@
       return num.toLocaleString("en-US", { style: "currency", currency: "USD" });
     }
 
+    function parseDimensionToInches(raw) {
+      const value = text(raw)
+        .replace(/[–—−]/g, "-")
+        .replace(/inches/gi, '"')
+        .replace(/inch/gi, '"')
+        .toLowerCase();
+      if (!value) return null;
+
+      const values = [];
+      const feetOnly = [...value.matchAll(/(\d+(?:\.\d+)?)\s*'/g)];
+      const inchesOnly = [...value.matchAll(/(\d+(?:\.\d+)?)\s*"/g)];
+      const bareNumbers = [...value.matchAll(/\d+(?:\.\d+)?/g)].map(m => Number(m[0]));
+
+      if (feetOnly.length) {
+        feetOnly.forEach(m => values.push(Number(m[1]) * 12));
+      }
+      if (inchesOnly.length) {
+        inchesOnly.forEach(m => values.push(Number(m[1])));
+      }
+
+      if (!values.length && bareNumbers.length) {
+        if (value.includes("ft") || value.includes("foot") || value.includes("feet")) {
+          bareNumbers.forEach(n => values.push(n * 12));
+        } else {
+          bareNumbers.forEach(n => values.push(n));
+        }
+      }
+
+      if (!values.length) return null;
+      return Math.max(...values);
+    }
+
+    function bucketDimension(inches) {
+      if (inches === null || Number.isNaN(inches)) return "unknown";
+      if (inches < 12) return "under12";
+      if (inches < 24) return "12to24";
+      if (inches < 36) return "24to36";
+      return "36plus";
+    }
+
     function inferExposure(raw) {
       const light = text(raw.light).toLowerCase();
       if (!light) return "Unknown";
-      if (light.includes("shade") && light.includes("sun")) return "Mixed";
-      if (light.includes("part")) return "Mixed";
+      if ((light.includes("shade") && light.includes("sun")) || light.includes("part")) return "Mixed";
       if (light.includes("shade")) return "Shade";
       if (light.includes("sun")) return "Sun";
       return titleCase(raw.light);
@@ -536,20 +632,24 @@
       return parts.filter(Boolean).slice(0, 2).join(" • ");
     }
 
-    function sizeHeightWidth(raw) {
-      const parts = [];
-      const size = text(raw.size);
-      const h = text(raw.height);
-      const w = text(raw.width);
-      if (size) parts.push(`Size: ${size}`);
-      if (h || w) parts.push(`Mature size: ${h || "—"} × ${w || "—"}`);
-      return parts;
+    function normalizeColor(raw) {
+      const value = titleCase(raw.color || "");
+      return value || "";
+    }
+
+    function detailLines(plant) {
+      const lines = [];
+      if (plant.size) lines.push(`Size: ${plant.size}`);
+      if (plant.height || plant.width) lines.push(`Mature size: ${plant.height || "—"} × ${plant.width || "—"}`);
+      return lines;
     }
 
     function normalizePlant(raw, idx) {
       const priceValue = parsePrice(raw.price);
       const sku = text(raw.sku);
-      return {
+      const color = normalizeColor(raw);
+
+      const plant = {
         id: sku || `plant-${idx}`,
         sku,
         skuKey: normalizeKey(sku),
@@ -562,18 +662,32 @@
         exposure: inferExposure(raw),
         group: inferGroup(raw),
         size: text(raw.size),
+        color,
         common: text(raw.common),
         genus: text(raw.genus),
         height: text(raw.height),
-        width: text(raw.width),
-        detailsLines: sizeHeightWidth(raw)
+        width: text(raw.width)
       };
+
+      plant.heightInches = parseDimensionToInches(plant.height);
+      plant.widthInches = parseDimensionToInches(plant.width);
+      plant.heightBucket = bucketDimension(plant.heightInches);
+      plant.widthBucket = bucketDimension(plant.widthInches);
+      plant.detailsLines = detailLines(plant);
+
+      return plant;
     }
 
     function buildGroupOptions(plants) {
       const groups = [...new Set(plants.map(p => p.group).filter(Boolean))].sort((a, b) => a.localeCompare(b));
       els.groupFilter.innerHTML = '<option value="all">All groups</option>' +
         groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join("");
+    }
+
+    function buildColorOptions(plants) {
+      const colors = [...new Set(plants.map(p => p.color).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      els.colorFilter.innerHTML = '<option value="all">All colors</option>' +
+        colors.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
     }
 
     function showFlash(message) {
@@ -679,6 +793,7 @@
         chips.innerHTML = `
           <span class="chip light">${escapeHtml(plant.exposure)}</span>
           <span class="chip">${escapeHtml(plant.group)}</span>
+          ${plant.color ? `<span class="chip dim">${escapeHtml(plant.color)}</span>` : ""}
           ${plant.size ? `<span class="chip dim">${escapeHtml(plant.size)}</span>` : ""}
         `;
 
@@ -726,12 +841,15 @@
         els.searchInput.value = "";
         els.exposureFilter.value = "all";
         els.groupFilter.value = "all";
+        els.colorFilter.value = "all";
+        els.heightFilter.value = "all";
+        els.widthFilter.value = "all";
         els.sortSelect.value = "name-asc";
         state.filtered = [hit];
         renderPlants([hit]);
         updateMeta();
-        setBanner(`Exact SKU match found: ${hit.sku} — ${hit.name}`);
-        els.statusText.textContent = `Showing exact SKU match for ${hit.sku}`;
+        setBanner(`Exact ID match found: ${hit.sku} — ${hit.name}`);
+        els.statusText.textContent = `Showing exact ID match for ${hit.sku}`;
         requestAnimationFrame(() => {
           document.getElementById(`card-${hit.skuKey}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
         });
@@ -739,8 +857,8 @@
         state.filtered = [];
         renderPlants([]);
         updateMeta();
-        setBanner(`No exact SKU match found for ${raw}. Clear filters to return to the full catalog.`);
-        els.statusText.textContent = `No exact SKU match for ${raw}`;
+        setBanner(`No exact ID match found for ${raw}. Clear filters to return to the full catalog.`);
+        els.statusText.textContent = `No exact ID match for ${raw}`;
       }
     }
 
@@ -749,6 +867,9 @@
       els.skuInput.value = "";
       els.exposureFilter.value = "all";
       els.groupFilter.value = "all";
+      els.colorFilter.value = "all";
+      els.heightFilter.value = "all";
+      els.widthFilter.value = "all";
       els.sortSelect.value = "name-asc";
       els.itemsPerPage.value = "48";
       state.exactSku = "";
@@ -766,13 +887,16 @@
       const query = text(els.searchInput.value).toLowerCase();
       const exposure = els.exposureFilter.value;
       const group = els.groupFilter.value;
+      const color = els.colorFilter.value;
+      const height = els.heightFilter.value;
+      const width = els.widthFilter.value;
       const sort = els.sortSelect.value;
       const limit = Number(els.itemsPerPage.value || 48);
 
       let list = state.plants.filter(plant => {
         const hay = [
           plant.name, plant.sku, plant.group, plant.exposure, plant.subtitle,
-          plant.common, plant.genus, plant.size, plant.height, plant.width
+          plant.common, plant.genus, plant.size, plant.height, plant.width, plant.color
         ].join(" ").toLowerCase();
 
         const matchesQuery = !query || hay.includes(query);
@@ -783,7 +907,14 @@
           (exposure === "mixed" && plant.exposure === "Mixed") ||
           (exposure === "unknown" && plant.exposure === "Unknown");
         const matchesGroup = group === "all" || plant.group === group;
-        return matchesQuery && matchesExposure && matchesGroup;
+        const matchesColor =
+          color === "all" ||
+          (color === "__blank__" && !plant.color) ||
+          plant.color === color;
+        const matchesHeight = height === "all" || plant.heightBucket === height;
+        const matchesWidth = width === "all" || plant.widthBucket === width;
+
+        return matchesQuery && matchesExposure && matchesGroup && matchesColor && matchesHeight && matchesWidth;
       });
 
       list = sortPlants(list, sort);
@@ -802,6 +933,7 @@
         const raw = Array.isArray(json) ? json : (json.plants || json.items || json.products || []);
         state.plants = raw.map(normalizePlant);
         buildGroupOptions(state.plants);
+        buildColorOptions(state.plants);
         applyFilters();
       } catch (err) {
         els.content.innerHTML = '<div class="empty">Could not load plants.json.</div>';
@@ -815,17 +947,27 @@
         const current = document.documentElement.getAttribute("data-theme") || "dark";
         applyTheme(current === "dark" ? "light" : "dark");
       });
+
       els.searchInput.addEventListener("input", () => {
         state.exactSku = "";
         setBanner("");
         applyFilters();
       });
+
+      els.skuInput.addEventListener("input", () => {
+        els.skuInput.value = els.skuInput.value.toUpperCase();
+      });
+
       els.exposureFilter.addEventListener("change", applyFilters);
       els.groupFilter.addEventListener("change", applyFilters);
+      els.colorFilter.addEventListener("change", applyFilters);
+      els.heightFilter.addEventListener("change", applyFilters);
+      els.widthFilter.addEventListener("change", applyFilters);
       els.sortSelect.addEventListener("change", applyFilters);
       els.itemsPerPage.addEventListener("change", applyFilters);
       els.clearFiltersBtn.addEventListener("click", clearFilters);
       els.scanSkuBtn.addEventListener("click", runExactSkuScan);
+
       els.skuInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") runExactSkuScan();
       });
