@@ -616,18 +616,38 @@
     }
 
     function getPlantGroup(plant) {
-      const sources = [
+      const rawValues = [
         plant.plant_group,
         plant.category,
         plant.section,
+        plant.department,
+        plant.link,
+        plant.url,
         plant.name,
         plant.common,
-        plant.genus
-      ]
-        .filter(Boolean)
-        .map(v => String(v).toLowerCase());
+        plant.genus,
+        plant.series
+      ].filter(Boolean);
 
-      const haystack = sources.join(" | ");
+      const haystack = rawValues
+        .map(v => String(v).toLowerCase())
+        .join(" | ");
+
+      if (
+        haystack.includes("shrub roses") ||
+        haystack.includes("shrub-roses") ||
+        haystack.includes("|55|mir") ||
+        haystack.includes("drift rose") ||
+        haystack.includes("drift roses") ||
+        haystack.includes("knockout rose") ||
+        haystack.includes("knockout roses") ||
+        haystack.includes("knock out rose") ||
+        haystack.includes("knock out roses") ||
+        haystack.includes("proven winner rose") ||
+        haystack.includes("proven winner roses")
+      ) {
+        return "Shrub Roses";
+      }
 
       if (haystack.includes("rose") || haystack.includes("roses")) return "Roses";
       if (haystack.includes("clematis")) return "Clematis";
