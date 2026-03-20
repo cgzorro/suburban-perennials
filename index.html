@@ -615,7 +615,7 @@
       return ["true", "yes", "y", "1", "x"].includes(t);
     }
 
-    function getRoseSignalText(plant) {
+    function getStructuredGroupText(plant) {
       return [
         plant.plant_group,
         plant.category,
@@ -626,6 +626,15 @@
         plant.plant_type,
         plant.link,
         plant.url,
+        plant.sku
+      ]
+        .filter(Boolean)
+        .map(v => String(v).toLowerCase())
+        .join(" | ");
+    }
+
+    function getLoosePlantText(plant) {
+      return [
         plant.name,
         plant.common,
         plant.genus
@@ -635,8 +644,8 @@
         .join(" | ");
     }
 
-    function isFalseRoseMatch(plant) {
-      const text = getRoseSignalText(plant);
+    function isFalseRoseLookalike(plant) {
+      const text = `${getStructuredGroupText(plant)} | ${getLoosePlantText(plant)}`;
 
       return (
         text.includes("primrose") ||
@@ -649,50 +658,36 @@
     }
 
     function isRoseTaxonomy(plant) {
-      const text = getRoseSignalText(plant);
+      const structured = getStructuredGroupText(plant);
+      const sku = normalizeSku(plant.sku || "");
 
-      if (isFalseRoseMatch(plant)) return false;
+      if (isFalseRoseLookalike(plant)) return false;
+
+      if (sku.startsWith("rose")) return true;
 
       if (
-        text.includes("|55|mir") ||
-        text.includes("shrub roses") ||
-        text.includes("shrub-roses") ||
-        text.includes("drift rose") ||
-        text.includes("drift roses") ||
-        text.includes("knockout rose") ||
-        text.includes("knockout roses") ||
-        text.includes("knock out rose") ||
-        text.includes("knock out roses") ||
-        text.includes("proven winner rose") ||
-        text.includes("proven winner roses") ||
-        text.includes("oso easy rose") ||
-        text.includes("oso easy roses")
+        structured.includes("|55|mir") ||
+        structured.includes("shrub roses") ||
+        structured.includes("shrub-roses") ||
+        structured.includes("drift rose") ||
+        structured.includes("drift roses") ||
+        structured.includes("knockout rose") ||
+        structured.includes("knockout roses") ||
+        structured.includes("knock out rose") ||
+        structured.includes("knock out roses") ||
+        structured.includes("proven winner rose") ||
+        structured.includes("proven winner roses") ||
+        structured.includes("oso easy rose") ||
+        structured.includes("oso easy roses")
       ) {
         return true;
       }
 
-      if (/(^|[^a-z])roses?([^a-z]|$)/i.test(text)) {
-        return true;
-      }
-
-      return false;
+      return /(^|[^a-z])roses?([^a-z]|$)/i.test(structured);
     }
 
     function getPlantGroup(plant) {
-      const taxonomy = [
-        plant.plant_group,
-        plant.category,
-        plant.section,
-        plant.department,
-        plant.series,
-        plant.type,
-        plant.plant_type,
-        plant.link,
-        plant.url
-      ]
-        .filter(Boolean)
-        .map(v => String(v).toLowerCase())
-        .join(" | ");
+      const taxonomy = getStructuredGroupText(plant);
 
       if (isRoseTaxonomy(plant)) return "Roses";
       if (taxonomy.includes("clematis")) return "Clematis";
