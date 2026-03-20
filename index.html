@@ -87,7 +87,7 @@
       margin: 8px 0 0;
       color: var(--text-muted);
       max-width: 980px;
-      line-height: 1.35;
+      line-height: 1.3;
       font-size: 1rem;
     }
 
@@ -402,7 +402,9 @@
       }
 
       .hero p {
-        font-size: .95rem;
+        font-size: .9rem;
+        line-height: 1.22;
+        margin-top: 6px;
       }
 
       .controls-wrap {
@@ -461,7 +463,7 @@
     <section class="hero">
       <div>
         <h1>Suburban Perennials</h1>
-        <p>Search by plant name, exact SKU, light needs, or plant group. Cards show size and mature height × width for quick customer lookup.</p>
+        <p>Search by name, SKU, exposure, or group. Cards show size and mature height × width for quick lookup.</p>
       </div>
       <button id="themeToggle" class="theme-toggle" type="button">Theme: Dark</button>
     </section>
@@ -614,6 +616,29 @@
     }
 
     function getPlantGroup(plant) {
+      const sources = [
+        plant.plant_group,
+        plant.category,
+        plant.section,
+        plant.name,
+        plant.common,
+        plant.genus
+      ]
+        .filter(Boolean)
+        .map(v => String(v).toLowerCase());
+
+      const haystack = sources.join(" | ");
+
+      if (haystack.includes("rose") || haystack.includes("roses")) return "Roses";
+      if (haystack.includes("clematis")) return "Clematis";
+      if (haystack.includes("grapes") || haystack.includes("berries")) return "Grapes & Berries";
+      if (haystack.includes("ground cover")) return "Ground Covers";
+      if (haystack.includes("hardy vining")) return "Hardy Vining Plants";
+      if (haystack.includes("native perennial")) return "Native Perennials";
+      if (haystack.includes("peonies") || haystack.includes("peony")) return "Peonies";
+      if (haystack.includes("perennials - shade")) return "Perennials - Shade";
+      if (haystack.includes("perennials - sun")) return "Perennials - Sun";
+
       return plant.plant_group || plant.category || plant.section || "Perennials";
     }
 
@@ -825,6 +850,7 @@
 
     function scanSku() {
       const sku = normalizeSku(els.scanSkuInput.value);
+
       if (!sku) {
         flashButton(els.scanSkuBtn, "No Match", "Scan SKU", "scanFlashTimer");
         return;
@@ -847,6 +873,7 @@
       renderSummary();
       renderResults();
       updateActionButtons();
+
       flashButton(
         els.scanSkuBtn,
         state.filtered.length ? `Found ${state.filtered.length}` : "No Match",
