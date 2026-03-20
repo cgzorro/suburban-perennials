@@ -615,8 +615,8 @@
       return ["true", "yes", "y", "1", "x"].includes(t);
     }
 
-    function getStructuredGroupText(plant) {
-      return [
+    function getPlantGroup(plant) {
+      const taxonomy = [
         plant.plant_group,
         plant.category,
         plant.section,
@@ -625,71 +625,12 @@
         plant.type,
         plant.plant_type,
         plant.link,
-        plant.url,
-        plant.sku
+        plant.url
       ]
         .filter(Boolean)
         .map(v => String(v).toLowerCase())
         .join(" | ");
-    }
 
-    function getLoosePlantText(plant) {
-      return [
-        plant.name,
-        plant.common,
-        plant.genus
-      ]
-        .filter(Boolean)
-        .map(v => String(v).toLowerCase())
-        .join(" | ");
-    }
-
-    function isFalseRoseLookalike(plant) {
-      const text = `${getStructuredGroupText(plant)} | ${getLoosePlantText(plant)}`;
-
-      return (
-        text.includes("primrose") ||
-        text.includes("lenten rose") ||
-        text.includes("rose mallow") ||
-        text.includes("rose campion") ||
-        text.includes("rock rose") ||
-        text.includes("rose of sharon")
-      );
-    }
-
-    function isRoseTaxonomy(plant) {
-      const structured = getStructuredGroupText(plant);
-      const sku = normalizeSku(plant.sku || "");
-
-      if (isFalseRoseLookalike(plant)) return false;
-
-      if (sku.startsWith("rose")) return true;
-
-      if (
-        structured.includes("|55|mir") ||
-        structured.includes("shrub roses") ||
-        structured.includes("shrub-roses") ||
-        structured.includes("drift rose") ||
-        structured.includes("drift roses") ||
-        structured.includes("knockout rose") ||
-        structured.includes("knockout roses") ||
-        structured.includes("knock out rose") ||
-        structured.includes("knock out roses") ||
-        structured.includes("proven winner rose") ||
-        structured.includes("proven winner roses") ||
-        structured.includes("oso easy rose") ||
-        structured.includes("oso easy roses")
-      ) {
-        return true;
-      }
-
-      return /(^|[^a-z])roses?([^a-z]|$)/i.test(structured);
-    }
-
-    function getPlantGroup(plant) {
-      const taxonomy = getStructuredGroupText(plant);
-
-      if (isRoseTaxonomy(plant)) return "Roses";
       if (taxonomy.includes("clematis")) return "Clematis";
       if (taxonomy.includes("grapes") || taxonomy.includes("berries")) return "Grapes & Berries";
       if (taxonomy.includes("ground cover")) return "Ground Covers";
@@ -803,7 +744,10 @@
     }
 
     function populateFilters(plants) {
-      const groups = [...new Set(plants.map(getPlantGroup).filter(Boolean))].sort();
+      const groups = [...new Set(plants.map(getPlantGroup).filter(Boolean))]
+        .filter(group => group !== "Roses")
+        .sort();
+
       const colors = [...new Set(plants.map(inferColor).filter(Boolean))].sort();
 
       const exposures = [...new Set(plants.map(getExposure))]
@@ -837,6 +781,10 @@
         opt.textContent = exposure;
         els.exposureFilter.appendChild(opt);
       });
+
+      if (els.groupFilter.value === "Roses") {
+        els.groupFilter.value = "";
+      }
     }
 
     function renderTraitChips() {
@@ -946,6 +894,7 @@
       const q = normalizeText(els.searchInput.value);
       const exposure = els.exposureFilter.value;
       const group = els.groupFilter.value;
+      const safeGroup = group === "Roses" ? "" : group;
       const color = els.colorFilter.value;
       const height = els.heightFilter.value;
       state.visibleCount = Number(els.showCount.value || 48);
@@ -953,7 +902,7 @@
       state.filtered = state.plants.filter(plant => {
         if (!matchesSearch(plant, q)) return false;
         if (exposure && getExposure(plant) !== exposure) return false;
-        if (group && getPlantGroup(plant) !== group) return false;
+        if (safeGroup && getPlantGroup(plant) !== safeGroup) return false;
         if (color && inferColor(plant) !== color) return false;
         if (height && heightBucket(plant.height) !== height) return false;
 
