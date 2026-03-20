@@ -615,49 +615,65 @@
       return ["true", "yes", "y", "1", "x"].includes(t);
     }
 
-    function getPlantGroup(plant) {
-      const rawValues = [
+    function getRoseTaxonomyText(plant) {
+      return [
         plant.plant_group,
         plant.category,
         plant.section,
         plant.department,
+        plant.series,
+        plant.type,
+        plant.plant_type,
         plant.link,
         plant.url,
-        plant.name,
-        plant.common,
-        plant.genus,
-        plant.series
-      ].filter(Boolean);
-
-      const haystack = rawValues
+        plant.sku
+      ]
+        .filter(Boolean)
         .map(v => String(v).toLowerCase())
         .join(" | ");
+    }
+
+    function isRoseTaxonomy(plant) {
+      const t = getRoseTaxonomyText(plant);
+      const sku = normalizeSku(plant.sku || "");
 
       if (
-        haystack.includes("shrub roses") ||
-        haystack.includes("shrub-roses") ||
-        haystack.includes("|55|mir") ||
-        haystack.includes("drift rose") ||
-        haystack.includes("drift roses") ||
-        haystack.includes("knockout rose") ||
-        haystack.includes("knockout roses") ||
-        haystack.includes("knock out rose") ||
-        haystack.includes("knock out roses") ||
-        haystack.includes("proven winner rose") ||
-        haystack.includes("proven winner roses")
+        t.includes("|55|mir") ||
+        t.includes("shrub roses") ||
+        t.includes("shrub-roses") ||
+        t.includes("drift rose") ||
+        t.includes("drift roses") ||
+        t.includes("knockout rose") ||
+        t.includes("knockout roses") ||
+        t.includes("knock out rose") ||
+        t.includes("knock out roses") ||
+        t.includes("proven winner rose") ||
+        t.includes("proven winner roses") ||
+        t.includes("oso easy rose") ||
+        t.includes("oso easy roses")
       ) {
-        return "Shrub Roses";
+        return true;
       }
 
-      if (haystack.includes("rose") || haystack.includes("roses")) return "Roses";
-      if (haystack.includes("clematis")) return "Clematis";
-      if (haystack.includes("grapes") || haystack.includes("berries")) return "Grapes & Berries";
-      if (haystack.includes("ground cover")) return "Ground Covers";
-      if (haystack.includes("hardy vining")) return "Hardy Vining Plants";
-      if (haystack.includes("native perennial")) return "Native Perennials";
-      if (haystack.includes("peonies") || haystack.includes("peony")) return "Peonies";
-      if (haystack.includes("perennials - shade")) return "Perennials - Shade";
-      if (haystack.includes("perennials - sun")) return "Perennials - Sun";
+      if (sku.startsWith("rose")) {
+        return true;
+      }
+
+      return false;
+    }
+
+    function getPlantGroup(plant) {
+      const taxonomy = getRoseTaxonomyText(plant);
+
+      if (isRoseTaxonomy(plant)) return "Roses";
+      if (taxonomy.includes("clematis")) return "Clematis";
+      if (taxonomy.includes("grapes") || taxonomy.includes("berries")) return "Grapes & Berries";
+      if (taxonomy.includes("ground cover")) return "Ground Covers";
+      if (taxonomy.includes("hardy vining")) return "Hardy Vining Plants";
+      if (taxonomy.includes("native perennial")) return "Native Perennials";
+      if (taxonomy.includes("peonies") || taxonomy.includes("peony")) return "Peonies";
+      if (taxonomy.includes("perennials - shade")) return "Perennials - Shade";
+      if (taxonomy.includes("perennials - sun")) return "Perennials - Sun";
 
       return plant.plant_group || plant.category || plant.section || "Perennials";
     }
