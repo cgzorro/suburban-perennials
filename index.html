@@ -119,6 +119,14 @@
       align-items: end;
     }
 
+    .scan-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+      gap: 12px;
+      align-items: end;
+      margin-top: 14px;
+    }
+
     .field label {
       display: block;
       font-size: .92rem;
@@ -137,6 +145,11 @@
       padding: 14px 16px;
       font-size: 1rem;
       outline: none;
+    }
+
+    .field input::placeholder {
+      color: var(--text-muted);
+      opacity: 0.92;
     }
 
     .button-col {
@@ -160,6 +173,7 @@
       align-items: center;
       justify-content: center;
       white-space: nowrap;
+      transition: background .18s ease, border-color .18s ease, color .18s ease, opacity .18s ease;
     }
 
     .btn.primary {
@@ -171,6 +185,12 @@
     .btn.is-confirmed {
       background: var(--success);
       border-color: var(--success);
+      color: white;
+    }
+
+    .btn.clear-active {
+      background: var(--accent);
+      border-color: var(--accent);
       color: white;
     }
 
@@ -360,7 +380,8 @@
     }
 
     @media (max-width: 1200px) {
-      .controls-grid {
+      .controls-grid,
+      .scan-grid {
         grid-template-columns: 1fr 1fr 1fr;
       }
     }
@@ -389,7 +410,8 @@
         border-radius: 20px;
       }
 
-      .controls-grid {
+      .controls-grid,
+      .scan-grid {
         grid-template-columns: 1fr;
         gap: 10px;
       }
@@ -441,7 +463,7 @@
         <h1>Suburban Perennials</h1>
         <p>Search by plant name, exact SKU, light needs, or plant group. Cards show size and mature height × width for quick customer lookup.</p>
       </div>
-      <button id="themeToggle" class="theme-toggle" type="button">Light Mode</button>
+      <button id="themeToggle" class="theme-toggle" type="button">Theme: Dark</button>
     </section>
 
     <section class="controls-wrap">
@@ -454,7 +476,7 @@
         <div class="field">
           <label for="exposureFilter">Exposure</label>
           <select id="exposureFilter">
-            <option value="">All Exposures</option>
+            <option value="">All exposures</option>
           </select>
         </div>
 
@@ -500,10 +522,20 @@
         <button id="clearFilters" class="btn" type="button">Clear filters</button>
       </div>
 
-      <div class="controls-grid" style="margin-top:14px;">
+      <div class="scan-grid">
         <div class="field">
           <label for="scanSkuInput">Scan SKU / exact product ID</label>
-          <input id="scanSkuInput" type="text" inputmode="numeric" placeholder="Enter or scan SKU" />
+          <input
+            id="scanSkuInput"
+            type="text"
+            inputmode="text"
+            enterkeyhint="search"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            placeholder="Enter or scan SKU"
+          />
         </div>
 
         <div class="field">
@@ -537,11 +569,9 @@
     const TRAITS = [
       "sun",
       "shade",
-      "mixed",
       "pollinator",
       "drought",
-      "deer resistant",
-      "native"
+      "deer resistant"
     ];
 
     const els = {
@@ -565,7 +595,7 @@
       state.theme = theme;
       els.html.setAttribute("data-theme", theme);
       localStorage.setItem("suburban-theme", theme);
-      els.themeToggle.textContent = theme === "dark" ? "Light Mode" : "Dark Mode";
+      els.themeToggle.textContent = theme === "dark" ? "Theme: Dark" : "Theme: Light";
     }
 
     function normalizeText(v) {
@@ -574,6 +604,13 @@
 
     function normalizeSku(v) {
       return (v || "").toString().replace(/\s+/g, "").trim().toLowerCase();
+    }
+
+    function isTruthy(value) {
+      if (value === true) return true;
+      if (value === false || value == null) return false;
+      const t = String(value).trim().toLowerCase();
+      return ["true", "yes", "y", "1", "x"].includes(t);
     }
 
     function getPlantGroup(plant) {
@@ -607,17 +644,27 @@
         plant.category,
         plant.plant_group,
         plant.section,
-        plant.light
+        plant.light,
+        plant.description,
+        plant.notes
       ].join(" ").toLowerCase();
 
       return {
         sun: exposure === "Sun",
         shade: exposure === "Shade",
-        mixed: exposure === "Mixed",
-        pollinator: !!plant.pollinator || haystack.includes("pollinator") || haystack.includes("butterfly") || haystack.includes("bee"),
-        drought: !!plant.drought || haystack.includes("drought"),
-        "deer resistant": !!plant.deer || haystack.includes("deer"),
-        native: !!plant.native || haystack.includes("native")
+        pollinator:
+          isTruthy(plant.pollinator) ||
+          haystack.includes("pollinator") ||
+          haystack.includes("butterfly") ||
+          haystack.includes("bee"),
+        drought:
+          isTruthy(plant.drought) ||
+          haystack.includes("drought"),
+        "deer resistant":
+          isTruthy(plant.deer) ||
+          isTruthy(plant.deer_resistant) ||
+          isTruthy(plant.deerResistant) ||
+          haystack.includes("deer")
       };
     }
 
@@ -654,22 +701,36 @@
     }
 
     function imageFor(plant) {
-      const img = plant.image || "";
-      if (!img) return "";
-      return img;
+      return plant.image || "";
+    }
+
+    function updateActionButtons() {
+      const hasAnythingToClear =
+        !!normalizeText(els.searchInput.value) ||
+        !!normalizeText(els.scanSkuInput.value) ||
+        !!els.exposureFilter.value ||
+        !!els.groupFilter.value ||
+        !!els.colorFilter.value ||
+        !!els.heightFilter.value ||
+        state.activeTraits.size > 0;
+
+      els.clearFilters.classList.toggle("clear-active", hasAnythingToClear);
     }
 
     function populateFilters(plants) {
       const groups = [...new Set(plants.map(getPlantGroup).filter(Boolean))].sort();
       const colors = [...new Set(plants.map(inferColor).filter(Boolean))].sort();
-      const exposures = [...new Set(plants.map(getExposure))].sort((a, b) => {
-        const order = ["Sun", "Shade", "Mixed", "Unknown"];
-        return order.indexOf(a) - order.indexOf(b);
-      });
+
+      const exposures = [...new Set(plants.map(getExposure))]
+        .filter(Boolean)
+        .sort((a, b) => {
+          const order = ["Sun", "Shade", "Mixed", "Unknown"];
+          return order.indexOf(a) - order.indexOf(b);
+        });
 
       els.groupFilter.innerHTML = `<option value="">All groups</option>`;
       els.colorFilter.innerHTML = `<option value="">All colors</option>`;
-      els.exposureFilter.innerHTML = `<option value="">All Exposures</option>`;
+      els.exposureFilter.innerHTML = `<option value="">All exposures</option>`;
 
       groups.forEach(group => {
         const opt = document.createElement("option");
@@ -695,23 +756,30 @@
 
     function renderTraitChips() {
       els.traitChips.innerHTML = "";
+
       TRAITS.forEach(trait => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "chip" + (state.activeTraits.has(trait) ? " active" : "");
         btn.textContent = trait.replace(/\b\w/g, m => m.toUpperCase());
+
         btn.addEventListener("click", () => {
           if (state.activeTraits.has(trait)) state.activeTraits.delete(trait);
           else state.activeTraits.add(trait);
+
           renderTraitChips();
           applyFilters();
         });
+
         els.traitChips.appendChild(btn);
       });
+
+      updateActionButtons();
     }
 
     function matchesSearch(plant, q) {
       if (!q) return true;
+
       const haystack = [
         plant.name,
         plant.sku,
@@ -738,6 +806,7 @@
       state[timerKey] = window.setTimeout(() => {
         btn.classList.remove("is-confirmed");
         btn.textContent = resetText;
+        updateActionButtons();
       }, 1400);
     }
 
@@ -770,13 +839,20 @@
       renderTraitChips();
 
       state.filtered = state.plants.filter(plant => normalizeSku(plant.sku) === sku);
+
       if (!state.filtered.length) {
         state.filtered = state.plants.filter(plant => normalizeSku(plant.sku).includes(sku));
       }
 
       renderSummary();
       renderResults();
-      flashButton(els.scanSkuBtn, state.filtered.length ? `Found ${state.filtered.length}` : "No Match", "Scan SKU", "scanFlashTimer");
+      updateActionButtons();
+      flashButton(
+        els.scanSkuBtn,
+        state.filtered.length ? `Found ${state.filtered.length}` : "No Match",
+        "Scan SKU",
+        "scanFlashTimer"
+      );
     }
 
     function applyFilters() {
@@ -804,6 +880,7 @@
 
       renderSummary();
       renderResults();
+      updateActionButtons();
     }
 
     function renderSummary() {
@@ -811,14 +888,14 @@
       const showing = state.filtered.length;
       const sun = state.filtered.filter(p => getExposure(p) === "Sun").length;
       const shade = state.filtered.filter(p => getExposure(p) === "Shade").length;
-      const mixed = state.filtered.filter(p => getExposure(p) === "Mixed").length;
+      const activeTraits = state.activeTraits.size;
 
       els.summaryBar.innerHTML = `
         <span class="pill">${total} loaded</span>
         <span class="pill">${showing} showing</span>
         <span class="pill">${sun} sun</span>
         <span class="pill">${shade} shade</span>
-        <span class="pill">${mixed} mixed</span>
+        <span class="pill">${activeTraits} active traits</span>
       `;
     }
 
@@ -841,7 +918,6 @@
         if (traits.pollinator) extraTags.push("Pollinator");
         if (traits.drought) extraTags.push("Drought");
         if (traits["deer resistant"]) extraTags.push("Deer Resistant");
-        if (traits.native) extraTags.push("Native");
 
         const card = document.createElement("article");
         card.className = "card";
@@ -915,6 +991,10 @@
       els.showCount.addEventListener("change", applyFilters);
       els.clearFilters.addEventListener("click", clearFilters);
       els.scanSkuBtn.addEventListener("click", scanSku);
+
+      els.scanSkuInput.addEventListener("input", updateActionButtons);
+      els.scanSkuInput.addEventListener("focus", updateActionButtons);
+
       els.scanSkuInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
