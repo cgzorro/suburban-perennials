@@ -615,7 +615,7 @@
       return ["true", "yes", "y", "1", "x"].includes(t);
     }
 
-    function getRoseTaxonomyText(plant) {
+    function getRoseSignalText(plant) {
       return [
         plant.plant_group,
         plant.category,
@@ -626,36 +626,52 @@
         plant.plant_type,
         plant.link,
         plant.url,
-        plant.sku
+        plant.name,
+        plant.common,
+        plant.genus
       ]
         .filter(Boolean)
         .map(v => String(v).toLowerCase())
         .join(" | ");
     }
 
+    function isFalseRoseMatch(plant) {
+      const text = getRoseSignalText(plant);
+
+      return (
+        text.includes("primrose") ||
+        text.includes("lenten rose") ||
+        text.includes("rose mallow") ||
+        text.includes("rose campion") ||
+        text.includes("rock rose") ||
+        text.includes("rose of sharon")
+      );
+    }
+
     function isRoseTaxonomy(plant) {
-      const t = getRoseTaxonomyText(plant);
-      const sku = normalizeSku(plant.sku || "");
+      const text = getRoseSignalText(plant);
+
+      if (isFalseRoseMatch(plant)) return false;
 
       if (
-        t.includes("|55|mir") ||
-        t.includes("shrub roses") ||
-        t.includes("shrub-roses") ||
-        t.includes("drift rose") ||
-        t.includes("drift roses") ||
-        t.includes("knockout rose") ||
-        t.includes("knockout roses") ||
-        t.includes("knock out rose") ||
-        t.includes("knock out roses") ||
-        t.includes("proven winner rose") ||
-        t.includes("proven winner roses") ||
-        t.includes("oso easy rose") ||
-        t.includes("oso easy roses")
+        text.includes("|55|mir") ||
+        text.includes("shrub roses") ||
+        text.includes("shrub-roses") ||
+        text.includes("drift rose") ||
+        text.includes("drift roses") ||
+        text.includes("knockout rose") ||
+        text.includes("knockout roses") ||
+        text.includes("knock out rose") ||
+        text.includes("knock out roses") ||
+        text.includes("proven winner rose") ||
+        text.includes("proven winner roses") ||
+        text.includes("oso easy rose") ||
+        text.includes("oso easy roses")
       ) {
         return true;
       }
 
-      if (sku.startsWith("rose")) {
+      if (/(^|[^a-z])roses?([^a-z]|$)/i.test(text)) {
         return true;
       }
 
@@ -663,7 +679,20 @@
     }
 
     function getPlantGroup(plant) {
-      const taxonomy = getRoseTaxonomyText(plant);
+      const taxonomy = [
+        plant.plant_group,
+        plant.category,
+        plant.section,
+        plant.department,
+        plant.series,
+        plant.type,
+        plant.plant_type,
+        plant.link,
+        plant.url
+      ]
+        .filter(Boolean)
+        .map(v => String(v).toLowerCase())
+        .join(" | ");
 
       if (isRoseTaxonomy(plant)) return "Roses";
       if (taxonomy.includes("clematis")) return "Clematis";
