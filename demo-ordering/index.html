@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suburban Perennials Order Demo</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-2: #0b1627;
+      --panel: #132033;
+      --panel-2: #1a2940;
+      --text: #f3f7fb;
+      --muted: #b7c4d5;
+      --line: rgba(140, 168, 210, 0.22);
+      --accent: #8ac48e;
+      --accent-2: #65b36f;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+      --ok: #b8edbd;
+      --amber: #ffe09b;
+      --blue: #a8d5ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top center, rgba(44, 82, 140, 0.12), transparent 38%),
+        linear-gradient(180deg, var(--bg-2), var(--bg));
+    }
+    .app {
+      max-width: 1540px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .hero, .panel, .stat, .tab, .table-wrap, .packet, .card {
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      border-radius: 28px;
+      padding: 24px;
+      background: linear-gradient(120deg, var(--panel), var(--panel-2));
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      align-items: start;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      letter-spacing: -0.03em;
+      line-height: 1.02;
+    }
+    .hero p {
+      margin: 0;
+      max-width: 62ch;
+      color: var(--muted);
+      line-height: 1.4;
+      font-size: 1.04rem;
+    }
+    .hero-tag {
+      border-radius: 999px;
+      padding: 12px 16px;
+      background: rgba(138, 196, 142, 0.12);
+      color: var(--ok);
+      font-weight: 800;
+      border: 1px solid rgba(138, 196, 142, 0.26);
+      white-space: nowrap;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .stat {
+      border-radius: 22px;
+      background: rgba(19, 32, 51, 0.72);
+      padding: 16px 18px;
+    }
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .stat-value {
+      margin-top: 6px;
+      font-size: 1.7rem;
+      font-weight: 900;
+    }
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .tab {
+      border-radius: 20px;
+      padding: 14px 16px;
+      background: rgba(19, 32, 51, 0.72);
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--muted);
+      text-align: center;
+      transition: transform 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .tab.active {
+      color: var(--text);
+      border-color: rgba(138, 196, 142, 0.3);
+      background: rgba(138, 196, 142, 0.11);
+    }
+    .tab:hover { transform: translateY(-1px); }
+    .page { display: none; margin-top: 18px; }
+    .page.active { display: block; }
+    .panel {
+      border-radius: 28px;
+      background: rgba(19, 32, 51, 0.72);
+      padding: 18px;
+    }
+    .panel-header {
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: end;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .panel-title {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 900;
+    }
+    .panel-copy {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.4;
+      max-width: 70ch;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .badge {
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      border: 1px solid var(--line);
+      background: rgba(19, 32, 51, 0.8);
+      color: var(--text);
+    }
+    .a { color: var(--ok); }
+    .l { color: var(--amber); }
+    .s { color: var(--blue); }
+    .controls {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    input, select, textarea, button {
+      font: inherit;
+    }
+    input, select, textarea {
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(11, 22, 39, 0.84);
+      color: var(--text);
+      padding: 14px 16px;
+      outline: none;
+    }
+    button {
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(26, 41, 64, 0.95);
+      color: var(--text);
+      padding: 14px 16px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .primary {
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      color: #04101a;
+      border-color: transparent;
+    }
+    .table-wrap {
+      overflow: auto;
+      border-radius: 22px;
+      background: rgba(11, 22, 39, 0.76);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.95rem;
+    }
+    th {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      background: rgba(7, 17, 31, 0.7);
+      position: sticky;
+      top: 0;
+    }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .qty-box {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .qty-box input {
+      width: 84px;
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+    .mini {
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 0.88rem;
+    }
+    .split {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+    }
+    .card {
+      border-radius: 24px;
+      background: rgba(11, 22, 39, 0.7);
+      padding: 18px;
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .stack {
+      display: grid;
+      gap: 14px;
+    }
+    .line-item {
+      border-radius: 18px;
+      background: rgba(19, 32, 51, 0.82);
+      border: 1px solid var(--line);
+      padding: 14px;
+    }
+    .line-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+    .line-name {
+      font-weight: 800;
+      line-height: 1.3;
+    }
+    .line-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .line-grid {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .metric {
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(11, 22, 39, 0.7);
+      padding: 10px 12px;
+    }
+    .metric-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .metric-value {
+      margin-top: 4px;
+      font-weight: 800;
+    }
+    .action-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .packet {
+      border-radius: 24px;
+      background: rgba(11, 22, 39, 0.76);
+      padding: 20px;
+    }
+    .packet-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+    }
+    .packet h3, .packet h4 { margin: 0; }
+    .muted {
+      color: var(--muted);
+    }
+    .footer {
+      margin-top: 18px;
+      padding: 14px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(19, 32, 51, 0.58);
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .brand {
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 28px 16px;
+    }
+    @media (max-width: 1180px) {
+      .stats, .tabs, .controls, .split { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 760px) {
+      .app { padding: 14px; }
+      .hero { padding: 18px; flex-direction: column; }
+      .hero p { max-width: 32ch; font-size: 0.98rem; }
+      .stats, .tabs, .controls, .split { grid-template-columns: 1fr; }
+      .line-grid { grid-template-columns: 1fr 1fr; }
+      table { min-width: 820px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div>
+        <h1>Suburban Perennials Order Demo</h1>
+        <p>
+          GitHub-ready demo showing how the current catalog can evolve into a farm availability selector, order builder,
+          manager review queue, vendor packet, and receiving workflow.
+        </p>
+      </div>
+      <div class="hero-tag">Draft → Review → Send → Receive</div>
+    </section>
+
+    <section class="stats">
+      <div class="stat"><div class="stat-label">Store</div><div class="stat-value">Perennials</div></div>
+      <div class="stat"><div class="stat-label">Vendor</div><div class="stat-value">Ashland-style list</div></div>
+      <div class="stat"><div class="stat-label">Draft Order</div><div class="stat-value">FTN-2026-0017</div></div>
+      <div class="stat"><div class="stat-label">Status</div><div class="stat-value">Under Review</div></div>
+    </section>
+
+    <section class="tabs">
+      <button class="tab active" data-page="availability">1. Availability Sheet</button>
+      <button class="tab" data-page="cart">2. Order Cart</button>
+      <button class="tab" data-page="review">3. Manager Review</button>
+      <button class="tab" data-page="packet">4. Vendor Packet</button>
+      <button class="tab" data-page="receiving">5. Receiving</button>
+    </section>
+
+    <section id="availability" class="page active">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Farm Availability Sheet → Digital Selector</h2>
+            <p class="panel-copy">
+              This page is intentionally sheet-like. It mirrors the current farm list pattern: status codes, grouped availability,
+              quantity entry, and line-by-line selection that flows into a live order draft.
+            </p>
+          </div>
+          <div class="legend">
+            <span class="badge a">A = Available</span>
+            <span class="badge l">L = Limited</span>
+            <span class="badge s">S = To Size / No Color</span>
+            <span class="badge">T = Tight Buds</span>
+            <span class="badge">C = Color Showing</span>
+            <span class="badge">B = Blooming</span>
+          </div>
+        </div>
+
+        <div class="controls">
+          <input id="search" placeholder="Search name, SKU, color, group..." />
+          <select id="filterExposure">
+            <option value="all">All exposures</option>
+            <option value="Sun">Sun</option>
+            <option value="Shade">Shade</option>
+          </select>
+          <select id="filterGroup">
+            <option value="all">All groups</option>
+          </select>
+          <select id="filterStatus">
+            <option value="all">All statuses</option>
+            <option value="A">Available</option>
+            <option value="L">Limited</option>
+            <option value="S">To Size</option>
+            <option value="T">Tight Buds</option>
+            <option value="C">Color Showing</option>
+            <option value="B">Blooming</option>
+          </select>
+          <button id="clearFilters">Clear filters</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Status</th>
+                <th>SKU</th>
+                <th>Plant</th>
+                <th>Group</th>
+                <th>Exposure</th>
+                <th>Size</th>
+                <th>Color</th>
+                <th>Price</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="availabilityRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="cart" class="page">
+      <div class="split">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Order Cart</h2>
+              <p class="panel-copy">Selected lines from the availability sheet become a store order draft with quantities, notes, and rough totals.</p>
+            </div>
+          </div>
+          <div id="cartLines" class="stack"></div>
+          <div id="cartEmpty" class="empty">No lines in the draft yet. Go to Availability Sheet and add a few plants.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Draft Summary</h2>
+              <p class="panel-copy">This is the right-hand summary block the manager or buyer sees before review.</p>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="card">
+              <h3>Draft metadata</h3>
+              <p>Order ID: <strong>FTN-2026-0017</strong><br>Vendor: <strong>Midwest Growers</strong><br>Department: <strong>Perennials</strong></p>
+            </div>
+            <div class="card">
+              <h3>Current totals</h3>
+              <div class="stack">
+                <div class="metric"><div class="metric-label">Requested lines</div><div id="sumLines" class="metric-value">0</div></div>
+                <div class="metric"><div class="metric-label">Requested units</div><div id="sumUnits" class="metric-value">0</div></div>
+                <div class="metric"><div class="metric-label">Estimated total</div><div id="sumValue" class="metric-value">$0.00</div></div>
+              </div>
+            </div>
+            <div class="action-row">
+              <button>Save draft</button>
+              <button class="primary">Submit for review</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="review" class="page">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Manager Review</h2>
+            <p class="panel-copy">Review quantities, reduce lines if needed, and approve the vendor request without printing, handwriting, scanning, or emailing marked-up paper.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Plant</th>
+                <th>Requested</th>
+                <th>Approved</th>
+                <th>Status</th>
+                <th>Decision</th>
+              </tr>
+            </thead>
+            <tbody id="reviewRows"></tbody>
+          </table>
+        </div>
+        <div class="action-row">
+          <button>Send back for edits</button>
+          <button class="primary">Approve order</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="packet" class="page">
+      <div class="packet">
+        <div class="packet-head">
+          <div>
+            <h3>Vendor Packet</h3>
+            <div class="muted">Order ID FTN-2026-0017 • Midwest Growers • Requested ship week: March 24</div>
+          </div>
+          <div class="badge a">Ready to send</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Plant</th>
+                <th>Approved Qty</th>
+                <th>Size</th>
+                <th>Color</th>
+                <th>Store Notes</th>
+              </tr>
+            </thead>
+            <tbody id="packetRows"></tbody>
+          </table>
+        </div>
+        <div class="action-row">
+          <button>Export PDF</button>
+          <button>Export CSV</button>
+          <button class="primary">Email to vendor</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="receiving" class="page">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Receiving</h2>
+            <p class="panel-copy">When the shipment arrives, compare expected vs. received quantities and flag shortages, substitutions, or damages against the approved order.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Plant</th>
+                <th>Approved</th>
+                <th>Received</th>
+                <th>Condition</th>
+                <th>Receiving Notes</th>
+              </tr>
+            </thead>
+            <tbody id="receivingRows"></tbody>
+          </table>
+        </div>
+        <div class="action-row">
+          <button>Save receiving draft</button>
+          <button class="primary">Complete receiving</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div><span class="brand">C.G. FOX</span> • Foxfield Studio</div>
+      <div>GitHub-ready demo • Single HTML file • Sample data only</div>
+    </div>
+  </div>
+
+  <script>
+    const availability = [
+      { sku: "PEONYIJR3", name: "Julia Rose Itoh Peony", group: "Peonies", exposure: "Sun", size: "3G", color: "Apricot / Pink", price: 59.99, status: "A", notes: "Feature table" },
+      { sku: "PEONYKRF2", name: "Karl Rosenfield Peony", group: "Peonies", exposure: "Sun", size: "2G", color: "Red", price: 34.99, status: "L", notes: "Good backup feature" },
+      { sku: "PHOSADG1", name: "Abiqua Drinking Gourd Hosta", group: "Perennials - Shade", exposure: "Shade", size: "1G", color: "Blue-Green", price: 13.99, status: "A", notes: "Shade bench reset" },
+      { sku: "PHOSBC1", name: "Blue Cadet Hosta", group: "Perennials - Shade", exposure: "Shade", size: "1G", color: "Blue", price: 11.99, status: "C", notes: "Strong filler" },
+      { sku: "CLEMROSE1", name: "Rosemoor Clematis", group: "Clematis", exposure: "Sun", size: "1G", color: "Violet", price: 18.99, status: "A", notes: "Replace sold-through stock" },
+      { sku: "BLUP2", name: "Bluecrop Blueberry", group: "Grapes & Berries", exposure: "Sun", size: "2G", color: "Blue", price: 24.99, status: "A", notes: "Edibles display" },
+      { sku: "BLKQ3", name: "Black Satin Blackberry", group: "Grapes & Berries", exposure: "Sun", size: "3G", color: "Black", price: 29.99, status: "S", notes: "Limited color stage" },
+      { sku: "AJUGBR1", name: "Burgundy Glow Ajuga", group: "Ground Covers", exposure: "Shade", size: "1G", color: "Blue", price: 9.99, status: "T", notes: "Ground cover refresh" }
+    ];
+
+    let cart = [
+      { sku: "PEONYIJR3", qty: 6, approved: 4, received: 0, condition: "Pending", notes: "Feature table" },
+      { sku: "PHOSADG1", qty: 8, approved: 8, received: 0, condition: "Pending", notes: "Shade bench reset" },
+      { sku: "CLEMROSE1", qty: 4, approved: 4, received: 0, condition: "Pending", notes: "Replace sold-through stock" },
+      { sku: "BLUP2", qty: 10, approved: 6, received: 0, condition: "Pending", notes: "Edibles display" }
+    ];
+
+    const $ = (id) => document.getElementById(id);
+
+    function money(value) {
+      return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+    }
+
+    function lineForSku(sku) {
+      return availability.find(item => item.sku === sku);
+    }
+
+    function cartLine(sku) {
+      return cart.find(item => item.sku === sku);
+    }
+
+    function fillGroupFilter() {
+      const select = $("filterGroup");
+      [...new Set(availability.map(item => item.group))].sort((a,b) => a.localeCompare(b)).forEach(group => {
+        const opt = document.createElement("option");
+        opt.value = group;
+        opt.textContent = group;
+        select.appendChild(opt);
+      });
+    }
+
+    function activeAvailability() {
+      const query = $("search").value.trim().toLowerCase();
+      const exposure = $("filterExposure").value;
+      const group = $("filterGroup").value;
+      const status = $("filterStatus").value;
+
+      return availability.filter(item => {
+        const hay = [item.sku, item.name, item.group, item.color, item.notes].join(" ").toLowerCase();
+        return (!query || hay.includes(query))
+          && (exposure === "all" || item.exposure === exposure)
+          && (group === "all" || item.group === group)
+          && (status === "all" || item.status === status);
+      });
+    }
+
+    function renderAvailability() {
+      const rows = $("availabilityRows");
+      rows.innerHTML = "";
+      activeAvailability().forEach(item => {
+        const existing = cartLine(item.sku);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>
+            <div class="qty-box">
+              <input type="number" min="1" value="${existing ? existing.qty : 1}" id="qty-${item.sku}">
+              <button class="mini primary" onclick="addToCart('${item.sku}')">${existing ? "Update" : "Add"}</button>
+            </div>
+          </td>
+          <td><span class="badge ${item.status.toLowerCase()}">${item.status}</span></td>
+          <td>${item.sku}</td>
+          <td>${item.name}</td>
+          <td>${item.group}</td>
+          <td>${item.exposure}</td>
+          <td>${item.size}</td>
+          <td>${item.color}</td>
+          <td>${money(item.price)}</td>
+          <td>${item.notes}</td>
+        `;
+        rows.appendChild(tr);
+      });
+    }
+
+    function addToCart(sku) {
+      const qty = Number(document.getElementById(`qty-${sku}`).value || 1);
+      const existing = cartLine(sku);
+      const item = lineForSku(sku);
+      if (existing) {
+        existing.qty = qty;
+        existing.approved = Math.min(existing.approved || qty, qty);
+      } else {
+        cart.push({ sku, qty, approved: qty, received: 0, condition: "Pending", notes: item.notes });
+      }
+      renderAll();
+    }
+
+    function removeLine(sku) {
+      cart = cart.filter(item => item.sku !== sku);
+      renderAll();
+    }
+
+    function updateQty(sku, field, value) {
+      const line = cartLine(sku);
+      if (!line) return;
+      if (field === "notes" || field === "condition") {
+        line[field] = value;
+      } else {
+        line[field] = Number(value || 0);
+      }
+      renderAll(false);
+    }
+
+    function renderCart() {
+      const wrap = $("cartLines");
+      const empty = $("cartEmpty");
+      wrap.innerHTML = "";
+      if (!cart.length) {
+        empty.style.display = "block";
+        $("sumLines").textContent = 0;
+        $("sumUnits").textContent = 0;
+        $("sumValue").textContent = money(0);
+        return;
+      }
+      empty.style.display = "none";
+
+      cart.forEach(line => {
+        const item = lineForSku(line.sku);
+        const div = document.createElement("div");
+        div.className = "line-item";
+        div.innerHTML = `
+          <div class="line-top">
+            <div>
+              <div class="line-name">${item.name}</div>
+              <div class="line-meta">${item.sku} • ${item.group} • ${item.size} • ${item.color}</div>
+            </div>
+            <button class="mini" onclick="removeLine('${item.sku}')">Remove</button>
+          </div>
+          <div class="line-grid">
+            <div class="metric">
+              <div class="metric-label">Requested</div>
+              <input type="number" min="0" value="${line.qty}" onchange="updateQty('${item.sku}','qty',this.value)">
+            </div>
+            <div class="metric">
+              <div class="metric-label">Approved</div>
+              <input type="number" min="0" value="${line.approved}" onchange="updateQty('${item.sku}','approved',this.value)">
+            </div>
+            <div class="metric">
+              <div class="metric-label">Unit price</div>
+              <div class="metric-value">${money(item.price)}</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Line total</div>
+              <div class="metric-value">${money(item.price * line.qty)}</div>
+            </div>
+          </div>
+          <div class="action-row">
+            <input value="${line.notes || ''}" placeholder="Line notes" onchange="updateQty('${item.sku}','notes',this.value)">
+          </div>
+        `;
+        wrap.appendChild(div);
+      });
+
+      const lines = cart.length;
+      const units = cart.reduce((sum, line) => sum + line.qty, 0);
+      const value = cart.reduce((sum, line) => {
+        const item = lineForSku(line.sku);
+        return sum + (item ? item.price * line.qty : 0);
+      }, 0);
+
+      $("sumLines").textContent = lines;
+      $("sumUnits").textContent = units;
+      $("sumValue").textContent = money(value);
+    }
+
+    function renderReview() {
+      const rows = $("reviewRows");
+      rows.innerHTML = "";
+      cart.forEach(line => {
+        const item = lineForSku(line.sku);
+        const tr = document.createElement("tr");
+        const decision = line.approved === line.qty ? "Approved" : (line.approved === 0 ? "Rejected" : "Approved w/ change");
+        tr.innerHTML = `
+          <td>${item.sku}</td>
+          <td>${item.name}</td>
+          <td>${line.qty}</td>
+          <td><input type="number" min="0" value="${line.approved}" onchange="updateQty('${item.sku}','approved',this.value)"></td>
+          <td><span class="badge ${item.status.toLowerCase()}">${item.status}</span></td>
+          <td>${decision}</td>
+        `;
+        rows.appendChild(tr);
+      });
+    }
+
+    function renderPacket() {
+      const rows = $("packetRows");
+      rows.innerHTML = "";
+      cart.forEach(line => {
+        const item = lineForSku(line.sku);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.sku}</td>
+          <td>${item.name}</td>
+          <td>${line.approved}</td>
+          <td>${item.size}</td>
+          <td>${item.color}</td>
+          <td>${line.notes || ""}</td>
+        `;
+        rows.appendChild(tr);
+      });
+    }
+
+    function renderReceiving() {
+      const rows = $("receivingRows");
+      rows.innerHTML = "";
+      cart.forEach(line => {
+        const item = lineForSku(line.sku);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.sku}</td>
+          <td>${item.name}</td>
+          <td>${line.approved}</td>
+          <td><input type="number" min="0" value="${line.received}" onchange="updateQty('${item.sku}','received',this.value)"></td>
+          <td>
+            <select onchange="updateQty('${item.sku}','condition',this.value)">
+              ${["Pending","Received","Partial","Shorted","Damaged"].map(opt => `<option ${line.condition===opt?'selected':''}>${opt}</option>`).join("")}
+            </select>
+          </td>
+          <td><input value="${line.notes || ''}" onchange="updateQty('${item.sku}','notes',this.value)"></td>
+        `;
+        rows.appendChild(tr);
+      });
+    }
+
+    function renderAll(renderAvailabilityTable = true) {
+      if (renderAvailabilityTable) renderAvailability();
+      renderCart();
+      renderReview();
+      renderPacket();
+      renderReceiving();
+    }
+
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+        document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.page).classList.add("active");
+      });
+    });
+
+    ["search","filterExposure","filterGroup","filterStatus"].forEach(id => {
+      $(id).addEventListener("input", renderAvailability);
+      $(id).addEventListener("change", renderAvailability);
+    });
+
+    $("clearFilters").addEventListener("click", () => {
+      $("search").value = "";
+      $("filterExposure").value = "all";
+      $("filterGroup").value = "all";
+      $("filterStatus").value = "all";
+      renderAvailability();
+    });
+
+    fillGroupFilter();
+    renderAll();
+  </script>
+</body>
+</html>
