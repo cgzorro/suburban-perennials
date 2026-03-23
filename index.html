@@ -500,10 +500,10 @@
           <label for="heightFilter">Height</label>
           <select id="heightFilter">
             <option value="">All heights</option>
-            <option value="under12">Under 12"</option>
-            <option value="12to24">12–24"</option>
-            <option value="24to36">24–36"</option>
-            <option value="36plus">36"+</option>
+            <option value="under12">Under 12&quot;</option>
+            <option value="12to24">12–24&quot;</option>
+            <option value="24to36">24–36&quot;</option>
+            <option value="36plus">36&quot;+</option>
           </select>
         </div>
 
@@ -616,31 +616,20 @@
     }
 
     function getPlantGroup(plant) {
-      const taxonomy = [
-        plant.plant_group,
-        plant.category,
-        plant.section,
-        plant.department,
-        plant.series,
-        plant.type,
-        plant.plant_type,
-        plant.link,
-        plant.url
-      ]
-        .filter(Boolean)
-        .map(v => String(v).toLowerCase())
-        .join(" | ");
+      const group = plant.plant_group || plant.category || plant.section || "Perennials";
+      const text = String(group).toLowerCase();
 
-      if (taxonomy.includes("clematis")) return "Clematis";
-      if (taxonomy.includes("grapes") || taxonomy.includes("berries")) return "Grapes & Berries";
-      if (taxonomy.includes("ground cover")) return "Ground Covers";
-      if (taxonomy.includes("hardy vining")) return "Hardy Vining Plants";
-      if (taxonomy.includes("native perennial")) return "Native Perennials";
-      if (taxonomy.includes("peonies") || taxonomy.includes("peony")) return "Peonies";
-      if (taxonomy.includes("perennials - shade")) return "Perennials - Shade";
-      if (taxonomy.includes("perennials - sun")) return "Perennials - Sun";
+      if (text.includes("clematis")) return "Clematis";
+      if (text.includes("grapes") || text.includes("berries")) return "Grapes & Berries";
+      if (text.includes("ground cover")) return "Ground Covers";
+      if (text.includes("hardy vining")) return "Hardy Vining Plants";
+      if (text.includes("native perennial")) return "Native Perennials";
+      if (text.includes("peonies") || text.includes("peony")) return "Peonies";
+      if (text.includes("perennials - shade")) return "Perennials - Shade";
+      if (text.includes("perennials - sun")) return "Perennials - Sun";
+      if (text.includes("roses") || text === "rose") return "Roses";
 
-      return plant.plant_group || plant.category || plant.section || "Perennials";
+      return group;
     }
 
     function getExposure(plant) {
@@ -744,10 +733,7 @@
     }
 
     function populateFilters(plants) {
-      const groups = [...new Set(plants.map(getPlantGroup).filter(Boolean))]
-        .filter(group => group !== "Roses")
-        .sort();
-
+      const groups = [...new Set(plants.map(getPlantGroup).filter(Boolean))].sort();
       const colors = [...new Set(plants.map(inferColor).filter(Boolean))].sort();
 
       const exposures = [...new Set(plants.map(getExposure))]
@@ -781,10 +767,6 @@
         opt.textContent = exposure;
         els.exposureFilter.appendChild(opt);
       });
-
-      if (els.groupFilter.value === "Roses") {
-        els.groupFilter.value = "";
-      }
     }
 
     function renderTraitChips() {
@@ -894,7 +876,6 @@
       const q = normalizeText(els.searchInput.value);
       const exposure = els.exposureFilter.value;
       const group = els.groupFilter.value;
-      const safeGroup = group === "Roses" ? "" : group;
       const color = els.colorFilter.value;
       const height = els.heightFilter.value;
       state.visibleCount = Number(els.showCount.value || 48);
@@ -902,7 +883,7 @@
       state.filtered = state.plants.filter(plant => {
         if (!matchesSearch(plant, q)) return false;
         if (exposure && getExposure(plant) !== exposure) return false;
-        if (safeGroup && getPlantGroup(plant) !== safeGroup) return false;
+        if (group && getPlantGroup(plant) !== group) return false;
         if (color && inferColor(plant) !== color) return false;
         if (height && heightBucket(plant.height) !== height) return false;
 
@@ -960,7 +941,7 @@
         card.innerHTML = `
           <div class="card-image">
             ${img
-              ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>';">`
+              ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>';"></img>`
               : `<div class="no-image">No image available</div>`
             }
           </div>
