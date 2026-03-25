@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Suburban Perennials</title>
+
   <style>
     :root {
       --bg: #071325;
@@ -192,7 +193,7 @@
       color: var(--text);
     }
 
-    .btn.is-confirmed {
+    .btn.active {
       background: var(--success);
       border-color: var(--success);
       color: white;
@@ -261,6 +262,35 @@
     .scan-status.success { color: var(--success); }
     .scan-status.warning { color: var(--warning); }
     .scan-status.error { color: var(--danger); }
+
+    .scanner-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .scanner-shell {
+      display: none;
+      margin-top: 14px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--bg-elev);
+      box-shadow: var(--shadow);
+    }
+
+    .scanner-shell.active {
+      display: block;
+    }
+
+    #reader {
+      width: 100%;
+      min-height: 320px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #000;
+    }
 
     .results-grid {
       display: grid;
@@ -401,18 +431,6 @@
       background: var(--bg-elev);
     }
 
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0,0,0,0);
-      white-space: nowrap;
-      border: 0;
-    }
-
     @media (max-width: 1200px) {
       .controls-grid {
         grid-template-columns: 1fr 1fr 1fr;
@@ -491,6 +509,10 @@
       .details,
       .sku {
         font-size: .9rem;
+      }
+
+      #reader {
+        min-height: 280px;
       }
     }
   </style>
@@ -583,25 +605,27 @@
         </div>
 
         <div class="field">
-          <label for="useCameraBtn">Camera</label>
-          <button id="useCameraBtn" class="btn secondary" type="button" style="width:100%;">Use Camera</button>
+          <label for="startScannerBtn">Scanner</label>
+          <button id="startScannerBtn" class="btn secondary" type="button" style="width:100%;">Start Scanner</button>
         </div>
+      </div>
+
+      <div class="scanner-actions">
+        <button id="stopScannerBtn" class="btn" type="button">Stop Scanner</button>
       </div>
 
       <div id="scanStatus" class="scan-status"></div>
 
-      <input
-        id="cameraCaptureInput"
-        class="sr-only"
-        type="file"
-        accept="image/*"
-        capture="environment"
-      />
+      <div id="scannerShell" class="scanner-shell">
+        <div id="reader"></div>
+      </div>
     </section>
 
     <section class="summary-bar" id="summaryBar"></section>
     <section id="results" class="results-grid"></section>
   </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 
   <script>
     const state = {
@@ -610,9 +634,9 @@
       activeTraits: new Set(),
       visibleCount: 48,
       theme: localStorage.getItem("suburban-theme") || "dark",
-      clearFlashTimer: null,
-      findFlashTimer: null,
-      cameraFlashTimer: null
+      scanner: null,
+      scannerActive: false,
+      scanLock: false
     };
 
     const TRAITS = [
@@ -634,13 +658,14 @@
       showCount: document.getElementById("showCount"),
       scanSkuInput: document.getElementById("scanSkuInput"),
       findSkuBtn: document.getElementById("findSkuBtn"),
-      useCameraBtn: document.getElementById("useCameraBtn"),
-      cameraCaptureInput: document.getElementById("cameraCaptureInput"),
+      startScannerBtn: document.getElementById("startScannerBtn"),
+      stopScannerBtn: document.getElementById("stopScannerBtn"),
       clearFilters: document.getElementById("clearFilters"),
       traitChips: document.getElementById("traitChips"),
       summaryBar: document.getElementById("summaryBar"),
       results: document.getElementById("results"),
-      scanStatus: document.getElementById("scanStatus")
+      scanStatus: document.getElementById("scanStatus"),
+      scannerShell: document.getElementById("scannerShell")
     };
 
     function setTheme(theme) {
@@ -648,6 +673,11 @@
       els.html.setAttribute("data-theme", theme);
       localStorage.setItem("suburban-theme", theme);
       els.themeToggle.textContent = theme === "dark" ? "Theme: Dark" : "Theme: Light";
+    }
+
+    function setScanStatus(message, type = "") {
+      els.scanStatus.textContent = message || "";
+      els.scanStatus.className = "scan-status" + (type ? ` ${type}` : "");
     }
 
     function normalizeText(v) {
@@ -666,11 +696,6 @@
       if (value === false || value == null) return false;
       const t = String(value).trim().toLowerCase();
       return ["true", "yes", "y", "1", "x"].includes(t);
-    }
-
-    function setScanStatus(message, type = "") {
-      els.scanStatus.textContent = message || "";
-      els.scanStatus.className = "scan-status" + (type ? ` ${type}` : "");
     }
 
     function getPlantGroup(plant) {
@@ -777,49 +802,6 @@
       return plant.image || "";
     }
 
-    function matchesSearch(plant, q) {
-      if (!q) return true;
-
-      const haystack = [
-        plant.name,
-        plant.sku,
-        plant.common,
-        plant.genus,
-        plant.species,
-        plant.series,
-        plant.category,
-        plant.plant_group,
-        plant.section,
-        plant.light,
-        plant.height,
-        plant.width,
-        plant.color
-      ].join(" ").toLowerCase();
-
-      return haystack.includes(q);
-    }
-
-    function findPlantsBySku(rawSku) {
-      const wanted = normalizeSku(rawSku);
-      if (!wanted) return [];
-
-      let exact = state.plants.filter(plant => normalizeSku(plant.sku) === wanted);
-      if (exact.length) return exact;
-
-      exact = state.plants.filter(plant => normalizeSku(plant.sku).includes(wanted));
-      return exact;
-    }
-
-    function clearNonCountFilters() {
-      els.searchInput.value = "";
-      els.exposureFilter.value = "";
-      els.groupFilter.value = "";
-      els.colorFilter.value = "";
-      els.heightFilter.value = "";
-      state.activeTraits.clear();
-      renderTraitChips();
-    }
-
     function updateActionButtons() {
       const hasAnythingToClear =
         !!normalizeText(els.searchInput.value) ||
@@ -831,6 +813,18 @@
         state.activeTraits.size > 0;
 
       els.clearFilters.classList.toggle("clear-active", hasAnythingToClear);
+    }
+
+    function updateScannerUi() {
+      if (state.scannerActive) {
+        els.startScannerBtn.textContent = "Scanner Live";
+        els.startScannerBtn.classList.add("active");
+        els.scannerShell.classList.add("active");
+      } else {
+        els.startScannerBtn.textContent = "Start Scanner";
+        els.startScannerBtn.classList.remove("active");
+        els.scannerShell.classList.remove("active");
+      }
     }
 
     function populateFilters(plants) {
@@ -893,18 +887,49 @@
       updateActionButtons();
     }
 
-    function flashButton(btn, text, resetText, timerKey) {
-      btn.classList.add("is-confirmed");
-      btn.textContent = text;
-      window.clearTimeout(state[timerKey]);
-      state[timerKey] = window.setTimeout(() => {
-        btn.classList.remove("is-confirmed");
-        btn.textContent = resetText;
-        updateActionButtons();
-      }, 1400);
+    function matchesSearch(plant, q) {
+      if (!q) return true;
+
+      const haystack = [
+        plant.name,
+        plant.sku,
+        plant.common,
+        plant.genus,
+        plant.species,
+        plant.series,
+        plant.category,
+        plant.plant_group,
+        plant.section,
+        plant.light,
+        plant.height,
+        plant.width,
+        plant.color
+      ].join(" ").toLowerCase();
+
+      return haystack.includes(q);
     }
 
-    function clearFilters() {
+    function clearNonCountFilters() {
+      els.searchInput.value = "";
+      els.exposureFilter.value = "";
+      els.groupFilter.value = "";
+      els.colorFilter.value = "";
+      els.heightFilter.value = "";
+      state.activeTraits.clear();
+      renderTraitChips();
+    }
+
+    function findPlantsBySku(rawSku) {
+      const wanted = normalizeSku(rawSku);
+      if (!wanted) return [];
+
+      let exact = state.plants.filter(plant => normalizeSku(plant.sku) === wanted);
+      if (exact.length) return exact;
+
+      return state.plants.filter(plant => normalizeSku(plant.sku).includes(wanted));
+    }
+
+    async function clearFilters() {
       els.searchInput.value = "";
       els.scanSkuInput.value = "";
       els.exposureFilter.value = "";
@@ -914,8 +939,65 @@
       state.activeTraits.clear();
       renderTraitChips();
       setScanStatus("");
+      await stopLiveScanner(true);
       applyFilters();
-      flashButton(els.clearFilters, "Filters Cleared", "Clear filters", "clearFlashTimer");
+    }
+
+    function runSkuLookup(rawSku, source = "manual") {
+      const sku = normalizeSku(rawSku);
+
+      if (!sku) {
+        setScanStatus("Enter a SKU or scan a barcode.", "warning");
+        return;
+      }
+
+      els.scanSkuInput.value = rawSku;
+      clearNonCountFilters();
+
+      state.filtered = findPlantsBySku(sku);
+
+      renderSummary();
+      renderResults();
+      updateActionButtons();
+
+      if (state.filtered.length) {
+        setScanStatus(
+          source === "scanner"
+            ? `Scanner found ${state.filtered.length} match${state.filtered.length === 1 ? "" : "es"} for ${rawSku}.`
+            : `Found ${state.filtered.length} match${state.filtered.length === 1 ? "" : "es"} for ${rawSku}.`,
+          "success"
+        );
+      } else {
+        setScanStatus(`No product found for SKU ${rawSku}.`, "error");
+      }
+    }
+
+    function applyFilters() {
+      const q = normalizeText(els.searchInput.value);
+      const exposure = els.exposureFilter.value;
+      const group = els.groupFilter.value;
+      const color = els.colorFilter.value;
+      const height = els.heightFilter.value;
+      state.visibleCount = Number(els.showCount.value || 48);
+
+      state.filtered = state.plants.filter(plant => {
+        if (!matchesSearch(plant, q)) return false;
+        if (exposure && getExposure(plant) !== exposure) return false;
+        if (group && getPlantGroup(plant) !== group) return false;
+        if (color && inferColor(plant) !== color) return false;
+        if (height && heightBucket(plant.height) !== height) return false;
+
+        const traits = inferTraits(plant);
+        for (const trait of state.activeTraits) {
+          if (!traits[trait]) return false;
+        }
+
+        return true;
+      });
+
+      renderSummary();
+      renderResults();
+      updateActionButtons();
     }
 
     function renderSummary() {
@@ -958,9 +1040,10 @@
         card.className = "card";
         card.innerHTML = `
           <div class="card-image">
-            ${img
-              ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>';">`
-              : `<div class="no-image">No image available</div>`
+            ${
+              img
+                ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>';">`
+                : `<div class="no-image">No image available</div>`
             }
           </div>
           <div class="card-body">
@@ -980,11 +1063,11 @@
               ${(plant.height || plant.width) ? `Mature size: ${plant.height || "—"} × ${plant.width || "—"}` : ""}
             </div>
 
-            ${extraTags.length ? `
-              <div class="tag-row">
-                ${extraTags.map(t => `<span class="tag">${t}</span>`).join("")}
-              </div>
-            ` : ""}
+            ${
+              extraTags.length
+                ? `<div class="tag-row">${extraTags.map(t => `<span class="tag">${t}</span>`).join("")}</div>`
+                : ""
+            }
 
             <div class="price-row">
               <div class="price">${plant.price || ""}</div>
@@ -994,118 +1077,131 @@
             ${plant.link ? `<a class="btn product-btn" href="${plant.link}" target="_blank" rel="noopener noreferrer">View Product</a>` : ""}
           </div>
         `;
+
         els.results.appendChild(card);
       });
     }
 
-    function applyFilters() {
-      const q = normalizeText(els.searchInput.value);
-      const exposure = els.exposureFilter.value;
-      const group = els.groupFilter.value;
-      const color = els.colorFilter.value;
-      const height = els.heightFilter.value;
-      state.visibleCount = Number(els.showCount.value || 48);
+    function getScannerBox(viewfinderWidth, viewfinderHeight) {
+      const width = Math.min(Math.floor(viewfinderWidth * 0.82), 420);
+      const height = Math.min(Math.floor(viewfinderHeight * 0.26), 160);
 
-      state.filtered = state.plants.filter(plant => {
-        if (!matchesSearch(plant, q)) return false;
-        if (exposure && getExposure(plant) !== exposure) return false;
-        if (group && getPlantGroup(plant) !== group) return false;
-        if (color && inferColor(plant) !== color) return false;
-        if (height && heightBucket(plant.height) !== height) return false;
-
-        const traits = inferTraits(plant);
-        for (const trait of state.activeTraits) {
-          if (!traits[trait]) return false;
-        }
-
-        return true;
-      });
-
-      renderSummary();
-      renderResults();
-      updateActionButtons();
+      return {
+        width: Math.max(width, 240),
+        height: Math.max(height, 90)
+      };
     }
 
-    function runSkuLookup(rawSku, source = "manual") {
-      const sku = normalizeSku(rawSku);
+    function ensureScannerLibrary() {
+      if (!window.Html5Qrcode) {
+        setScanStatus("Scanner library did not load.", "error");
+        return false;
+      }
+      return true;
+    }
 
-      if (!sku) {
-        setScanStatus("Enter a SKU or use the camera.", "warning");
-        flashButton(els.findSkuBtn, "No SKU", "Find SKU", "findFlashTimer");
+    async function startLiveScanner() {
+      if (!ensureScannerLibrary()) return;
+
+      if (state.scannerActive) {
+        setScanStatus("Scanner is already running.", "warning");
         return;
       }
 
-      els.scanSkuInput.value = rawSku;
-      clearNonCountFilters();
-
-      state.filtered = findPlantsBySku(sku);
-      renderSummary();
-      renderResults();
-      updateActionButtons();
-
-      if (state.filtered.length) {
-        setScanStatus(
-          source === "camera"
-            ? `Camera found ${state.filtered.length} match${state.filtered.length === 1 ? "" : "es"} for SKU ${rawSku}.`
-            : `Found ${state.filtered.length} match${state.filtered.length === 1 ? "" : "es"} for SKU ${rawSku}.`,
-          "success"
-        );
-        flashButton(els.findSkuBtn, `Found ${state.filtered.length}`, "Find SKU", "findFlashTimer");
-      } else {
-        setScanStatus(`No product found for SKU ${rawSku}.`, "error");
-        flashButton(els.findSkuBtn, "No Match", "Find SKU", "findFlashTimer");
-      }
-    }
-
-    async function decodeBarcodeFromFile(file) {
-      if (!("BarcodeDetector" in window)) {
-        throw new Error("BarcodeDetector unavailable on this browser.");
-      }
-
-      const detector = new BarcodeDetector({
-        formats: ["code_128", "code_39", "ean_13", "ean_8", "upc_a", "upc_e"]
-      });
-
-      const bitmap = await createImageBitmap(file);
-      const results = await detector.detect(bitmap);
-
-      if (!results || !results.length) {
-        throw new Error("No barcode detected.");
-      }
-
-      return results[0].rawValue || "";
-    }
-
-    function openCameraCapture() {
-      setScanStatus("Opening camera…", "");
-      els.cameraCaptureInput.value = "";
-      els.cameraCaptureInput.click();
-    }
-
-    async function handleCameraCapture(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) {
-        setScanStatus("Camera canceled.", "warning");
-        return;
-      }
-
-      setScanStatus("Reading barcode from image…", "");
+      setScanStatus("Requesting camera access…", "");
+      state.scanner = new Html5Qrcode("reader");
 
       try {
-        const rawValue = await decodeBarcodeFromFile(file);
-        if (!rawValue) {
-          throw new Error("No barcode value returned.");
+        const config = {
+          fps: 10,
+          qrbox: getScannerBox,
+          aspectRatio: 1.777778,
+          disableFlip: false,
+          rememberLastUsedCamera: true,
+          supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+        };
+
+        const onScanSuccess = async (decodedText) => {
+          if (state.scanLock) return;
+          state.scanLock = true;
+
+          try {
+            runSkuLookup(decodedText, "scanner");
+            await stopLiveScanner(true);
+          } finally {
+            setTimeout(() => {
+              state.scanLock = false;
+            }, 900);
+          }
+        };
+
+        const onScanFailure = () => {
+          // keep scanning silently
+        };
+
+        try {
+          await state.scanner.start(
+            { facingMode: { exact: "environment" } },
+            config,
+            onScanSuccess,
+            onScanFailure
+          );
+        } catch (err) {
+          await state.scanner.start(
+            { facingMode: "environment" },
+            config,
+            onScanSuccess,
+            onScanFailure
+          );
         }
 
-        runSkuLookup(rawValue, "camera");
-        flashButton(els.useCameraBtn, "Captured", "Use Camera", "cameraFlashTimer");
-      } catch (error) {
-        console.warn("Camera barcode decode failed:", error);
-        setScanStatus(
-          "Camera opened, but this browser could not auto-read the barcode. You can still type the SKU manually.",
-          "warning"
-        );
-        flashButton(els.useCameraBtn, "Opened", "Use Camera", "cameraFlashTimer");
+        state.scannerActive = true;
+        updateScannerUi();
+        setScanStatus("Scanner is live. Hold barcode inside the box.", "success");
+      } catch (err) {
+        console.error("Scanner start failed:", err);
+
+        try {
+          if (state.scanner) {
+            await state.scanner.clear();
+          }
+        } catch (_) {}
+
+        state.scanner = null;
+        state.scannerActive = false;
+        updateScannerUi();
+        setScanStatus("Could not start live scanner. Check HTTPS and camera permissions.", "error");
+      }
+    }
+
+    async function stopLiveScanner(silent = false) {
+      if (!state.scanner) {
+        state.scannerActive = false;
+        updateScannerUi();
+        if (!silent) setScanStatus("Scanner stopped.", "warning");
+        return;
+      }
+
+      try {
+        if (state.scannerActive) {
+          await state.scanner.stop();
+        }
+      } catch (err) {
+        console.warn("Scanner stop warning:", err);
+      }
+
+      try {
+        await state.scanner.clear();
+      } catch (err) {
+        console.warn("Scanner clear warning:", err);
+      }
+
+      state.scanner = null;
+      state.scannerActive = false;
+      updateScannerUi();
+
+      if (!silent) {
+        setScanStatus("Scanner stopped.", "warning");
       }
     }
 
@@ -1135,14 +1231,22 @@
       els.colorFilter.addEventListener("change", applyFilters);
       els.heightFilter.addEventListener("change", applyFilters);
       els.showCount.addEventListener("change", applyFilters);
-      els.clearFilters.addEventListener("click", clearFilters);
+
+      els.clearFilters.addEventListener("click", () => {
+        clearFilters();
+      });
 
       els.findSkuBtn.addEventListener("click", () => {
         runSkuLookup(els.scanSkuInput.value, "manual");
       });
 
-      els.useCameraBtn.addEventListener("click", openCameraCapture);
-      els.cameraCaptureInput.addEventListener("change", handleCameraCapture);
+      els.startScannerBtn.addEventListener("click", () => {
+        startLiveScanner();
+      });
+
+      els.stopScannerBtn.addEventListener("click", () => {
+        stopLiveScanner(false);
+      });
 
       els.scanSkuInput.addEventListener("input", updateActionButtons);
       els.scanSkuInput.addEventListener("focus", updateActionButtons);
@@ -1156,6 +1260,7 @@
     }
 
     setTheme(state.theme);
+    updateScannerUi();
     wireEvents();
     loadPlants();
   </script>
