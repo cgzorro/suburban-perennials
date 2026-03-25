@@ -21,6 +21,8 @@
       --input-bg: #132746;
       --card-bg: #0d1d36;
       --success: #67c35f;
+      --warning: #efc45e;
+      --danger: #f08b8b;
     }
 
     html[data-theme="light"] {
@@ -39,6 +41,8 @@
       --input-bg: #ffffff;
       --card-bg: #ffffff;
       --success: #53b44c;
+      --warning: #a77400;
+      --danger: #c94b4b;
     }
 
     * { box-sizing: border-box; }
@@ -121,7 +125,7 @@
 
     .scan-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 2fr 1fr 1fr;
       gap: 12px;
       align-items: end;
       margin-top: 14px;
@@ -182,6 +186,12 @@
       color: white;
     }
 
+    .btn.secondary {
+      background: var(--bg-elev);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
     .btn.is-confirmed {
       background: var(--success);
       border-color: var(--success);
@@ -239,6 +249,18 @@
       padding: 10px 14px;
       font-weight: 700;
     }
+
+    .scan-status {
+      margin-top: 12px;
+      min-height: 22px;
+      font-size: .95rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .scan-status.success { color: var(--success); }
+    .scan-status.warning { color: var(--warning); }
+    .scan-status.error { color: var(--danger); }
 
     .results-grid {
       display: grid;
@@ -379,10 +401,25 @@
       background: var(--bg-elev);
     }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     @media (max-width: 1200px) {
-      .controls-grid,
-      .scan-grid {
+      .controls-grid {
         grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .scan-grid {
+        grid-template-columns: 1fr 1fr;
       }
     }
 
@@ -526,7 +563,7 @@
 
       <div class="scan-grid">
         <div class="field">
-          <label for="scanSkuInput">Scan SKU / exact product ID</label>
+          <label for="scanSkuInput">SKU lookup</label>
           <input
             id="scanSkuInput"
             type="text"
@@ -541,19 +578,28 @@
         </div>
 
         <div class="field">
-          <label>&nbsp;</label>
-          <button id="scanSkuBtn" class="btn primary" type="button" style="width:100%;">Scan SKU</button>
+          <label for="findSkuBtn">Find</label>
+          <button id="findSkuBtn" class="btn primary" type="button" style="width:100%;">Find SKU</button>
         </div>
 
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+        <div class="field">
+          <label for="useCameraBtn">Camera</label>
+          <button id="useCameraBtn" class="btn secondary" type="button" style="width:100%;">Use Camera</button>
+        </div>
       </div>
+
+      <div id="scanStatus" class="scan-status"></div>
+
+      <input
+        id="cameraCaptureInput"
+        class="sr-only"
+        type="file"
+        accept="image/*"
+        capture="environment"
+      />
     </section>
 
     <section class="summary-bar" id="summaryBar"></section>
-
     <section id="results" class="results-grid"></section>
   </div>
 
@@ -565,7 +611,8 @@
       visibleCount: 48,
       theme: localStorage.getItem("suburban-theme") || "dark",
       clearFlashTimer: null,
-      scanFlashTimer: null
+      findFlashTimer: null,
+      cameraFlashTimer: null
     };
 
     const TRAITS = [
@@ -586,11 +633,14 @@
       heightFilter: document.getElementById("heightFilter"),
       showCount: document.getElementById("showCount"),
       scanSkuInput: document.getElementById("scanSkuInput"),
-      scanSkuBtn: document.getElementById("scanSkuBtn"),
+      findSkuBtn: document.getElementById("findSkuBtn"),
+      useCameraBtn: document.getElementById("useCameraBtn"),
+      cameraCaptureInput: document.getElementById("cameraCaptureInput"),
       clearFilters: document.getElementById("clearFilters"),
       traitChips: document.getElementById("traitChips"),
       summaryBar: document.getElementById("summaryBar"),
-      results: document.getElementById("results")
+      results: document.getElementById("results"),
+      scanStatus: document.getElementById("scanStatus")
     };
 
     function setTheme(theme) {
@@ -601,11 +651,14 @@
     }
 
     function normalizeText(v) {
-      return (v || "").toString().trim().toLowerCase();
+      return String(v || "").trim().toLowerCase();
     }
 
     function normalizeSku(v) {
-      return (v || "").toString().replace(/\s+/g, "").trim().toLowerCase();
+      return String(v || "")
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "");
     }
 
     function isTruthy(value) {
@@ -613,6 +666,11 @@
       if (value === false || value == null) return false;
       const t = String(value).trim().toLowerCase();
       return ["true", "yes", "y", "1", "x"].includes(t);
+    }
+
+    function setScanStatus(message, type = "") {
+      els.scanStatus.textContent = message || "";
+      els.scanStatus.className = "scan-status" + (type ? ` ${type}` : "");
     }
 
     function getPlantGroup(plant) {
@@ -719,6 +777,49 @@
       return plant.image || "";
     }
 
+    function matchesSearch(plant, q) {
+      if (!q) return true;
+
+      const haystack = [
+        plant.name,
+        plant.sku,
+        plant.common,
+        plant.genus,
+        plant.species,
+        plant.series,
+        plant.category,
+        plant.plant_group,
+        plant.section,
+        plant.light,
+        plant.height,
+        plant.width,
+        plant.color
+      ].join(" ").toLowerCase();
+
+      return haystack.includes(q);
+    }
+
+    function findPlantsBySku(rawSku) {
+      const wanted = normalizeSku(rawSku);
+      if (!wanted) return [];
+
+      let exact = state.plants.filter(plant => normalizeSku(plant.sku) === wanted);
+      if (exact.length) return exact;
+
+      exact = state.plants.filter(plant => normalizeSku(plant.sku).includes(wanted));
+      return exact;
+    }
+
+    function clearNonCountFilters() {
+      els.searchInput.value = "";
+      els.exposureFilter.value = "";
+      els.groupFilter.value = "";
+      els.colorFilter.value = "";
+      els.heightFilter.value = "";
+      state.activeTraits.clear();
+      renderTraitChips();
+    }
+
     function updateActionButtons() {
       const hasAnythingToClear =
         !!normalizeText(els.searchInput.value) ||
@@ -792,28 +893,6 @@
       updateActionButtons();
     }
 
-    function matchesSearch(plant, q) {
-      if (!q) return true;
-
-      const haystack = [
-        plant.name,
-        plant.sku,
-        plant.common,
-        plant.genus,
-        plant.species,
-        plant.series,
-        plant.category,
-        plant.plant_group,
-        plant.section,
-        plant.light,
-        plant.height,
-        plant.width,
-        plant.color
-      ].join(" ").toLowerCase();
-
-      return haystack.includes(q);
-    }
-
     function flashButton(btn, text, resetText, timerKey) {
       btn.classList.add("is-confirmed");
       btn.textContent = text;
@@ -827,77 +906,16 @@
 
     function clearFilters() {
       els.searchInput.value = "";
+      els.scanSkuInput.value = "";
       els.exposureFilter.value = "";
       els.groupFilter.value = "";
       els.colorFilter.value = "";
       els.heightFilter.value = "";
-      els.scanSkuInput.value = "";
       state.activeTraits.clear();
       renderTraitChips();
+      setScanStatus("");
       applyFilters();
       flashButton(els.clearFilters, "Filters Cleared", "Clear filters", "clearFlashTimer");
-    }
-
-    function scanSku() {
-      const sku = normalizeSku(els.scanSkuInput.value);
-
-      if (!sku) {
-        flashButton(els.scanSkuBtn, "No Match", "Scan SKU", "scanFlashTimer");
-        return;
-      }
-
-      els.searchInput.value = "";
-      els.exposureFilter.value = "";
-      els.groupFilter.value = "";
-      els.colorFilter.value = "";
-      els.heightFilter.value = "";
-      state.activeTraits.clear();
-      renderTraitChips();
-
-      state.filtered = state.plants.filter(plant => normalizeSku(plant.sku) === sku);
-
-      if (!state.filtered.length) {
-        state.filtered = state.plants.filter(plant => normalizeSku(plant.sku).includes(sku));
-      }
-
-      renderSummary();
-      renderResults();
-      updateActionButtons();
-
-      flashButton(
-        els.scanSkuBtn,
-        state.filtered.length ? `Found ${state.filtered.length}` : "No Match",
-        "Scan SKU",
-        "scanFlashTimer"
-      );
-    }
-
-    function applyFilters() {
-      const q = normalizeText(els.searchInput.value);
-      const exposure = els.exposureFilter.value;
-      const group = els.groupFilter.value;
-      const color = els.colorFilter.value;
-      const height = els.heightFilter.value;
-      state.visibleCount = Number(els.showCount.value || 48);
-
-      state.filtered = state.plants.filter(plant => {
-        if (!matchesSearch(plant, q)) return false;
-        if (exposure && getExposure(plant) !== exposure) return false;
-        if (group && getPlantGroup(plant) !== group) return false;
-        if (color && inferColor(plant) !== color) return false;
-        if (height && heightBucket(plant.height) !== height) return false;
-
-        const traits = inferTraits(plant);
-        for (const trait of state.activeTraits) {
-          if (!traits[trait]) return false;
-        }
-
-        return true;
-      });
-
-      renderSummary();
-      renderResults();
-      updateActionButtons();
     }
 
     function renderSummary() {
@@ -941,7 +959,7 @@
         card.innerHTML = `
           <div class="card-image">
             ${img
-              ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>';"></img>`
+              ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>';">`
               : `<div class="no-image">No image available</div>`
             }
           </div>
@@ -980,6 +998,117 @@
       });
     }
 
+    function applyFilters() {
+      const q = normalizeText(els.searchInput.value);
+      const exposure = els.exposureFilter.value;
+      const group = els.groupFilter.value;
+      const color = els.colorFilter.value;
+      const height = els.heightFilter.value;
+      state.visibleCount = Number(els.showCount.value || 48);
+
+      state.filtered = state.plants.filter(plant => {
+        if (!matchesSearch(plant, q)) return false;
+        if (exposure && getExposure(plant) !== exposure) return false;
+        if (group && getPlantGroup(plant) !== group) return false;
+        if (color && inferColor(plant) !== color) return false;
+        if (height && heightBucket(plant.height) !== height) return false;
+
+        const traits = inferTraits(plant);
+        for (const trait of state.activeTraits) {
+          if (!traits[trait]) return false;
+        }
+
+        return true;
+      });
+
+      renderSummary();
+      renderResults();
+      updateActionButtons();
+    }
+
+    function runSkuLookup(rawSku, source = "manual") {
+      const sku = normalizeSku(rawSku);
+
+      if (!sku) {
+        setScanStatus("Enter a SKU or use the camera.", "warning");
+        flashButton(els.findSkuBtn, "No SKU", "Find SKU", "findFlashTimer");
+        return;
+      }
+
+      els.scanSkuInput.value = rawSku;
+      clearNonCountFilters();
+
+      state.filtered = findPlantsBySku(sku);
+      renderSummary();
+      renderResults();
+      updateActionButtons();
+
+      if (state.filtered.length) {
+        setScanStatus(
+          source === "camera"
+            ? `Camera found ${state.filtered.length} match${state.filtered.length === 1 ? "" : "es"} for SKU ${rawSku}.`
+            : `Found ${state.filtered.length} match${state.filtered.length === 1 ? "" : "es"} for SKU ${rawSku}.`,
+          "success"
+        );
+        flashButton(els.findSkuBtn, `Found ${state.filtered.length}`, "Find SKU", "findFlashTimer");
+      } else {
+        setScanStatus(`No product found for SKU ${rawSku}.`, "error");
+        flashButton(els.findSkuBtn, "No Match", "Find SKU", "findFlashTimer");
+      }
+    }
+
+    async function decodeBarcodeFromFile(file) {
+      if (!("BarcodeDetector" in window)) {
+        throw new Error("BarcodeDetector unavailable on this browser.");
+      }
+
+      const detector = new BarcodeDetector({
+        formats: ["code_128", "code_39", "ean_13", "ean_8", "upc_a", "upc_e"]
+      });
+
+      const bitmap = await createImageBitmap(file);
+      const results = await detector.detect(bitmap);
+
+      if (!results || !results.length) {
+        throw new Error("No barcode detected.");
+      }
+
+      return results[0].rawValue || "";
+    }
+
+    function openCameraCapture() {
+      setScanStatus("Opening camera…", "");
+      els.cameraCaptureInput.value = "";
+      els.cameraCaptureInput.click();
+    }
+
+    async function handleCameraCapture(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) {
+        setScanStatus("Camera canceled.", "warning");
+        return;
+      }
+
+      setScanStatus("Reading barcode from image…", "");
+
+      try {
+        const rawValue = await decodeBarcodeFromFile(file);
+        if (!rawValue) {
+          throw new Error("No barcode value returned.");
+        }
+
+        runSkuLookup(rawValue, "camera");
+        flashButton(els.useCameraBtn, "Captured", "Use Camera", "cameraFlashTimer");
+      } catch (error) {
+        console.warn("Camera barcode decode failed:", error);
+        setScanStatus(
+          "Camera opened, but this browser could not auto-read the barcode. You can still type the SKU manually.",
+          "warning"
+        );
+        flashButton(els.useCameraBtn, "Opened", "Use Camera", "cameraFlashTimer");
+      }
+    }
+
     async function loadPlants() {
       try {
         const res = await fetch("./plants.json", { cache: "no-store" });
@@ -1007,7 +1136,13 @@
       els.heightFilter.addEventListener("change", applyFilters);
       els.showCount.addEventListener("change", applyFilters);
       els.clearFilters.addEventListener("click", clearFilters);
-      els.scanSkuBtn.addEventListener("click", scanSku);
+
+      els.findSkuBtn.addEventListener("click", () => {
+        runSkuLookup(els.scanSkuInput.value, "manual");
+      });
+
+      els.useCameraBtn.addEventListener("click", openCameraCapture);
+      els.cameraCaptureInput.addEventListener("change", handleCameraCapture);
 
       els.scanSkuInput.addEventListener("input", updateActionButtons);
       els.scanSkuInput.addEventListener("focus", updateActionButtons);
@@ -1015,7 +1150,7 @@
       els.scanSkuInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          scanSku();
+          runSkuLookup(els.scanSkuInput.value, "manual");
         }
       });
     }
