@@ -746,6 +746,9 @@
       margin-top: 10px;
     }
 
+    .map-static.subtle { opacity: .72; }
+    .map-static.tiny { font-size: 13px; font-weight: 700; }
+
     .zone-details {
       display: grid;
       gap: 10px;
@@ -936,9 +939,9 @@
         font-size: .9rem;
       }
       #reader { min-height: 280px; }
-      .map-label { font-size: 18px; }
+      .map-label { font-size: 17px; }
       .map-small,
-      .map-static { font-size: 14px; }
+      .map-static { font-size: 13px; }
     }
   
 /* Map cleanup update */
@@ -1001,9 +1004,9 @@
 }
 
 .map-zone-shape {
-  fill: rgba(219, 228, 238, 0.88);
-  stroke: var(--map-line);
-  stroke-width: 2.2;
+  fill: rgba(219, 228, 238, 0.82);
+  stroke: rgba(69, 90, 118, 0.88);
+  stroke-width: 2;
 }
 
 .map-zone-shape.active {
@@ -1012,57 +1015,59 @@
 }
 
 .map-label {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
   text-anchor: middle;
 }
 
 .map-label.house {
-  font-size: 18px;
+  font-size: 17px;
 }
 
 .map-small {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 650;
   text-anchor: middle;
+  opacity: .82;
 }
 
 .map-small.house {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .map-static {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 700;
 }
 
 .map-static.section {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
 }
 
 .map-static.small {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .map-fixed-flag {
-  opacity: .98;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.18));
+  opacity: .64;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.14));
 }
 
 .map-fixed-flag.active {
-  filter: drop-shadow(0 0 8px rgba(123, 208, 95, 0.55));
+  opacity: 1;
+  filter: drop-shadow(0 0 7px rgba(123, 208, 95, 0.52));
 }
 
 .map-flag-stick {
   stroke: #667384;
-  stroke-width: 2;
+  stroke-width: 1.5;
 }
 
 .map-flag-base {
   stroke: #263243;
-  stroke-width: 1.4;
+  stroke-width: 1.2;
 }
 
 .map-flag-base.white {
@@ -1260,7 +1265,7 @@ html[data-theme="light"] .map-bench-strip {
 
           <div class="finder-actions">
             <button id="finderClearBtn" class="btn" type="button">Clear</button>
-            <a class="map-link" href="https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&amp;g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+            <a class="map-link" href="https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&amp;g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Open nursery in Google Maps</a>
           </div>
         </div>
 
@@ -1474,30 +1479,30 @@ html[data-theme="light"] .map-bench-strip {
     };
 
     const MAP_ZONES = [
-      { id: "a", title: "A", subtitle: "Upright Arborvitae", shape: "rect", x: 68, y: 34, w: 116, h: 74, centerX: 126, centerY: 71 },
-      { id: "b", title: "B", subtitle: "Upright Juniper & Pine", shape: "rect", x: 274, y: 34, w: 132, h: 74, centerX: 340, centerY: 71 },
+      { id: "a", title: "A", subtitle: "Arborvitae", shape: "rect", x: 68, y: 34, w: 116, h: 74, centerX: 126, centerY: 71 },
+      { id: "b", title: "B", subtitle: "Juniper / Pine", shape: "rect", x: 274, y: 34, w: 132, h: 74, centerX: 340, centerY: 71 },
       { id: "c", title: "C", subtitle: "Evergreens", shape: "rect", x: 40, y: 152, w: 196, h: 94, centerX: 138, centerY: 199 },
-      { id: "d", title: "D", subtitle: "Deciduous Trees", shape: "rect", x: 250, y: 152, w: 510, h: 94, centerX: 505, centerY: 199 },
-      { id: "container", title: "Container Trees", subtitle: "Tree field", shape: "rect", x: 238, y: 288, w: 274, h: 92, centerX: 375, centerY: 334 },
+      { id: "d", title: "D", subtitle: "Deciduous", shape: "rect", x: 250, y: 152, w: 510, h: 94, centerX: 505, centerY: 199 },
+      { id: "container", title: "Container Trees", subtitle: "", shape: "rect", x: 238, y: 288, w: 274, h: 92, centerX: 375, centerY: 334 },
       { id: "e", title: "E", subtitle: "Center Bed", shape: "rect", x: 526, y: 280, w: 78, h: 112, centerX: 565, centerY: 336 },
-      { id: "flowering", title: "Flowering Shrubs", subtitle: "Open field", shape: "rect", x: 620, y: 288, w: 156, h: 220, centerX: 698, centerY: 398 },
-      { id: "playground", title: "Playground", subtitle: "Near shrub field", shape: "rect", x: 640, y: 430, w: 104, h: 58, centerX: 692, centerY: 459 },
-      { id: "house8", title: "House 8", subtitle: "Dogwood Trees", shape: "pill", x: 790, y: 288, w: 166, h: 42, centerX: 873, centerY: 309 },
-      { id: "house7", title: "House 7", subtitle: "Japanese Maples", shape: "pill", x: 790, y: 336, w: 166, h: 42, centerX: 873, centerY: 357 },
-      { id: "house6", title: "House 6", subtitle: "Redbud & Magnolia", shape: "pill", x: 790, y: 384, w: 166, h: 42, centerX: 873, centerY: 405 },
-      { id: "house5", title: "House 5", subtitle: "Hydrangeas", shape: "pill", x: 790, y: 432, w: 166, h: 42, centerX: 873, centerY: 453 },
-      { id: "house4", title: "House 4", subtitle: "Azaleas & Rhododendron", shape: "pill", x: 790, y: 480, w: 166, h: 42, centerX: 873, centerY: 501 },
-      { id: "house3", title: "House 3", subtitle: "Shrubs for Shade", shape: "pill", x: 790, y: 528, w: 166, h: 42, centerX: 873, centerY: 549 },
-      { id: "house2", title: "House 2", subtitle: "Yews", shape: "pill", x: 790, y: 576, w: 166, h: 42, centerX: 873, centerY: 597 },
-      { id: "house1", title: "House 1", subtitle: "Groundcovers / Vines / Liriope", shape: "pill", x: 790, y: 624, w: 166, h: 46, centerX: 873, centerY: 647 },
-      { id: "roses", title: "Roses & Grasses", subtitle: "Lower right", shape: "rect", x: 640, y: 552, w: 132, h: 62, centerX: 706, centerY: 583 },
-      { id: "field-shrub", title: "Shrub Field", subtitle: "Look for flag color", shape: "rect", x: 430, y: 498, w: 150, h: 106, centerX: 505, centerY: 551 },
-      { id: "field-tree", title: "Tree Field", subtitle: "Look for flag color", shape: "rect", x: 238, y: 404, w: 162, h: 94, centerX: 319, centerY: 451 },
-      { id: "between123", title: "Between Houses 1–3", subtitle: "Fruit trees", shape: "rect", x: 714, y: 616, w: 64, h: 54, centerX: 746, centerY: 643 },
-      { id: "sun-perennials", title: "Sun Perennials", subtitle: "You are here area", shape: "rect", x: 626, y: 680, w: 148, h: 58, centerX: 700, centerY: 709 },
-      { id: "tropicals", title: "Tropicals", subtitle: "Front building", shape: "rect", x: 300, y: 744, w: 150, h: 92, centerX: 375, centerY: 790 },
-      { id: "shade-perennials", title: "Shade Perennials", subtitle: "Front building", shape: "rect", x: 460, y: 744, w: 164, h: 92, centerX: 542, centerY: 790 },
-      { id: "annuals", title: "Annuals", subtitle: "Front building", shape: "rect", x: 634, y: 744, w: 140, h: 92, centerX: 704, centerY: 790 }
+      { id: "flowering", title: "Flowering Shrubs", subtitle: "", shape: "rect", x: 620, y: 288, w: 156, h: 220, centerX: 698, centerY: 398 },
+      { id: "playground", title: "Playground", subtitle: "", shape: "rect", x: 640, y: 430, w: 104, h: 58, centerX: 692, centerY: 459 },
+      { id: "house8", title: "8", subtitle: "Dogwoods", shape: "pill", x: 790, y: 288, w: 166, h: 42, centerX: 873, centerY: 309 },
+      { id: "house7", title: "7", subtitle: "Japanese Maples", shape: "pill", x: 790, y: 336, w: 166, h: 42, centerX: 873, centerY: 357 },
+      { id: "house6", title: "6", subtitle: "Redbud / Magnolia", shape: "pill", x: 790, y: 384, w: 166, h: 42, centerX: 873, centerY: 405 },
+      { id: "house5", title: "5", subtitle: "Hydrangeas", shape: "pill", x: 790, y: 432, w: 166, h: 42, centerX: 873, centerY: 453 },
+      { id: "house4", title: "4", subtitle: "Azalea / Rhody", shape: "pill", x: 790, y: 480, w: 166, h: 42, centerX: 873, centerY: 501 },
+      { id: "house3", title: "3", subtitle: "Shade Shrubs", shape: "pill", x: 790, y: 528, w: 166, h: 42, centerX: 873, centerY: 549 },
+      { id: "house2", title: "2", subtitle: "Yews", shape: "pill", x: 790, y: 576, w: 166, h: 42, centerX: 873, centerY: 597 },
+      { id: "house1", title: "1", subtitle: "Groundcovers", shape: "pill", x: 790, y: 624, w: 166, h: 46, centerX: 873, centerY: 647 },
+      { id: "roses", title: "Roses & Grasses", subtitle: "", shape: "rect", x: 640, y: 552, w: 132, h: 62, centerX: 706, centerY: 583 },
+      { id: "field-shrub", title: "Shrub Field", subtitle: "Flag color", shape: "rect", x: 430, y: 498, w: 150, h: 106, centerX: 505, centerY: 551 },
+      { id: "field-tree", title: "Tree Field", subtitle: "Flag color", shape: "rect", x: 238, y: 404, w: 162, h: 94, centerX: 319, centerY: 451 },
+      { id: "between123", title: "1–3", subtitle: "Fruit Trees", shape: "rect", x: 714, y: 616, w: 64, h: 54, centerX: 746, centerY: 643 },
+      { id: "sun-perennials", title: "Sun Perennials", subtitle: "", shape: "rect", x: 626, y: 680, w: 148, h: 58, centerX: 700, centerY: 709 },
+      { id: "tropicals", title: "Tropicals", subtitle: "", shape: "rect", x: 300, y: 744, w: 150, h: 92, centerX: 375, centerY: 790 },
+      { id: "shade-perennials", title: "Shade Perennials", subtitle: "", shape: "rect", x: 460, y: 744, w: 164, h: 92, centerX: 542, centerY: 790 },
+      { id: "annuals", title: "Annuals", subtitle: "", shape: "rect", x: 634, y: 744, w: 140, h: 92, centerX: 704, centerY: 790 }
     ];
 
 const MAP_FLAG_MARKERS = [
@@ -2174,7 +2179,7 @@ const MAP_FLAG_MARKERS = [
   });
 
   els.flagLegend.innerHTML = `
-    <span class="flag-chip flag-chip-note">Flags shown below are only the ones visible on the paper map example.</span>
+    <span class="flag-chip flag-chip-note">Approximate field-flag examples from the paper map.</span>
     ${orderedColors.map(color => `
       <span class="flag-chip">
         <span class="mini-flag ${color === "white" ? "white" : ""}" style="--flag:${FLAG_COLORS[color] || color}"></span>
@@ -2197,27 +2202,11 @@ function escapeHtml(value) {
   const selectedColors = new Set((markerItems || []).map(item => item.flagColor).filter(Boolean));
 
   const staticText = `
-    <text class="map-static" x="44" y="334">Employees Only</text>
-    <text class="map-static" x="42" y="526">Bulk Mulch</text>
-    <text class="map-static" x="42" y="575">Rock Yard</text>
-    <text class="map-static" x="42" y="637">Bagged Goods &amp; Loading</text>
-    <text class="map-static" x="42" y="724">Bulk Soils, Sand &amp; Compost</text>
-    <text class="map-static section" x="288" y="136">Ball &amp; Burlap Trees</text>
-    <text class="map-static small" x="232" y="302">To East Bottoms</text>
+    <text class="map-static section" x="286" y="136">Ball &amp; Burlap Trees</text>
     <text class="map-static section" x="786" y="268">Hoop Houses</text>
-    <text class="map-static small" x="804" y="289">(shade tolerant)</text>
-    <text class="map-static" x="212" y="463">Tree &amp; Shrub</text>
-    <text class="map-static" x="212" y="486">Loading Area</text>
-    <text class="map-static" x="296" y="641">Statuary</text>
-    <text class="map-static" x="372" y="676">Pottery</text>
-    <text class="map-static small" x="716" y="716">Sun</text>
-    <text class="map-static small" x="690" y="736">Perennials</text>
-    <text class="map-static" x="470" y="812">Tropicals</text>
-    <text class="map-static" x="600" y="813">Shade</text>
-    <text class="map-static" x="592" y="836">Perennials</text>
-    <text class="map-static" x="710" y="836">Annuals</text>
-    <text class="map-static section" x="536" y="890">Checkout</text>
-    <text class="map-static small" x="634" y="757">You are here</text>
+    <text class="map-static small subtle" x="804" y="289">Shade-tolerant</text>
+    <text class="map-static tiny subtle" x="642" y="758">You are here</text>
+    <text class="map-static tiny subtle" x="546" y="884">Checkout</text>
   `;
 
   const zoneShapes = MAP_ZONES.map(zone => {
@@ -2225,11 +2214,12 @@ function escapeHtml(value) {
     const subtitleY = zone.centerY + (zone.shape === "pill" ? 16 : 18);
     const titleClass = zone.shape === "pill" ? "map-label house" : "map-label";
     const subtitleClass = zone.shape === "pill" ? "map-small house" : "map-small";
+    const titleY = zone.subtitle ? zone.centerY - 4 : zone.centerY + 6;
     return `
       <g data-zone-group="${zone.id}">
         <rect class="map-zone-shape${active.has(zone.id) ? " active" : ""}" data-zone="${zone.id}" x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${rx}" ry="${rx}"></rect>
-        <text class="${titleClass}" x="${zone.centerX}" y="${zone.centerY - 4}">${zone.title}</text>
-        <text class="${subtitleClass}" x="${zone.centerX}" y="${subtitleY}">${zone.subtitle}</text>
+        <text class="${titleClass}" x="${zone.centerX}" y="${titleY}">${zone.title}</text>
+        ${zone.subtitle ? `<text class="${subtitleClass}" x="${zone.centerX}" y="${subtitleY}">${zone.subtitle}</text>` : ""}
       </g>
     `;
   }).join("");
