@@ -940,6 +940,183 @@
       .map-small,
       .map-static { font-size: 14px; }
     }
+  
+/* Map cleanup update */
+.flag-chip-note {
+  background: transparent;
+  border-style: dashed;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.mini-flag.white {
+  filter: drop-shadow(0 0 0.8px rgba(0,0,0,0.55));
+}
+
+.map-board {
+  padding: 14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.12)),
+    var(--map-bg);
+}
+
+.map-board svg {
+  border-radius: 18px;
+}
+
+.map-top-field {
+  fill: #e8edf4;
+  stroke: #bcc8d7;
+  stroke-width: 2;
+}
+
+.map-soft-block {
+  fill: #eef3f8;
+  stroke: #c5d0dd;
+  stroke-width: 1.8;
+}
+
+.map-road {
+  fill: none;
+  stroke: #f8fbff;
+  stroke-width: 26;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .95;
+}
+
+.map-bench-strip {
+  fill: none;
+  stroke: #b7c2d1;
+  stroke-width: 8;
+  stroke-linecap: round;
+  opacity: .9;
+}
+
+.map-arrow-line {
+  stroke: var(--map-line);
+  stroke-width: 3;
+  stroke-dasharray: 9 8;
+  opacity: .75;
+}
+
+.map-zone-shape {
+  fill: rgba(219, 228, 238, 0.88);
+  stroke: var(--map-line);
+  stroke-width: 2.2;
+}
+
+.map-zone-shape.active {
+  fill: var(--map-zone-active);
+  stroke-width: 4;
+}
+
+.map-label {
+  font-size: 20px;
+  font-weight: 800;
+  text-anchor: middle;
+}
+
+.map-label.house {
+  font-size: 18px;
+}
+
+.map-small {
+  font-size: 14px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.map-small.house {
+  font-size: 13px;
+}
+
+.map-static {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.map-static.section {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.map-static.small {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.map-fixed-flag {
+  opacity: .98;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.18));
+}
+
+.map-fixed-flag.active {
+  filter: drop-shadow(0 0 8px rgba(123, 208, 95, 0.55));
+}
+
+.map-flag-stick {
+  stroke: #667384;
+  stroke-width: 2;
+}
+
+.map-flag-base {
+  stroke: #263243;
+  stroke-width: 1.4;
+}
+
+.map-flag-base.white {
+  stroke: #516071;
+  stroke-width: 2.2;
+}
+
+html[data-theme="light"] .map-top-field {
+  fill: #edf3f9;
+  stroke: #bcc8d6;
+}
+
+html[data-theme="light"] .map-soft-block {
+  fill: #ffffff;
+  stroke: #ccd7e4;
+}
+
+html[data-theme="light"] .map-road {
+  stroke: #ffffff;
+}
+
+html[data-theme="light"] .map-bench-strip {
+  stroke: #c3cddd;
+}
+
+@media (max-width: 900px) {
+  .flag-chip-note {
+    width: 100%;
+    border-radius: 16px;
+  }
+
+  .map-label {
+    font-size: 16px;
+  }
+
+  .map-label.house {
+    font-size: 14px;
+  }
+
+  .map-small,
+  .map-small.house,
+  .map-static.small {
+    font-size: 11px;
+  }
+
+  .map-static {
+    font-size: 13px;
+  }
+
+  .map-static.section {
+    font-size: 15px;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -1101,6 +1278,7 @@
           <section class="panel">
             <h2>Nursery map</h2>
             <div class="flag-legend" id="flagLegend"></div>
+            <p class="map-help">Flags are drawn only where they appear on the paper map example. Zone highlighting stays interactive for plant lookup.</p>
             <div class="map-board" id="mapBoard"></div>
             <div class="map-help-row quick-links">
               <button type="button" class="location-btn" data-zone-jump="house4">Azaleas / Rhododendron</button>
@@ -1113,7 +1291,7 @@
 
           <section class="panel zone-details" id="locationDetails">
             <h3>Select a plant or zone</h3>
-            <p class="finder-note">This panel will show the location, field-flag cue, and a simple direction note you can use with customers in real life tomorrow.</p>
+            <p class="finder-note">This panel shows the location, any flag cue from the sheets, and a short direction line you can use with customers on the floor.</p>
           </section>
 
           <section class="panel">
@@ -1170,20 +1348,21 @@
     const NURSERY_MAPS_LINK = "https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D";
 
     const FLAG_COLORS = {
-      black: "#1d2430",
-      brown: "#7b5131",
-      pink: "#d14f92",
-      purple: "#7f4fc8",
-      yellow: "#d8b13b",
-      green: "#3e9c5b",
-      blue: "#4b7fd7",
-      red: "#d74a4a",
-      orange: "#eb7a3a",
-      magenta: "#b93a83",
-      teal: "#2f9f87",
-      gray: "#7d8794",
-      white: "#ffffff"
-    };
+  black: "#1d2430",
+  brown: "#7b5131",
+  pink: "#d14f92",
+  purple: "#7f4fc8",
+  yellow: "#d8b13b",
+  green: "#3e9c5b",
+  blue: "#4b7fd7",
+  red: "#d74a4a",
+  orange: "#eb7a3a",
+  magenta: "#b93a83",
+  teal: "#2f9f87",
+  gray: "#7d8794",
+  charcoal: "#565f6c",
+  white: "#ffffff"
+};
 
     const FINDER_TRAITS = [
       "shade",
@@ -1320,6 +1499,22 @@
       { id: "shade-perennials", title: "Shade Perennials", subtitle: "Front building", shape: "rect", x: 460, y: 744, w: 164, h: 92, centerX: 542, centerY: 790 },
       { id: "annuals", title: "Annuals", subtitle: "Front building", shape: "rect", x: 634, y: 744, w: 140, h: 92, centerX: 704, centerY: 790 }
     ];
+
+const MAP_FLAG_MARKERS = [
+  { id: "flag-entry-magenta", color: "magenta", x: 180, y: 420, note: "Entry-side field flag shown on paper map" },
+  { id: "flag-top-black", color: "black", x: 414, y: 308, note: "Upper center flag shown on paper map" },
+  { id: "flag-container-brown", color: "brown", x: 415, y: 395, note: "Container tree row flag shown on paper map" },
+  { id: "flag-house8-purple", color: "purple", x: 730, y: 316, note: "Upper right hoop-house flag shown on paper map" },
+  { id: "flag-center-green", color: "green", x: 585, y: 405, note: "Center bed flag shown on paper map" },
+  { id: "flag-house6-yellow", color: "yellow", x: 726, y: 408, note: "Right-center flag shown on paper map" },
+  { id: "flag-evergreen-white", color: "white", x: 410, y: 494, note: "Evergreen strip flag shown on paper map" },
+  { id: "flag-evergreen-charcoal", color: "charcoal", x: 565, y: 494, note: "Evergreen strip dark flag shown on paper map" },
+  { id: "flag-lower-blue", color: "blue", x: 472, y: 598, note: "Lower left bed flag shown on paper map" },
+  { id: "flag-lower-pink", color: "pink", x: 592, y: 598, note: "Lower middle bed flag shown on paper map" },
+  { id: "flag-lower-orange", color: "orange", x: 732, y: 596, note: "Lower right bed flag shown on paper map" },
+  { id: "flag-lower-teal", color: "teal", x: 620, y: 704, note: "Curved lower bed flag shown on paper map" },
+  { id: "flag-roses-red", color: "red", x: 752, y: 682, note: "Roses and grasses flag shown on paper map" }
+];
 
     const NURSERY_BASE = [
       // Trees
@@ -1973,16 +2168,23 @@
     }
 
     function renderFlagLegend() {
-      const colorOrder = ["orange", "yellow", "purple", "green", "red", "blue", "brown", "pink", "teal", "gray", "black"];
-      els.flagLegend.innerHTML = colorOrder.map(color => `
-        <span class="flag-chip">
-          <span class="mini-flag" style="--flag:${FLAG_COLORS[color] || color}"></span>
-          ${titleCase(color)} flag
-        </span>
-      `).join("");
-    }
+  const orderedColors = [];
+  MAP_FLAG_MARKERS.forEach(marker => {
+    if (!orderedColors.includes(marker.color)) orderedColors.push(marker.color);
+  });
 
-    function escapeHtml(value) {
+  els.flagLegend.innerHTML = `
+    <span class="flag-chip flag-chip-note">Flags shown below are only the ones visible on the paper map example.</span>
+    ${orderedColors.map(color => `
+      <span class="flag-chip">
+        <span class="mini-flag ${color === "white" ? "white" : ""}" style="--flag:${FLAG_COLORS[color] || color}"></span>
+        ${titleCase(color)} flag
+      </span>
+    `).join("")}
+  `;
+}
+
+function escapeHtml(value) {
       return String(value || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -1991,63 +2193,105 @@
     }
 
     function renderMap(activeZoneIds = [], markerItems = []) {
-      const active = new Set(activeZoneIds || []);
-      const staticText = `
-        <text class="map-static" x="20" y="325">Employees Only</text>
-        <text class="map-static" x="20" y="530">Bulk Mulch</text>
-        <text class="map-static" x="20" y="578">Rock Yard</text>
-        <text class="map-static" x="20" y="640">Bagged Goods &amp; Loading</text>
-        <text class="map-static" x="20" y="726">Bulk Soils, Sand &amp; Compost</text>
-        <text class="map-static" x="250" y="136">Ball &amp; Burlap Trees</text>
-        <text class="map-static" x="238" y="270">To East Bottoms ↑</text>
-        <text class="map-static" x="595" y="270">Hoop Houses (shade tolerant)</text>
-        <text class="map-static" x="280" y="666">Statuary</text>
-        <text class="map-static" x="360" y="674">Pottery</text>
-        <text class="map-static" x="522" y="822">Checkout</text>
-        <text class="map-static" x="598" y="725">You are here</text>
-        <circle cx="590" cy="716" r="8" fill="#d74a4a"></circle>
-      `;
+  const active = new Set(activeZoneIds || []);
+  const selectedColors = new Set((markerItems || []).map(item => item.flagColor).filter(Boolean));
 
-      const shapes = MAP_ZONES.map(zone => {
-        const rx = zone.shape === "pill" ? 20 : 12;
-        return `
-          <g data-zone-group="${zone.id}">
-            <rect class="map-zone-shape${active.has(zone.id) ? " active" : ""}" data-zone="${zone.id}" x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${rx}" ry="${rx}"></rect>
-            <text class="map-label" x="${zone.centerX}" y="${zone.centerY - 6}">${zone.title}</text>
-            <text class="map-small" x="${zone.centerX}" y="${zone.centerY + 18}">${zone.subtitle}</text>
-          </g>
-        `;
-      }).join("");
+  const staticText = `
+    <text class="map-static" x="44" y="334">Employees Only</text>
+    <text class="map-static" x="42" y="526">Bulk Mulch</text>
+    <text class="map-static" x="42" y="575">Rock Yard</text>
+    <text class="map-static" x="42" y="637">Bagged Goods &amp; Loading</text>
+    <text class="map-static" x="42" y="724">Bulk Soils, Sand &amp; Compost</text>
+    <text class="map-static section" x="288" y="136">Ball &amp; Burlap Trees</text>
+    <text class="map-static small" x="232" y="302">To East Bottoms</text>
+    <text class="map-static section" x="786" y="268">Hoop Houses</text>
+    <text class="map-static small" x="804" y="289">(shade tolerant)</text>
+    <text class="map-static" x="212" y="463">Tree &amp; Shrub</text>
+    <text class="map-static" x="212" y="486">Loading Area</text>
+    <text class="map-static" x="296" y="641">Statuary</text>
+    <text class="map-static" x="372" y="676">Pottery</text>
+    <text class="map-static small" x="716" y="716">Sun</text>
+    <text class="map-static small" x="690" y="736">Perennials</text>
+    <text class="map-static" x="470" y="812">Tropicals</text>
+    <text class="map-static" x="600" y="813">Shade</text>
+    <text class="map-static" x="592" y="836">Perennials</text>
+    <text class="map-static" x="710" y="836">Annuals</text>
+    <text class="map-static section" x="536" y="890">Checkout</text>
+    <text class="map-static small" x="634" y="757">You are here</text>
+  `;
 
-      const markerSvg = markerItems.flatMap(item => {
-        const color = FLAG_COLORS[item.flagColor] || item.flagColor || "#777";
-        return item.zoneIds.map(zoneId => {
-          const zone = MAP_ZONES.find(z => z.id === zoneId);
-          if (!zone) return "";
-          const x = zone.centerX + 48;
-          const y = zone.centerY - 8;
-          return `<polygon points="${x},${y} ${x - 16},${y - 10} ${x - 16},${y + 10}" fill="${color}" stroke="#223" stroke-width="1.2"></polygon>`;
-        });
-      }).join("");
+  const zoneShapes = MAP_ZONES.map(zone => {
+    const rx = zone.shape === "pill" ? 22 : 14;
+    const subtitleY = zone.centerY + (zone.shape === "pill" ? 16 : 18);
+    const titleClass = zone.shape === "pill" ? "map-label house" : "map-label";
+    const subtitleClass = zone.shape === "pill" ? "map-small house" : "map-small";
+    return `
+      <g data-zone-group="${zone.id}">
+        <rect class="map-zone-shape${active.has(zone.id) ? " active" : ""}" data-zone="${zone.id}" x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${rx}" ry="${rx}"></rect>
+        <text class="${titleClass}" x="${zone.centerX}" y="${zone.centerY - 4}">${zone.title}</text>
+        <text class="${subtitleClass}" x="${zone.centerX}" y="${subtitleY}">${zone.subtitle}</text>
+      </g>
+    `;
+  }).join("");
 
-      els.mapBoard.innerHTML = `
-        <svg viewBox="0 0 980 860" role="img" aria-label="Digital nursery map">
-          <rect x="0" y="0" width="980" height="860" fill="var(--map-bg)"></rect>
-          <rect class="map-soft" x="8" y="268" width="180" height="112" rx="16"></rect>
-          <rect class="map-soft" x="244" y="628" width="538" height="226" rx="6"></rect>
-          <rect class="map-soft" x="240" y="404" width="24" height="270" rx="8"></rect>
-          ${shapes}
-          ${markerSvg}
-          ${staticText}
-        </svg>
-      `;
+  const exampleFlags = MAP_FLAG_MARKERS.map(marker => {
+    const color = FLAG_COLORS[marker.color] || marker.color || "#777";
+    const isActive = selectedColors.has(marker.color);
+    return `
+      <g class="map-fixed-flag${isActive ? " active" : ""}" aria-hidden="true" transform="translate(${marker.x} ${marker.y})">
+        <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="25"></line>
+        <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="0,0 -22,-12 -22,12" fill="${color}"></polygon>
+      </g>
+    `;
+  }).join("");
 
-      els.mapBoard.querySelectorAll("[data-zone]").forEach(node => {
-        node.addEventListener("click", () => handleZoneClick(node.dataset.zone));
-      });
-    }
+  els.mapBoard.innerHTML = `
+    <svg viewBox="0 0 980 930" role="img" aria-label="Digital nursery map based on the paper map">
+      <defs>
+        <pattern id="diagHatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="8" stroke="#c8d2dd" stroke-width="2"></line>
+        </pattern>
+      </defs>
 
-    function zoneTitle(zoneId) {
+      <rect x="0" y="0" width="980" height="930" fill="var(--map-bg)"></rect>
+
+      <path class="map-top-field" d="M36 46h180c28 0 44 16 52 38 10 29 26 38 51 38 27 0 41-11 51-38 7-21 24-38 50-38h444c46 0 76 28 76 72v114c0 44-28 72-72 72H366V148H222V304H54c-34 0-54-20-54-52V114C0 70 14 46 36 46Z"></path>
+
+      <rect class="map-soft-block" x="18" y="282" width="158" height="118" rx="16"></rect>
+      <rect x="14" y="270" width="166" height="130" rx="16" fill="url(#diagHatch)" opacity=".44"></rect>
+
+      <path class="map-road" d="M304 296V466"></path>
+      <path class="map-road" d="M352 408H760"></path>
+      <path class="map-road" d="M676 322V714"></path>
+      <path class="map-road" d="M382 748C412 706 438 690 480 688C522 687 548 704 582 742"></path>
+
+      <rect class="map-soft-block" x="246" y="634" width="542" height="252" rx="4"></rect>
+      <rect class="map-soft-block" x="334" y="694" width="76" height="128" rx="8"></rect>
+      <rect class="map-soft-block" x="430" y="714" width="118" height="114" rx="10"></rect>
+      <rect class="map-soft-block" x="250" y="516" width="18" height="162" rx="8"></rect>
+
+      <path class="map-bench-strip" d="M164 694l54-88"></path>
+      <path class="map-bench-strip" d="M176 722l58-92"></path>
+      <path class="map-bench-strip" d="M188 750l60-94"></path>
+      <path class="map-bench-strip" d="M202 780l60-94"></path>
+
+      <line x1="306" y1="182" x2="306" y2="470" class="map-arrow-line"></line>
+      <polygon points="306,170 299,184 313,184" fill="var(--map-line)"></polygon>
+
+      ${zoneShapes}
+      ${exampleFlags}
+      ${staticText}
+
+      <circle cx="620" cy="744" r="9" fill="#d74a4a" stroke="#9a2f2f" stroke-width="2"></circle>
+    </svg>
+  `;
+
+  els.mapBoard.querySelectorAll("[data-zone]").forEach(node => {
+    node.addEventListener("click", () => handleZoneClick(node.dataset.zone));
+  });
+}
+
+function zoneTitle(zoneId) {
       const zone = MAP_ZONES.find(z => z.id === zoneId);
       return zone ? `${zone.title} — ${zone.subtitle}` : zoneId;
     }
@@ -2245,7 +2489,7 @@
       renderFinderChips();
       applyFinderFilters();
       renderMap([], []);
-      els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel will show the location, field-flag cue, and a simple direction note you can use with customers in real life tomorrow.</p>`;
+      els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel shows the location, any flag cue from the sheets, and a short direction line you can use with customers on the floor.</p>`;
     }
 
     function renderKioskActions() {
