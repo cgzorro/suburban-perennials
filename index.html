@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Suburban Perennials</title>
-
   <style>
     :root {
       --bg: #071325;
@@ -24,6 +23,11 @@
       --success: #67c35f;
       --warning: #efc45e;
       --danger: #f08b8b;
+      --map-bg: #eaf0f7;
+      --map-line: #455a76;
+      --map-text: #112136;
+      --map-zone: #dbe4ee;
+      --map-zone-active: #b8e38c;
     }
 
     html[data-theme="light"] {
@@ -44,6 +48,11 @@
       --success: #53b44c;
       --warning: #a77400;
       --danger: #c94b4b;
+      --map-bg: #f8fbff;
+      --map-line: #526274;
+      --map-text: #182435;
+      --map-zone: #ecf2f8;
+      --map-zone-active: #cfe9ae;
     }
 
     * { box-sizing: border-box; }
@@ -64,6 +73,17 @@
         var(--bg);
     }
 
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+    }
+
     .container {
       width: min(1480px, calc(100% - 28px));
       margin: 0 auto;
@@ -80,15 +100,16 @@
       box-shadow: var(--shadow);
       padding: 26px 28px;
       margin-bottom: 18px;
+      align-items: flex-start;
     }
 
-    .hero h1 {
+    .hero-copy h1 {
       margin: 0;
       font-size: clamp(2.1rem, 3vw, 3rem);
       line-height: 1.02;
     }
 
-    .hero p {
+    .hero-copy p {
       margin: 8px 0 0;
       color: var(--text-muted);
       max-width: 980px;
@@ -96,17 +117,59 @@
       font-size: 1rem;
     }
 
-    .theme-toggle {
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      min-width: 270px;
+    }
+
+    .view-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .theme-toggle,
+    .view-tab,
+    .btn,
+    .chip,
+    .kiosk-btn,
+    .finder-card,
+    .map-link,
+    .location-btn {
       border: 1px solid var(--border);
-      background: var(--bg-elev);
       color: var(--text);
+      cursor: pointer;
+      transition: background .18s ease, border-color .18s ease, color .18s ease, opacity .18s ease, transform .18s ease;
+    }
+
+    .theme-toggle {
+      background: var(--bg-elev);
       border-radius: 999px;
       padding: 12px 18px;
-      cursor: pointer;
       font-weight: 700;
       white-space: nowrap;
       height: fit-content;
     }
+
+    .view-tab {
+      background: var(--bg-soft);
+      border-radius: 999px;
+      padding: 11px 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .view-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .app-view[hidden] { display: none !important; }
 
     .controls-wrap {
       background: linear-gradient(180deg, rgba(70, 102, 144, 0.42), rgba(35, 58, 95, 0.42));
@@ -132,7 +195,9 @@
       margin-top: 14px;
     }
 
-    .field label {
+    .field label,
+    .finder-field label,
+    .kiosk-field label {
       display: block;
       font-size: .92rem;
       font-weight: 800;
@@ -141,7 +206,10 @@
     }
 
     .field input,
-    .field select {
+    .field select,
+    .finder-field input,
+    .finder-field select,
+    .kiosk-field input {
       width: 100%;
       border: 1px solid var(--border);
       background: var(--input-bg);
@@ -152,12 +220,15 @@
       outline: none;
     }
 
-    .field input::placeholder {
+    .field input::placeholder,
+    .finder-field input::placeholder,
+    .kiosk-field input::placeholder {
       color: var(--text-muted);
       opacity: 0.92;
     }
 
-    .button-col {
+    .button-col,
+    .finder-actions {
       display: flex;
       gap: 10px;
       align-items: end;
@@ -165,26 +236,26 @@
       margin-top: 14px;
     }
 
-    .btn {
-      border: 1px solid var(--border);
+    .btn,
+    .map-link,
+    .location-btn {
       background: var(--bg-elev);
-      color: var(--text);
       border-radius: 16px;
       padding: 13px 18px;
-      cursor: pointer;
       font-weight: 800;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       white-space: nowrap;
-      transition: background .18s ease, border-color .18s ease, color .18s ease, opacity .18s ease;
     }
 
-    .btn.primary {
+    .btn.primary,
+    .map-link.primary,
+    .location-btn.primary {
       background: var(--accent);
       border-color: var(--accent);
-      color: white;
+      color: #fff;
     }
 
     .btn.secondary {
@@ -193,41 +264,50 @@
       color: var(--text);
     }
 
-    .btn.active {
+    .btn.active,
+    .kiosk-btn.active,
+    .finder-chip.active,
+    .location-btn.active {
       background: var(--success);
       border-color: var(--success);
-      color: white;
+      color: #fff;
     }
 
     .btn.clear-active {
       background: var(--accent);
       border-color: var(--accent);
-      color: white;
+      color: #fff;
     }
 
-    .chips {
+    .chips,
+    .finder-chip-row,
+    .kiosk-actions,
+    .quick-links {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 14px;
     }
 
-    .chip {
-      border: 1px solid var(--border);
+    .chips { margin-top: 14px; }
+
+    .chip,
+    .finder-chip,
+    .kiosk-btn {
       background: var(--chip-bg);
       color: var(--chip-text);
       border-radius: 999px;
       padding: 10px 14px;
       font-size: .95rem;
-      cursor: pointer;
       user-select: none;
       font-weight: 700;
     }
 
-    .chip.active {
+    .chip.active,
+    .finder-chip.active,
+    .kiosk-btn.active {
       background: var(--accent);
       border-color: var(--accent);
-      color: white;
+      color: #fff;
     }
 
     .summary-bar {
@@ -280,9 +360,7 @@
       box-shadow: var(--shadow);
     }
 
-    .scanner-shell.active {
-      display: block;
-    }
+    .scanner-shell.active { display: block; }
 
     #reader {
       width: 100%;
@@ -313,16 +391,27 @@
       gap: 18px;
     }
 
-    .card {
+    .card,
+    .finder-card,
+    .panel,
+    .def-card,
+    .kiosk-card {
       background: linear-gradient(180deg, #13294c, #0d1d36);
       border: 1px solid var(--border);
-      border-radius: 24px;
-      overflow: hidden;
       box-shadow: var(--shadow);
     }
 
-    html[data-theme="light"] .card {
+    html[data-theme="light"] .card,
+    html[data-theme="light"] .finder-card,
+    html[data-theme="light"] .panel,
+    html[data-theme="light"] .def-card,
+    html[data-theme="light"] .kiosk-card {
       background: linear-gradient(180deg, #f7fbff, #edf4fb);
+    }
+
+    .card {
+      border-radius: 24px;
+      overflow: hidden;
     }
 
     .card-image {
@@ -356,28 +445,37 @@
       padding: 18px 18px 20px;
     }
 
-    .card-title {
+    .card-title,
+    .finder-card h3,
+    .kiosk-card h3 {
       margin: 0 0 10px;
       font-size: 1.15rem;
       line-height: 1.15;
       font-weight: 800;
     }
 
-    .subline {
+    .subline,
+    .finder-meta,
+    .kiosk-meta {
       color: var(--text-muted);
       font-size: .98rem;
       line-height: 1.35;
       margin-bottom: 12px;
     }
 
-    .tag-row {
+    .tag-row,
+    .finder-tag-row,
+    .detail-tag-row {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 14px;
     }
 
-    .tag {
+    .tag,
+    .trait-badge,
+    .note-badge,
+    .location-badge {
       border: 1px solid rgba(255,255,255,0.12);
       background: rgba(98, 126, 176, 0.24);
       color: var(--text);
@@ -387,12 +485,14 @@
       font-weight: 800;
     }
 
-    .tag.green {
+    .tag.green,
+    .trait-badge.good {
       background: rgba(113, 193, 96, 0.18);
       color: #d9ffd0;
     }
 
-    html[data-theme="light"] .tag.green {
+    html[data-theme="light"] .tag.green,
+    html[data-theme="light"] .trait-badge.good {
       color: #245d1a;
     }
 
@@ -414,12 +514,10 @@
     .price {
       font-size: 1.1rem;
       font-weight: 900;
-      color: #ffffff;
+      color: #fff;
     }
 
-    html[data-theme="light"] .price {
-      color: #182435;
-    }
+    html[data-theme="light"] .price { color: #182435; }
 
     .sku {
       font-size: .95rem;
@@ -431,7 +529,7 @@
       justify-content: center;
       background: linear-gradient(180deg, var(--accent-2), var(--accent));
       border-color: var(--accent);
-      color: white;
+      color: #fff;
       font-size: 1rem;
       padding: 15px 18px;
       border-radius: 20px;
@@ -446,13 +544,321 @@
       background: var(--bg-elev);
     }
 
+    .finder-toolbar {
+      display: grid;
+      grid-template-columns: 2fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    .finder-layout {
+      display: grid;
+      grid-template-columns: 390px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      border-radius: 24px;
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 1.35rem;
+    }
+
+    .panel-lead,
+    .zone-directions,
+    .definitions-note,
+    .finder-note,
+    .kiosk-lead {
+      color: var(--text-muted);
+      line-height: 1.42;
+      margin: 0 0 14px;
+    }
+
+    .flag-legend,
+    .map-help-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .flag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .flag-icon,
+    .mini-flag {
+      width: 0;
+      height: 0;
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      border-left: 16px solid currentColor;
+      display: inline-block;
+      color: var(--flag, #555);
+      flex: 0 0 auto;
+    }
+
+    .mini-flag { border-top-width: 7px; border-bottom-width: 7px; border-left-width: 13px; }
+
+    .finder-results,
+    .kiosk-results {
+      display: grid;
+      gap: 12px;
+      max-height: 960px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .finder-card,
+    .kiosk-card {
+      border-radius: 22px;
+      padding: 16px;
+      text-align: left;
+      width: 100%;
+    }
+
+    .finder-card:hover,
+    .kiosk-card:hover,
+    .view-tab:hover,
+    .btn:hover,
+    .chip:hover,
+    .finder-chip:hover,
+    .kiosk-btn:hover,
+    .location-btn:hover,
+    .map-link:hover {
+      transform: translateY(-1px);
+    }
+
+    .finder-card.active,
+    .kiosk-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(123, 208, 95, 0.2), var(--shadow);
+    }
+
+    .finder-card .topline,
+    .kiosk-card .topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .flag-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .finder-card .details-text,
+    .kiosk-card .details-text {
+      color: var(--text-muted);
+      line-height: 1.4;
+      font-size: .96rem;
+    }
+
+    .map-shell {
+      display: grid;
+      gap: 16px;
+    }
+
+    .map-board {
+      background: var(--map-bg);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      padding: 10px;
+    }
+
+    .map-board svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .map-zone-shape {
+      fill: var(--map-zone);
+      stroke: var(--map-line);
+      stroke-width: 2.5;
+      cursor: pointer;
+      transition: fill .18s ease, transform .18s ease, opacity .18s ease;
+    }
+
+    .map-zone-shape:hover {
+      fill: #dce8c9;
+    }
+
+    .map-zone-shape.active {
+      fill: var(--map-zone-active);
+      stroke-width: 4;
+    }
+
+    .map-label,
+    .map-small,
+    .map-static {
+      fill: var(--map-text);
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+    }
+
+    .map-label {
+      font-size: 22px;
+      font-weight: 800;
+      text-anchor: middle;
+    }
+
+    .map-small {
+      font-size: 16px;
+      font-weight: 700;
+      text-anchor: middle;
+    }
+
+    .map-static {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .map-soft {
+      fill: #e6ebf1;
+      stroke: #b1becd;
+      stroke-width: 1.8;
+    }
+
+    .map-help {
+      color: var(--text-muted);
+      font-size: .95rem;
+      line-height: 1.45;
+      margin-top: 10px;
+    }
+
+    .zone-details {
+      display: grid;
+      gap: 10px;
+    }
+
+    .zone-details h3 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .detail-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .definitions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .def-card {
+      border-radius: 20px;
+      padding: 16px;
+    }
+
+    .def-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .def-card p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.42;
+      font-size: .95rem;
+    }
+
+    .kiosk-shell {
+      display: grid;
+      gap: 16px;
+    }
+
+    .kiosk-top {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .kiosk-field input {
+      font-size: 1.15rem;
+      padding: 16px 18px;
+      border-radius: 20px;
+    }
+
+    .kiosk-actions {
+      gap: 12px;
+    }
+
+    .kiosk-btn {
+      padding: 14px 18px;
+      font-size: 1rem;
+      min-height: 52px;
+    }
+
+    .kiosk-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 16px;
+    }
+
+    .kiosk-side {
+      display: grid;
+      gap: 16px;
+    }
+
+    .status-note {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--bg-soft);
+      padding: 14px 16px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+
+    .muted { color: var(--text-muted); }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+
     @media (max-width: 1200px) {
       .controls-grid {
         grid-template-columns: 1fr 1fr 1fr;
       }
-
-      .scan-grid {
+      .scan-grid,
+      .finder-toolbar,
+      .kiosk-grid {
         grid-template-columns: 1fr 1fr;
+      }
+      .finder-layout {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -461,188 +867,562 @@
         width: min(100%, calc(100% - 14px));
         padding: 12px 0 18px;
       }
-
       .hero {
         padding: 18px 16px;
         border-radius: 20px;
+        flex-direction: column;
       }
-
-      .hero h1 {
-        font-size: 1.8rem;
-      }
-
-      .hero p {
+      .hero-copy h1 { font-size: 1.8rem; }
+      .hero-copy p {
         font-size: .9rem;
         line-height: 1.22;
         margin-top: 6px;
       }
-
-      .controls-wrap {
+      .hero-actions {
+        width: 100%;
+        align-items: stretch;
+      }
+      .view-tabs { justify-content: flex-start; }
+      .controls-wrap,
+      .panel {
         padding: 14px;
         border-radius: 20px;
       }
-
       .controls-grid,
-      .scan-grid {
+      .scan-grid,
+      .finder-toolbar,
+      .kiosk-grid {
         grid-template-columns: 1fr;
         gap: 10px;
       }
-
       .field input,
-      .field select {
+      .field select,
+      .finder-field input,
+      .finder-field select,
+      .kiosk-field input {
         border-radius: 14px;
         padding: 12px 14px;
       }
-
-      .chips {
+      .chips,
+      .finder-chip-row,
+      .kiosk-actions,
+      .quick-links {
         gap: 8px;
       }
-
-      .chip {
-        padding: 8px 11px;
-        font-size: .84rem;
+      .chip,
+      .finder-chip,
+      .kiosk-btn,
+      .view-tab {
+        padding: 9px 12px;
+        font-size: .86rem;
       }
-
       .results-grid {
         grid-template-columns: 1fr;
         gap: 12px;
       }
-
-      .card {
-        border-radius: 18px;
-      }
-
-      .card-body {
-        padding: 14px;
-      }
-
-      .card-title {
-        font-size: 1.02rem;
-      }
-
+      .card { border-radius: 18px; }
+      .card-body { padding: 14px; }
+      .card-title,
+      .finder-card h3,
+      .kiosk-card h3 { font-size: 1.02rem; }
       .subline,
       .details,
-      .sku {
+      .sku,
+      .finder-meta,
+      .kiosk-meta,
+      .finder-card .details-text,
+      .kiosk-card .details-text,
+      .def-card p {
         font-size: .9rem;
       }
-
-      #reader {
-        min-height: 280px;
-      }
+      #reader { min-height: 280px; }
+      .map-label { font-size: 18px; }
+      .map-small,
+      .map-static { font-size: 14px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <section class="hero">
-      <div>
+      <div class="hero-copy">
         <h1>Suburban Perennials</h1>
-        <p>Search by name, SKU, exposure, or group. Cards show size and mature height × width for quick lookup.</p>
+        <p>Perennial browser, nursery finder, and customer kiosk in one app. The plant browser stays intact; the new tabs add whole-nursery wayfinding for trees, shrubs, hoop houses, and field-flag lookups.</p>
       </div>
-      <button id="themeToggle" class="theme-toggle" type="button">Theme: Dark</button>
-    </section>
-
-    <section class="controls-wrap">
-      <div class="controls-grid">
-        <div class="field">
-          <label for="searchInput">Search catalog</label>
-          <input id="searchInput" type="text" placeholder="Name, common name, genus, SKU" />
+      <div class="hero-actions">
+        <div class="view-tabs" role="tablist" aria-label="App views">
+          <button id="tabBrowser" class="view-tab active" type="button" data-view="browser">Plant Browser</button>
+          <button id="tabFinder" class="view-tab" type="button" data-view="finder">Nursery Finder</button>
+          <button id="tabKiosk" class="view-tab" type="button" data-view="kiosk">Customer Kiosk</button>
         </div>
-
-        <div class="field">
-          <label for="exposureFilter">Exposure</label>
-          <select id="exposureFilter">
-            <option value="">All exposures</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="groupFilter">Plant group</label>
-          <select id="groupFilter">
-            <option value="">All groups</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="colorFilter">Color</label>
-          <select id="colorFilter">
-            <option value="">All colors</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="heightFilter">Height</label>
-          <select id="heightFilter">
-            <option value="">All heights</option>
-            <option value="under12">Under 12&quot;</option>
-            <option value="12to24">12–24&quot;</option>
-            <option value="24to36">24–36&quot;</option>
-            <option value="36plus">36&quot;+</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="showCount">Show</label>
-          <select id="showCount">
-            <option value="24">24 cards</option>
-            <option value="48" selected>48 cards</option>
-            <option value="96">96 cards</option>
-            <option value="9999">All cards</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="chips" id="traitChips"></div>
-
-      <div class="button-col">
-        <button id="clearFilters" class="btn" type="button">Clear filters</button>
-      </div>
-
-      <div class="scan-grid">
-        <div class="field">
-          <label for="scanSkuInput">SKU lookup</label>
-          <input
-            id="scanSkuInput"
-            type="text"
-            inputmode="text"
-            enterkeyhint="search"
-            autocomplete="off"
-            autocapitalize="off"
-            autocorrect="off"
-            spellcheck="false"
-            placeholder="Enter or scan SKU"
-          />
-        </div>
-
-        <div class="field">
-          <label for="findSkuBtn">Find</label>
-          <button id="findSkuBtn" class="btn primary" type="button" style="width:100%;">Find SKU</button>
-        </div>
-
-        <div class="field">
-          <label for="startScannerBtn">Scanner</label>
-          <button id="startScannerBtn" class="btn secondary" type="button" style="width:100%;">Start Scanner</button>
-        </div>
-      </div>
-
-      <div class="scanner-actions">
-        <button id="stopScannerBtn" class="btn" type="button">Stop Scanner</button>
-      </div>
-
-      <div id="scanStatus" class="scan-status"></div>
-
-      <div id="scannerShell" class="scanner-shell">
-        <div id="reader"></div>
+        <button id="themeToggle" class="theme-toggle" type="button">Dark / Light: Dark</button>
       </div>
     </section>
 
-    <section class="summary-bar" id="summaryBar"></section>
-    <section id="results" class="results-grid"></section>
+    <section id="browserView" class="app-view">
+      <section class="controls-wrap">
+        <div class="controls-grid">
+          <div class="field">
+            <label for="searchInput">Search catalog</label>
+            <input id="searchInput" type="text" placeholder="Name, common name, genus, SKU" />
+          </div>
+
+          <div class="field">
+            <label for="exposureFilter">Exposure</label>
+            <select id="exposureFilter">
+              <option value="">All exposures</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="groupFilter">Plant group</label>
+            <select id="groupFilter">
+              <option value="">All groups</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="colorFilter">Color</label>
+            <select id="colorFilter">
+              <option value="">All colors</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="heightFilter">Height</label>
+            <select id="heightFilter">
+              <option value="">All heights</option>
+              <option value="under12">Under 12&quot;</option>
+              <option value="12to24">12–24&quot;</option>
+              <option value="24to36">24–36&quot;</option>
+              <option value="36plus">36&quot;+</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="showCount">Show</label>
+            <select id="showCount">
+              <option value="24">24 cards</option>
+              <option value="48" selected>48 cards</option>
+              <option value="96">96 cards</option>
+              <option value="9999">All cards</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="chips" id="traitChips"></div>
+
+        <div class="button-col">
+          <button id="clearFilters" class="btn" type="button">Clear filters</button>
+        </div>
+
+        <div class="scan-grid">
+          <div class="field">
+            <label for="scanSkuInput">SKU lookup</label>
+            <input
+              id="scanSkuInput"
+              type="text"
+              inputmode="text"
+              enterkeyhint="search"
+              autocomplete="off"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+              placeholder="Enter or scan SKU"
+            />
+          </div>
+
+          <div class="field">
+            <label for="findSkuBtn">Find</label>
+            <button id="findSkuBtn" class="btn primary" type="button" style="width:100%;">Find SKU</button>
+          </div>
+
+          <div class="field">
+            <label for="startScannerBtn">Scanner</label>
+            <button id="startScannerBtn" class="btn secondary" type="button" style="width:100%;">Start Scanner</button>
+          </div>
+        </div>
+
+        <div class="scanner-actions">
+          <button id="stopScannerBtn" class="btn" type="button">Stop Scanner</button>
+        </div>
+
+        <div id="scanStatus" class="scan-status"></div>
+
+        <div id="scannerShell" class="scanner-shell">
+          <div id="reader"></div>
+        </div>
+      </section>
+
+      <section class="summary-bar" id="summaryBar"></section>
+      <section id="results" class="results-grid"></section>
+    </section>
+
+    <section id="finderView" class="app-view" hidden>
+      <section class="controls-wrap">
+        <div class="status-note">
+          <strong>New:</strong> the Nursery Finder uses the tree/shrub sheets, hoop house references, brochure traits, and a clean digital schematic. Colored triangles on the map represent the physical field flags you mentioned.
+        </div>
+
+        <div class="finder-toolbar">
+          <div class="finder-field">
+            <label for="finderSearch">Find it in the nursery</label>
+            <input id="finderSearch" type="search" placeholder="Try hydrangea, Japanese maple, yew, dogwood, viburnum..." />
+          </div>
+
+          <div class="finder-field">
+            <label for="finderCategory">Category</label>
+            <select id="finderCategory">
+              <option value="">All categories</option>
+              <option value="Tree">Trees</option>
+              <option value="Shrub">Shrubs</option>
+              <option value="Tree/Shrub">Tree & shrub form</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="finder-actions">
+            <button id="finderClearBtn" class="btn" type="button">Clear</button>
+            <a class="map-link" href="https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&amp;g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+          </div>
+        </div>
+
+        <div class="finder-chip-row" id="finderTraitChips"></div>
+      </section>
+
+      <div class="finder-layout">
+        <section class="panel">
+          <h2>Lookup results</h2>
+          <p class="panel-lead">Tap a result to highlight its location on the map and show directions from the perennials/check-out side.</p>
+          <div class="finder-results" id="finderResults"></div>
+        </section>
+
+        <div class="map-shell">
+          <section class="panel">
+            <h2>Nursery map</h2>
+            <div class="flag-legend" id="flagLegend"></div>
+            <div class="map-board" id="mapBoard"></div>
+            <div class="map-help-row quick-links">
+              <button type="button" class="location-btn" data-zone-jump="house4">Azaleas / Rhododendron</button>
+              <button type="button" class="location-btn" data-zone-jump="house5">Hydrangeas</button>
+              <button type="button" class="location-btn" data-zone-jump="house7">Japanese Maples</button>
+              <button type="button" class="location-btn" data-zone-jump="house8">Dogwoods</button>
+            </div>
+            <p class="map-help">You are here: customers typically enter this part of the nursery from the <strong>perennials / checkout</strong> side at the bottom of the map. Hoop houses are on the right. Ball &amp; Burlap trees are at the top. Bulk goods and rock yard are left.</p>
+          </section>
+
+          <section class="panel zone-details" id="locationDetails">
+            <h3>Select a plant or zone</h3>
+            <p class="finder-note">This panel will show the location, field-flag cue, and a simple direction note you can use with customers in real life tomorrow.</p>
+          </section>
+
+          <section class="panel">
+            <h2>Nursery notes</h2>
+            <p class="definitions-note">These are shortened from the paper brochure so staff and kiosk users can answer quick questions without leaving the app.</p>
+            <div class="definitions-grid" id="definitionsGrid"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section id="kioskView" class="app-view" hidden>
+      <section class="controls-wrap kiosk-shell">
+        <div class="kiosk-top">
+          <div class="status-note">
+            <strong>Customer mode:</strong> big search, fast buttons, short directions. This keeps the current perennial browser separate while giving you a cleaner front-facing lookup tool.
+          </div>
+          <div class="kiosk-field">
+            <label for="kioskSearch">Find a plant</label>
+            <input id="kioskSearch" type="search" placeholder="Search tree or shrub name" />
+          </div>
+          <div class="kiosk-actions" id="kioskActions"></div>
+        </div>
+
+        <div class="kiosk-grid">
+          <section class="panel">
+            <h2>Quick results</h2>
+            <p class="kiosk-lead">Results are simplified for customer use: where to go, what flag color to look for, and whether it likes shade, pollinators, or deer resistance.</p>
+            <div class="kiosk-results" id="kioskResults"></div>
+          </section>
+
+          <div class="kiosk-side">
+            <section class="panel" id="kioskDetailPanel">
+              <h2>Directions</h2>
+              <p class="kiosk-lead">Select a result to show a short verbal direction you can repeat to a customer.</p>
+            </section>
+            <section class="panel">
+              <h2>Fast prompts</h2>
+              <div class="detail-tag-row">
+                <span class="note-badge">“Go to House 5 for hydrangeas.”</span>
+                <span class="note-badge">“Head right to the hoop houses.”</span>
+                <span class="note-badge">“Look for the purple flag in the field.”</span>
+                <span class="note-badge">“Ball &amp; Burlap is at the top of the yard.”</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </section>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-
   <script>
+    const NURSERY_MAPS_LINK = "https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D";
+
+    const FLAG_COLORS = {
+      black: "#1d2430",
+      brown: "#7b5131",
+      pink: "#d14f92",
+      purple: "#7f4fc8",
+      yellow: "#d8b13b",
+      green: "#3e9c5b",
+      blue: "#4b7fd7",
+      red: "#d74a4a",
+      orange: "#eb7a3a",
+      magenta: "#b93a83",
+      teal: "#2f9f87",
+      gray: "#7d8794",
+      white: "#ffffff"
+    };
+
+    const FINDER_TRAITS = [
+      "shade",
+      "deer-resistant",
+      "pollinator-friendly",
+      "drought-tolerant",
+      "wet-tolerant",
+      "attracts-birds"
+    ];
+
+    const DEFINITIONS = [
+      {
+        title: "Evergreen trees",
+        text: "Larger trees that stay green all winter. Most have needles, though some broadleaf evergreens like certain magnolias also fit here."
+      },
+      {
+        title: "Ornamental trees",
+        text: "Smaller trees, often 8–30 feet at maturity, used for spring blooms or fall color. Think redbud, serviceberry, dogwood, Japanese maple, and cherry."
+      },
+      {
+        title: "Container trees",
+        text: "Easy to take home and plant. These are container-grown trees in sizes like 5, 7, 10, 15, 20, and 25 gallon. Remove the container when planting."
+      },
+      {
+        title: "Evergreen shrubs",
+        text: "Year-round foliage, especially useful for foundation planting and privacy screening. Yews, junipers, spruce, arborvitae, cedar, boxwood, and holly live in this world."
+      },
+      {
+        title: "Flowering shrubs",
+        text: "Adds color and interest in beds and foundations. Many are deciduous and drop leaves in winter. Hydrangea, lilac, spirea, viburnum, weigela, and more."
+      },
+      {
+        title: "Groundcovers & vines",
+        text: "Useful for heavily shaded areas, tight spots, or vertical accents on trellises and fences. Hoop House 1 covers groundcovers, vines, and liriope."
+      },
+      {
+        title: "Sun requirements",
+        text: "Full sun means about 6+ hours of direct light. Part sun means roughly 6 hours or less. Shade means bright light with little to no direct sun. Shade-tolerant plants are in Houses 1–8."
+      },
+      {
+        title: "Water requirements",
+        text: "Most plants want about 1 inch of water per week. Deep watering once weekly usually beats several light waterings."
+      }
+    ];
+
+    const BROCHURE_TRAITS = {
+      "aspen": ["wet-tolerant"],
+      "bald cypress": ["deer-resistant", "wet-tolerant"],
+      "black gum": ["wet-tolerant", "attracts-birds"],
+      "birch": ["deer-resistant", "wet-tolerant"],
+      "catalpa": ["drought-tolerant", "pollinator-friendly"],
+      "ornamental cherry": ["drought-tolerant"],
+      "cherry": ["drought-tolerant"],
+      "crabapple": ["pollinator-friendly", "attracts-birds"],
+      "dawn redwood": ["deer-resistant", "wet-tolerant"],
+      "dogwood tree": ["pollinator-friendly", "attracts-birds"],
+      "dogwood": ["pollinator-friendly", "attracts-birds"],
+      "ginkgo": ["deer-resistant", "drought-tolerant"],
+      "honeylocust": ["deer-resistant", "drought-tolerant"],
+      "hornbeam": ["deer-resistant"],
+      "japanese maple": ["deer-resistant"],
+      "lilac tree": ["deer-resistant", "drought-tolerant", "pollinator-friendly"],
+      "linden": ["pollinator-friendly"],
+      "magnolia": ["deer-resistant", "pollinator-friendly"],
+      "redbud": ["deer-resistant"],
+      "spruce": ["deer-resistant"],
+      "serviceberry": ["deer-resistant", "wet-tolerant", "pollinator-friendly", "attracts-birds"],
+      "tulip tree": ["deer-resistant", "pollinator-friendly"],
+      "whitebud": ["deer-resistant"],
+      "willow": ["deer-resistant", "wet-tolerant"],
+      "abelia": ["deer-resistant", "pollinator-friendly"],
+      "althea": ["deer-resistant", "pollinator-friendly"],
+      "azalea": ["pollinator-friendly"],
+      "barberry": ["deer-resistant", "drought-tolerant", "attracts-birds"],
+      "boxwood": ["deer-resistant", "drought-tolerant"],
+      "buckthorn": ["deer-resistant", "drought-tolerant"],
+      "butterfly bush": ["drought-tolerant", "pollinator-friendly"],
+      "caryopteris": ["deer-resistant", "drought-tolerant", "pollinator-friendly"],
+      "chokeberry": ["wet-tolerant", "pollinator-friendly", "attracts-birds"],
+      "clethra": ["wet-tolerant", "pollinator-friendly"],
+      "cotoneaster": ["attracts-birds"],
+      "crape myrtle": ["drought-tolerant", "attracts-birds"],
+      "crapemyrtle": ["drought-tolerant", "attracts-birds"],
+      "deutzia": ["deer-resistant"],
+      "euonymus": ["drought-tolerant"],
+      "forsythia": ["deer-resistant"],
+      "holly": ["deer-resistant", "attracts-birds"],
+      "honeysuckle": ["pollinator-friendly"],
+      "hypericum": ["drought-tolerant", "pollinator-friendly"],
+      "juniper": ["deer-resistant", "drought-tolerant", "attracts-birds"],
+      "lilac shrub": ["deer-resistant", "drought-tolerant", "pollinator-friendly"],
+      "mahonia": ["deer-resistant", "drought-tolerant", "attracts-birds"],
+      "mockorange": ["deer-resistant", "wet-tolerant"],
+      "nandina": ["deer-resistant", "drought-tolerant"],
+      "ninebark": ["deer-resistant", "pollinator-friendly"],
+      "pieris": ["deer-resistant"],
+      "pieris japonica": ["deer-resistant"],
+      "privet": ["deer-resistant", "drought-tolerant"],
+      "quince": ["deer-resistant", "drought-tolerant"],
+      "rhododendron": ["pollinator-friendly"],
+      "sand cherry": ["pollinator-friendly"],
+      "spirea": ["deer-resistant", "pollinator-friendly"],
+      "sweetspire": ["deer-resistant", "wet-tolerant", "pollinator-friendly"],
+      "viburnum": ["deer-resistant", "pollinator-friendly", "attracts-birds"],
+      "weigela": ["deer-resistant", "pollinator-friendly"],
+      "wisteria": ["pollinator-friendly"],
+      "yew": ["deer-resistant", "drought-tolerant", "attracts-birds"],
+      "yucca": ["drought-tolerant"]
+    };
+
+    const MAP_ZONES = [
+      { id: "a", title: "A", subtitle: "Upright Arborvitae", shape: "rect", x: 68, y: 34, w: 116, h: 74, centerX: 126, centerY: 71 },
+      { id: "b", title: "B", subtitle: "Upright Juniper & Pine", shape: "rect", x: 274, y: 34, w: 132, h: 74, centerX: 340, centerY: 71 },
+      { id: "c", title: "C", subtitle: "Evergreens", shape: "rect", x: 40, y: 152, w: 196, h: 94, centerX: 138, centerY: 199 },
+      { id: "d", title: "D", subtitle: "Deciduous Trees", shape: "rect", x: 250, y: 152, w: 510, h: 94, centerX: 505, centerY: 199 },
+      { id: "container", title: "Container Trees", subtitle: "Tree field", shape: "rect", x: 238, y: 288, w: 274, h: 92, centerX: 375, centerY: 334 },
+      { id: "e", title: "E", subtitle: "Center Bed", shape: "rect", x: 526, y: 280, w: 78, h: 112, centerX: 565, centerY: 336 },
+      { id: "flowering", title: "Flowering Shrubs", subtitle: "Open field", shape: "rect", x: 620, y: 288, w: 156, h: 220, centerX: 698, centerY: 398 },
+      { id: "playground", title: "Playground", subtitle: "Near shrub field", shape: "rect", x: 640, y: 430, w: 104, h: 58, centerX: 692, centerY: 459 },
+      { id: "house8", title: "House 8", subtitle: "Dogwood Trees", shape: "pill", x: 790, y: 288, w: 166, h: 42, centerX: 873, centerY: 309 },
+      { id: "house7", title: "House 7", subtitle: "Japanese Maples", shape: "pill", x: 790, y: 336, w: 166, h: 42, centerX: 873, centerY: 357 },
+      { id: "house6", title: "House 6", subtitle: "Redbud & Magnolia", shape: "pill", x: 790, y: 384, w: 166, h: 42, centerX: 873, centerY: 405 },
+      { id: "house5", title: "House 5", subtitle: "Hydrangeas", shape: "pill", x: 790, y: 432, w: 166, h: 42, centerX: 873, centerY: 453 },
+      { id: "house4", title: "House 4", subtitle: "Azaleas & Rhododendron", shape: "pill", x: 790, y: 480, w: 166, h: 42, centerX: 873, centerY: 501 },
+      { id: "house3", title: "House 3", subtitle: "Shrubs for Shade", shape: "pill", x: 790, y: 528, w: 166, h: 42, centerX: 873, centerY: 549 },
+      { id: "house2", title: "House 2", subtitle: "Yews", shape: "pill", x: 790, y: 576, w: 166, h: 42, centerX: 873, centerY: 597 },
+      { id: "house1", title: "House 1", subtitle: "Groundcovers / Vines / Liriope", shape: "pill", x: 790, y: 624, w: 166, h: 46, centerX: 873, centerY: 647 },
+      { id: "roses", title: "Roses & Grasses", subtitle: "Lower right", shape: "rect", x: 640, y: 552, w: 132, h: 62, centerX: 706, centerY: 583 },
+      { id: "field-shrub", title: "Shrub Field", subtitle: "Look for flag color", shape: "rect", x: 430, y: 498, w: 150, h: 106, centerX: 505, centerY: 551 },
+      { id: "field-tree", title: "Tree Field", subtitle: "Look for flag color", shape: "rect", x: 238, y: 404, w: 162, h: 94, centerX: 319, centerY: 451 },
+      { id: "between123", title: "Between Houses 1–3", subtitle: "Fruit trees", shape: "rect", x: 714, y: 616, w: 64, h: 54, centerX: 746, centerY: 643 },
+      { id: "sun-perennials", title: "Sun Perennials", subtitle: "You are here area", shape: "rect", x: 626, y: 680, w: 148, h: 58, centerX: 700, centerY: 709 },
+      { id: "tropicals", title: "Tropicals", subtitle: "Front building", shape: "rect", x: 300, y: 744, w: 150, h: 92, centerX: 375, centerY: 790 },
+      { id: "shade-perennials", title: "Shade Perennials", subtitle: "Front building", shape: "rect", x: 460, y: 744, w: 164, h: 92, centerX: 542, centerY: 790 },
+      { id: "annuals", title: "Annuals", subtitle: "Front building", shape: "rect", x: 634, y: 744, w: 140, h: 92, centerX: 704, centerY: 790 }
+    ];
+
+    const NURSERY_BASE = [
+      // Trees
+      { name: "Arborvitae Tree", category: "Tree", zoneIds: ["a"], locationLabel: "Ball & Burlap A", area: "Upright Arborvitae", flagColor: "black" },
+      { name: "Aspen", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Bald Cypress", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Birch", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Black Gum", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Cedar", category: "Tree", zoneIds: ["c"], locationLabel: "Ball & Burlap C", area: "Evergreens", flagColor: "pink" },
+      { name: "Cherry", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "magenta" },
+      { name: "Crabapple", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "magenta" },
+      { name: "Cypress", category: "Tree", zoneIds: ["c"], locationLabel: "Ball & Burlap C", area: "Evergreens", flagColor: "pink" },
+      { name: "Dogwood", category: "Tree", zoneIds: ["house8"], locationLabel: "Hoop House 8", area: "Dogwood Trees", flagColor: "purple" },
+      { name: "Elm", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Fruit Trees", category: "Tree", zoneIds: ["between123", "house1", "house2", "house3"], locationLabel: "Between Houses 1, 2, and 3", area: "Hoop Houses", flagColor: "yellow", notes: "Fruit trees noted between Hoop Houses 1–3." },
+      { name: "Hornbeam", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Ginkgo", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Japanese Maple", category: "Tree", zoneIds: ["house7", "house8"], locationLabel: "Hoop Houses 7 & 8", area: "Japanese Maples", flagColor: "blue" },
+      { name: "Juniper", category: "Tree", zoneIds: ["b"], locationLabel: "Ball & Burlap B", area: "Upright Juniper & Pine", flagColor: "blue" },
+      { name: "KY Coffee Tree", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Lilac Tree", category: "Tree/Shrub", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "magenta", notes: "Available in tree form and shrub form." },
+      { name: "Linden", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Honeylocust", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "London Plane", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Magnolia", category: "Tree", zoneIds: ["house6"], locationLabel: "Hoop House 6", area: "Redbud & Magnolia", flagColor: "brown" },
+      { name: "Maple", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Oak", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Pine", category: "Tree", zoneIds: ["b"], locationLabel: "Ball & Burlap B", area: "Upright Juniper & Pine", flagColor: "green" },
+      { name: "Redbud", category: "Tree", zoneIds: ["house6"], locationLabel: "Hoop House 6", area: "Redbud & Magnolia", flagColor: "brown" },
+      { name: "Dawn Redwood", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "gray" },
+      { name: "Serviceberry", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "pink" },
+      { name: "Seven Sons", category: "Tree", zoneIds: ["field-tree"], locationLabel: "Tree field — follow purple flag", area: "Tree Field", flagColor: "purple", notes: "Paper list shows purple field flag." },
+      { name: "Smoketree", category: "Tree", zoneIds: ["field-tree"], locationLabel: "Tree field — follow yellow flag", area: "Tree Field", flagColor: "yellow" },
+      { name: "Spruce", category: "Tree/Shrub", zoneIds: ["c"], locationLabel: "Ball & Burlap C", area: "Evergreens", flagColor: "green", notes: "Available in tree form and shrub form." },
+      { name: "Tulip Tree", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+      { name: "Whitebud", category: "Tree", zoneIds: ["house6"], locationLabel: "Hoop House 6", area: "Redbud & Magnolia", flagColor: "brown" },
+      { name: "Willow", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
+
+      // Shrubs
+      { name: "Abelia", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow orange flag", area: "Flowering Shrubs", flagColor: "orange" },
+      { name: "Althea", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow orange flag", area: "Flowering Shrubs", flagColor: "orange" },
+      { name: "Arborvitae Shrub", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow pink flag", area: "Evergreen Trees & Shrubs", flagColor: "pink" },
+      { name: "Azalea", category: "Shrub", zoneIds: ["house4"], locationLabel: "Hoop House 4", area: "Azaleas & Rhododendron", flagColor: "orange" },
+      { name: "Barberry", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow orange flag", area: "Flowering Shrubs", flagColor: "orange" },
+      { name: "Bayberry", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "orange" },
+      { name: "Beautyberry", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow orange flag", area: "Flowering Shrubs", flagColor: "orange" },
+      { name: "Boxwood", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow teal flag", area: "Evergreen Trees & Shrubs", flagColor: "teal" },
+      { name: "Buckthorn", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow orange flag", area: "Flowering Shrubs", flagColor: "orange" },
+      { name: "Burning Bush", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow orange flag", area: "Flowering Shrubs", flagColor: "orange" },
+      { name: "Butterfly Bush", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow orange flag", area: "Flowering Shrubs", flagColor: "orange" },
+      { name: "Caryopteris", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Chokeberry", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Clethra", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "yellow" },
+      { name: "Cotoneaster", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Crapemyrtle", category: "Shrub", zoneIds: ["playground"], locationLabel: "Playground area", area: "Flowering Shrubs", flagColor: "red" },
+      { name: "False Cypress", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow pink flag", area: "Evergreen Trees & Shrubs", flagColor: "pink" },
+      { name: "Deutzia", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "red" },
+      { name: "Dogwood, Shrub", category: "Shrub", zoneIds: ["house8"], locationLabel: "Hoop House 8", area: "Dogwood Trees / related stock", flagColor: "purple" },
+      { name: "Elderberry", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "orange" },
+      { name: "Euonymus", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Evergreen Trees & Shrubs", flagColor: "yellow" },
+      { name: "Forsythia", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Fothergilla", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "yellow" },
+      { name: "Grasses", category: "Other", zoneIds: ["roses"], locationLabel: "Roses & Grasses area", area: "Lower right", flagColor: "red", notes: "Not covered under the 2-year guarantee on the paper sheet." },
+      { name: "Holly", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "yellow" },
+      { name: "Honeysuckle", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Hydrangea", category: "Tree/Shrub", zoneIds: ["house5"], locationLabel: "Hoop House 5", area: "Hydrangeas", flagColor: "yellow", notes: "Available in shrub form on paper sheet; hydrangea traits included from brochure." },
+      { name: "Hypericum", category: "Shrub", zoneIds: ["playground"], locationLabel: "Playground area", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Inkberry Holly", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "yellow" },
+      { name: "Juniper Shrub", category: "Tree/Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow dark flag", area: "Evergreen Trees & Shrubs", flagColor: "gray", notes: "Available in tree form and shrub form." },
+      { name: "Laurel", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "gray" },
+      { name: "Lilac", category: "Shrub", zoneIds: ["playground"], locationLabel: "Playground area", area: "Flowering Shrubs", flagColor: "purple" },
+      { name: "Liriope", category: "Shrub", zoneIds: ["house1"], locationLabel: "Hoop House 1", area: "Groundcovers, Vines & Liriope", flagColor: "yellow" },
+      { name: "Mahonia", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "yellow" },
+      { name: "Mockorange", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Nandina", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "yellow" },
+      { name: "Ninebark", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Pieris Japonica", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "yellow" },
+      { name: "Pine Shrub", category: "Tree/Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow green flag", area: "Evergreen Trees & Shrubs", flagColor: "green", notes: "Available in tree form and shrub form." },
+      { name: "Potentilla", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "yellow" },
+      { name: "Privet", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Pyracantha", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Quince", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Rhododendron", category: "Shrub", zoneIds: ["house4"], locationLabel: "Hoop House 4", area: "Azaleas & Rhododendron", flagColor: "red" },
+      { name: "Roses", category: "Other", zoneIds: ["roses"], locationLabel: "Roses & Grasses area", area: "Lower right", flagColor: "red", notes: "Not covered under the 2-year guarantee on the paper sheet." },
+      { name: "Rose of Sharon", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow orange flag", area: "Flowering Shrubs", flagColor: "orange" },
+      { name: "Sand Cherry", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Seven Sons Shrub", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow purple flag", area: "Flowering Shrubs", flagColor: "purple" },
+      { name: "Smoketree Shrub", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Sorbaria", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Spirea", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow purple flag", area: "Flowering Shrubs", flagColor: "purple" },
+      { name: "Spruce Shrub", category: "Tree/Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow green flag", area: "Evergreen Trees & Shrubs", flagColor: "green", notes: "Available in tree form and shrub form." },
+      { name: "St. John's Wort", category: "Shrub", zoneIds: ["playground"], locationLabel: "Playground area", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Sumac", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Sweetspire", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow yellow flag", area: "Flowering Shrubs", flagColor: "yellow" },
+      { name: "Viburnum", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow purple flag", area: "Flowering Shrubs", flagColor: "purple" },
+      { name: "Weigela", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow purple flag", area: "Flowering Shrubs", flagColor: "purple" },
+      { name: "Willow Shrub", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow purple flag", area: "Flowering Shrubs", flagColor: "purple" },
+      { name: "Winterberry", category: "Shrub", zoneIds: ["house3"], locationLabel: "Hoop House 3", area: "Shrubs for Shade", flagColor: "purple" },
+      { name: "Wisteria", category: "Shrub", zoneIds: ["house1"], locationLabel: "Hoop House 1", area: "Groundcovers, Vines & Liriope", flagColor: "purple" },
+      { name: "Yew", category: "Shrub", zoneIds: ["house2"], locationLabel: "Hoop House 2", area: "Yews", flagColor: "purple" },
+      { name: "Yucca", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow red flag", area: "Flowering Shrubs", flagColor: "red" }
+    ];
+
     const state = {
       plants: [],
       filtered: [],
@@ -651,20 +1431,29 @@
       theme: localStorage.getItem("suburban-theme") || "dark",
       scanner: null,
       scannerActive: false,
-      scanLock: false
+      scanLock: false,
+      view: "browser",
+      finderQuery: "",
+      finderCategory: "",
+      finderTraits: new Set(),
+      finderResults: [],
+      selectedFinderId: "",
+      selectedZoneIds: [],
+      kioskQuery: "",
+      kioskTrait: "",
+      kioskResults: [],
+      selectedKioskId: ""
     };
 
-    const TRAITS = [
-      "sun",
-      "shade",
-      "pollinator",
-      "drought",
-      "deer resistant"
-    ];
+    const TRAITS = ["sun", "shade", "pollinator", "drought", "deer resistant"];
 
     const els = {
       html: document.documentElement,
       themeToggle: document.getElementById("themeToggle"),
+      viewTabs: Array.from(document.querySelectorAll(".view-tab")),
+      browserView: document.getElementById("browserView"),
+      finderView: document.getElementById("finderView"),
+      kioskView: document.getElementById("kioskView"),
       searchInput: document.getElementById("searchInput"),
       exposureFilter: document.getElementById("exposureFilter"),
       groupFilter: document.getElementById("groupFilter"),
@@ -680,30 +1469,29 @@
       summaryBar: document.getElementById("summaryBar"),
       results: document.getElementById("results"),
       scanStatus: document.getElementById("scanStatus"),
-      scannerShell: document.getElementById("scannerShell")
+      scannerShell: document.getElementById("scannerShell"),
+      finderSearch: document.getElementById("finderSearch"),
+      finderCategory: document.getElementById("finderCategory"),
+      finderTraitChips: document.getElementById("finderTraitChips"),
+      finderResults: document.getElementById("finderResults"),
+      finderClearBtn: document.getElementById("finderClearBtn"),
+      flagLegend: document.getElementById("flagLegend"),
+      mapBoard: document.getElementById("mapBoard"),
+      locationDetails: document.getElementById("locationDetails"),
+      definitionsGrid: document.getElementById("definitionsGrid"),
+      zoneJumpButtons: Array.from(document.querySelectorAll("[data-zone-jump]")),
+      kioskSearch: document.getElementById("kioskSearch"),
+      kioskActions: document.getElementById("kioskActions"),
+      kioskResults: document.getElementById("kioskResults"),
+      kioskDetailPanel: document.getElementById("kioskDetailPanel")
     };
-
-    function setTheme(theme) {
-      state.theme = theme;
-      els.html.setAttribute("data-theme", theme);
-      localStorage.setItem("suburban-theme", theme);
-      els.themeToggle.textContent = theme === "dark" ? "Theme: Dark" : "Theme: Light";
-    }
-
-    function setScanStatus(message, type = "") {
-      els.scanStatus.textContent = message || "";
-      els.scanStatus.className = "scan-status" + (type ? ` ${type}` : "");
-    }
 
     function normalizeText(v) {
       return String(v || "").trim().toLowerCase();
     }
 
     function normalizeSku(v) {
-      return String(v || "")
-        .trim()
-        .toUpperCase()
-        .replace(/[^A-Z0-9]/g, "");
+      return String(v || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
     }
 
     function isTruthy(value) {
@@ -713,10 +1501,48 @@
       return ["true", "yes", "y", "1", "x"].includes(t);
     }
 
+    function normalizeName(name) {
+      return String(name || "")
+        .toLowerCase()
+        .replace(/[*',.]/g, "")
+        .replace(/&/g, "and")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function titleCase(text) {
+      return String(text || "").replace(/\b\w/g, m => m.toUpperCase());
+    }
+
+    function setTheme(theme) {
+      state.theme = theme;
+      els.html.setAttribute("data-theme", theme);
+      localStorage.setItem("suburban-theme", theme);
+      els.themeToggle.textContent = theme === "dark" ? "Dark / Light: Dark" : "Dark / Light: Light";
+    }
+
+    function showView(view) {
+      state.view = view;
+      const views = {
+        browser: els.browserView,
+        finder: els.finderView,
+        kiosk: els.kioskView
+      };
+      Object.entries(views).forEach(([key, node]) => {
+        const active = key === view;
+        node.hidden = !active;
+      });
+      els.viewTabs.forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
+    }
+
+    function setScanStatus(message, type = "") {
+      els.scanStatus.textContent = message || "";
+      els.scanStatus.className = "scan-status" + (type ? ` ${type}` : "");
+    }
+
     function getPlantGroup(plant) {
       const group = plant.plant_group || plant.category || plant.section || "Perennials";
       const text = String(group).toLowerCase();
-
       if (text.includes("clematis")) return "Clematis";
       if (text.includes("grapes") || text.includes("berries")) return "Grapes & Berries";
       if (text.includes("ground cover")) return "Ground Covers";
@@ -726,23 +1552,17 @@
       if (text.includes("perennials - shade")) return "Perennials - Shade";
       if (text.includes("perennials - sun")) return "Perennials - Sun";
       if (text.includes("roses") || text === "rose") return "Roses";
-
       return group;
     }
 
     function getExposure(plant) {
       const light = String(plant.light || "").toLowerCase();
       const group = String(getPlantGroup(plant)).toLowerCase();
-
       if (group.includes("perennials - sun")) return "Sun";
       if (group.includes("perennials - shade")) return "Shade";
-
       const hasSun = light.includes("sun");
       const hasShade = light.includes("shade");
-
-      if ((hasSun && hasShade) || light.includes("part sun") || light.includes("part shade") || light.includes("full-part")) {
-        return "Mixed";
-      }
+      if ((hasSun && hasShade) || light.includes("part sun") || light.includes("part shade") || light.includes("full-part")) return "Mixed";
       if (hasSun) return "Sun";
       if (hasShade) return "Shade";
       return "Unknown";
@@ -761,23 +1581,12 @@
         plant.description,
         plant.notes
       ].join(" ").toLowerCase();
-
       return {
         sun: exposure === "Sun",
         shade: exposure === "Shade",
-        pollinator:
-          isTruthy(plant.pollinator) ||
-          haystack.includes("pollinator") ||
-          haystack.includes("butterfly") ||
-          haystack.includes("bee"),
-        drought:
-          isTruthy(plant.drought) ||
-          haystack.includes("drought"),
-        "deer resistant":
-          isTruthy(plant.deer) ||
-          isTruthy(plant.deer_resistant) ||
-          isTruthy(plant.deerResistant) ||
-          haystack.includes("deer")
+        pollinator: isTruthy(plant.pollinator) || haystack.includes("pollinator") || haystack.includes("butterfly") || haystack.includes("bee"),
+        drought: isTruthy(plant.drought) || haystack.includes("drought"),
+        "deer resistant": isTruthy(plant.deer) || isTruthy(plant.deer_resistant) || isTruthy(plant.deerResistant) || haystack.includes("deer")
       };
     }
 
@@ -788,19 +1597,14 @@
     function parseHeightToInches(heightText) {
       if (!heightText) return null;
       const t = String(heightText).toLowerCase();
-
       let m = t.match(/(\d+)\s*-\s*(\d+)\s*(?:in|")/);
       if (m) return (Number(m[1]) + Number(m[2])) / 2;
-
       m = t.match(/(\d+)\s*(?:in|")/);
       if (m) return Number(m[1]);
-
       m = t.match(/(\d+)\s*-\s*(\d+)\s*ft/);
       if (m) return ((Number(m[1]) + Number(m[2])) / 2) * 12;
-
       m = t.match(/(\d+)\s*ft/);
       if (m) return Number(m[1]) * 12;
-
       return null;
     }
 
@@ -826,7 +1630,6 @@
         !!els.colorFilter.value ||
         !!els.heightFilter.value ||
         state.activeTraits.size > 0;
-
       els.clearFilters.classList.toggle("clear-active", hasAnythingToClear);
     }
 
@@ -845,13 +1648,9 @@
     function populateFilters(plants) {
       const groups = [...new Set(plants.map(getPlantGroup).filter(Boolean))].sort();
       const colors = [...new Set(plants.map(inferColor).filter(Boolean))].sort();
-
       const exposures = [...new Set(plants.map(getExposure))]
         .filter(Boolean)
-        .sort((a, b) => {
-          const order = ["Sun", "Shade", "Mixed", "Unknown"];
-          return order.indexOf(a) - order.indexOf(b);
-        });
+        .sort((a, b) => ["Sun", "Shade", "Mixed", "Unknown"].indexOf(a) - ["Sun", "Shade", "Mixed", "Unknown"].indexOf(b));
 
       els.groupFilter.innerHTML = `<option value="">All groups</option>`;
       els.colorFilter.innerHTML = `<option value="">All colors</option>`;
@@ -881,30 +1680,24 @@
 
     function renderTraitChips() {
       els.traitChips.innerHTML = "";
-
       TRAITS.forEach(trait => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "chip" + (state.activeTraits.has(trait) ? " active" : "");
         btn.textContent = trait.replace(/\b\w/g, m => m.toUpperCase());
-
         btn.addEventListener("click", () => {
           if (state.activeTraits.has(trait)) state.activeTraits.delete(trait);
           else state.activeTraits.add(trait);
-
           renderTraitChips();
           applyFilters();
         });
-
         els.traitChips.appendChild(btn);
       });
-
       updateActionButtons();
     }
 
     function matchesSearch(plant, q) {
       if (!q) return true;
-
       const haystack = [
         plant.name,
         plant.sku,
@@ -920,7 +1713,6 @@
         plant.width,
         plant.color
       ].join(" ").toLowerCase();
-
       return haystack.includes(q);
     }
 
@@ -937,10 +1729,8 @@
     function findPlantsBySku(rawSku) {
       const wanted = normalizeSku(rawSku);
       if (!wanted) return [];
-
-      let exact = state.plants.filter(plant => normalizeSku(plant.sku) === wanted);
+      const exact = state.plants.filter(plant => normalizeSku(plant.sku) === wanted);
       if (exact.length) return exact;
-
       return state.plants.filter(plant => normalizeSku(plant.sku).includes(wanted));
     }
 
@@ -960,21 +1750,16 @@
 
     function runSkuLookup(rawSku, source = "manual") {
       const sku = normalizeSku(rawSku);
-
       if (!sku) {
         setScanStatus("Enter a SKU or scan a barcode.", "warning");
         return;
       }
-
       els.scanSkuInput.value = rawSku;
       clearNonCountFilters();
-
       state.filtered = findPlantsBySku(sku);
-
       renderSummary();
       renderResults();
       updateActionButtons();
-
       if (state.filtered.length) {
         setScanStatus(
           source === "scanner"
@@ -994,22 +1779,18 @@
       const color = els.colorFilter.value;
       const height = els.heightFilter.value;
       state.visibleCount = Number(els.showCount.value || 48);
-
       state.filtered = state.plants.filter(plant => {
         if (!matchesSearch(plant, q)) return false;
         if (exposure && getExposure(plant) !== exposure) return false;
         if (group && getPlantGroup(plant) !== group) return false;
         if (color && inferColor(plant) !== color) return false;
         if (height && heightBucket(plant.height) !== height) return false;
-
         const traits = inferTraits(plant);
         for (const trait of state.activeTraits) {
           if (!traits[trait]) return false;
         }
-
         return true;
       });
-
       renderSummary();
       renderResults();
       updateActionButtons();
@@ -1021,7 +1802,6 @@
       const sun = state.filtered.filter(p => getExposure(p) === "Sun").length;
       const shade = state.filtered.filter(p => getExposure(p) === "Shade").length;
       const activeTraits = state.activeTraits.size;
-
       els.summaryBar.innerHTML = `
         <span class="pill">${total} loaded</span>
         <span class="pill">${showing} showing</span>
@@ -1033,66 +1813,49 @@
 
     function renderResults() {
       els.results.innerHTML = "";
-
       if (!state.filtered.length) {
         els.results.innerHTML = `<div class="empty">No plants match the current filters.</div>`;
         return;
       }
-
       const visiblePlants = state.filtered.slice(0, state.visibleCount);
-
       visiblePlants.forEach(plant => {
         const traits = inferTraits(plant);
         const exposure = getExposure(plant);
         const img = imageFor(plant);
-
         const extraTags = [];
         if (traits.pollinator) extraTags.push("Pollinator");
         if (traits.drought) extraTags.push("Drought");
         if (traits["deer resistant"]) extraTags.push("Deer Resistant");
-
         const card = document.createElement("article");
         card.className = "card";
         card.innerHTML = `
           <div class="card-image">
             ${
               img
-                ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>';">`
+                ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>'">`
                 : `<div class="no-image">No image available</div>`
             }
           </div>
           <div class="card-body">
             <h3 class="card-title">${plant.name || "Unnamed Plant"}</h3>
-            <div class="subline">
-              ${(plant.common || "")}${plant.common && plant.genus ? " • " : ""}${plant.genus || ""}
-            </div>
-
+            <div class="subline">${(plant.common || "")}${plant.common && plant.genus ? " • " : ""}${plant.genus || ""}</div>
             <div class="tag-row">
               <span class="tag green">${exposure}</span>
               <span class="tag">${getPlantGroup(plant)}</span>
               ${plant.size ? `<span class="tag">${plant.size}</span>` : ""}
             </div>
-
             <div class="details">
               ${plant.size ? `Size: ${plant.size}<br>` : ""}
               ${(plant.height || plant.width) ? `Mature size: ${plant.height || "—"} × ${plant.width || "—"}` : ""}
             </div>
-
-            ${
-              extraTags.length
-                ? `<div class="tag-row">${extraTags.map(t => `<span class="tag">${t}</span>`).join("")}</div>`
-                : ""
-            }
-
+            ${extraTags.length ? `<div class="tag-row">${extraTags.map(t => `<span class="tag">${t}</span>`).join("")}</div>` : ""}
             <div class="price-row">
               <div class="price">${plant.price || ""}</div>
               <div class="sku">SKU: ${plant.sku || "—"}</div>
             </div>
-
             ${plant.link ? `<a class="btn product-btn" href="${plant.link}" target="_blank" rel="noopener noreferrer">View Product</a>` : ""}
           </div>
         `;
-
         els.results.appendChild(card);
       });
     }
@@ -1107,75 +1870,39 @@
 
     async function startLiveScanner() {
       if (!ensureScannerLibrary()) return;
-
       if (state.scannerActive) {
         setScanStatus("Scanner is already running.", "warning");
         return;
       }
-
       els.scannerShell.classList.add("active");
       setScanStatus("Requesting camera access…", "");
-
       try {
         const cameras = await Html5Qrcode.getCameras();
-
-        if (!cameras || !cameras.length) {
-          throw new Error("No cameras found.");
-        }
-
+        if (!cameras || !cameras.length) throw new Error("No cameras found.");
         let chosen = cameras[0];
-        const rearCam =
-          cameras.find(c => /back|rear|environment|world/i.test(c.label || "")) ||
-          cameras[cameras.length - 1];
-
+        const rearCam = cameras.find(c => /back|rear|environment|world/i.test(c.label || "")) || cameras[cameras.length - 1];
         if (rearCam) chosen = rearCam;
-
         state.scanner = new Html5Qrcode("reader");
-
-        const config = {
-          fps: 10,
-          qrbox: { width: 320, height: 120 },
-          disableFlip: false,
-          rememberLastUsedCamera: true
-        };
-
-        const onScanSuccess = async (decodedText) => {
+        const config = { fps: 10, qrbox: { width: 320, height: 120 }, disableFlip: false, rememberLastUsedCamera: true };
+        const onScanSuccess = async decodedText => {
           if (state.scanLock) return;
           state.scanLock = true;
-
           try {
             runSkuLookup(decodedText, "scanner");
             await stopLiveScanner(true);
           } finally {
-            setTimeout(() => {
-              state.scanLock = false;
-            }, 900);
+            setTimeout(() => { state.scanLock = false; }, 900);
           }
         };
-
-        const onScanFailure = () => {
-          // keep scanning silently
-        };
-
-        await state.scanner.start(
-          chosen.id,
-          config,
-          onScanSuccess,
-          onScanFailure
-        );
-
+        await state.scanner.start(chosen.id, config, onScanSuccess, () => {});
         state.scannerActive = true;
         updateScannerUi();
         setScanStatus(`Scanner is live. Using: ${chosen.label || "camera"}`, "success");
       } catch (err) {
         console.error("Scanner start failed:", err);
-
         try {
-          if (state.scanner) {
-            await state.scanner.clear();
-          }
+          if (state.scanner) await state.scanner.clear();
         } catch (_) {}
-
         state.scanner = null;
         state.scannerActive = false;
         updateScannerUi();
@@ -1191,28 +1918,415 @@
         if (!silent) setScanStatus("Scanner stopped.", "warning");
         return;
       }
-
       try {
-        if (state.scannerActive) {
-          await state.scanner.stop();
-        }
+        if (state.scannerActive) await state.scanner.stop();
       } catch (err) {
         console.warn("Scanner stop warning:", err);
       }
-
       try {
         await state.scanner.clear();
       } catch (err) {
         console.warn("Scanner clear warning:", err);
       }
-
       state.scanner = null;
       state.scannerActive = false;
       updateScannerUi();
+      if (!silent) setScanStatus("Scanner stopped.", "warning");
+    }
 
-      if (!silent) {
-        setScanStatus("Scanner stopped.", "warning");
+    function getBrochureTraits(name) {
+      const key = normalizeName(name)
+        .replace(/ shrub/g, "")
+        .replace(/ tree/g, key => key)
+        .trim();
+      return BROCHURE_TRAITS[key] || BROCHURE_TRAITS[normalizeName(name)] || [];
+    }
+
+    function uniqueValues(values) {
+      return [...new Set(values.filter(Boolean))];
+    }
+
+    function buildNurseryData() {
+      return NURSERY_BASE.map((item, index) => {
+        const brochureTraits = getBrochureTraits(item.name);
+        const searchTerms = [item.name, item.locationLabel, item.area, item.category, ...(item.aliases || [])];
+        if (item.area && /house/i.test(item.area)) searchTerms.push("hoop house");
+        if (item.locationLabel.toLowerCase().includes("house")) searchTerms.push("hoop house");
+        return {
+          ...item,
+          id: `n${index + 1}`,
+          traits: uniqueValues([...(item.traits || []), ...brochureTraits]),
+          searchBlob: searchTerms.join(" ").toLowerCase()
+        };
+      });
+    }
+
+    const NURSERY_ITEMS = buildNurseryData();
+
+    function renderDefinitions() {
+      els.definitionsGrid.innerHTML = DEFINITIONS.map(def => `
+        <article class="def-card">
+          <h3>${def.title}</h3>
+          <p>${def.text}</p>
+        </article>
+      `).join("");
+    }
+
+    function renderFlagLegend() {
+      const colorOrder = ["orange", "yellow", "purple", "green", "red", "blue", "brown", "pink", "teal", "gray", "black"];
+      els.flagLegend.innerHTML = colorOrder.map(color => `
+        <span class="flag-chip">
+          <span class="mini-flag" style="--flag:${FLAG_COLORS[color] || color}"></span>
+          ${titleCase(color)} flag
+        </span>
+      `).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderMap(activeZoneIds = [], markerItems = []) {
+      const active = new Set(activeZoneIds || []);
+      const staticText = `
+        <text class="map-static" x="20" y="325">Employees Only</text>
+        <text class="map-static" x="20" y="530">Bulk Mulch</text>
+        <text class="map-static" x="20" y="578">Rock Yard</text>
+        <text class="map-static" x="20" y="640">Bagged Goods &amp; Loading</text>
+        <text class="map-static" x="20" y="726">Bulk Soils, Sand &amp; Compost</text>
+        <text class="map-static" x="250" y="136">Ball &amp; Burlap Trees</text>
+        <text class="map-static" x="238" y="270">To East Bottoms ↑</text>
+        <text class="map-static" x="595" y="270">Hoop Houses (shade tolerant)</text>
+        <text class="map-static" x="280" y="666">Statuary</text>
+        <text class="map-static" x="360" y="674">Pottery</text>
+        <text class="map-static" x="522" y="822">Checkout</text>
+        <text class="map-static" x="598" y="725">You are here</text>
+        <circle cx="590" cy="716" r="8" fill="#d74a4a"></circle>
+      `;
+
+      const shapes = MAP_ZONES.map(zone => {
+        const rx = zone.shape === "pill" ? 20 : 12;
+        return `
+          <g data-zone-group="${zone.id}">
+            <rect class="map-zone-shape${active.has(zone.id) ? " active" : ""}" data-zone="${zone.id}" x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${rx}" ry="${rx}"></rect>
+            <text class="map-label" x="${zone.centerX}" y="${zone.centerY - 6}">${zone.title}</text>
+            <text class="map-small" x="${zone.centerX}" y="${zone.centerY + 18}">${zone.subtitle}</text>
+          </g>
+        `;
+      }).join("");
+
+      const markerSvg = markerItems.flatMap(item => {
+        const color = FLAG_COLORS[item.flagColor] || item.flagColor || "#777";
+        return item.zoneIds.map(zoneId => {
+          const zone = MAP_ZONES.find(z => z.id === zoneId);
+          if (!zone) return "";
+          const x = zone.centerX + 48;
+          const y = zone.centerY - 8;
+          return `<polygon points="${x},${y} ${x - 16},${y - 10} ${x - 16},${y + 10}" fill="${color}" stroke="#223" stroke-width="1.2"></polygon>`;
+        });
+      }).join("");
+
+      els.mapBoard.innerHTML = `
+        <svg viewBox="0 0 980 860" role="img" aria-label="Digital nursery map">
+          <rect x="0" y="0" width="980" height="860" fill="var(--map-bg)"></rect>
+          <rect class="map-soft" x="8" y="268" width="180" height="112" rx="16"></rect>
+          <rect class="map-soft" x="244" y="628" width="538" height="226" rx="6"></rect>
+          <rect class="map-soft" x="240" y="404" width="24" height="270" rx="8"></rect>
+          ${shapes}
+          ${markerSvg}
+          ${staticText}
+        </svg>
+      `;
+
+      els.mapBoard.querySelectorAll("[data-zone]").forEach(node => {
+        node.addEventListener("click", () => handleZoneClick(node.dataset.zone));
+      });
+    }
+
+    function zoneTitle(zoneId) {
+      const zone = MAP_ZONES.find(z => z.id === zoneId);
+      return zone ? `${zone.title} — ${zone.subtitle}` : zoneId;
+    }
+
+    function directionFromZone(item) {
+      const zoneIds = item.zoneIds || [];
+      if (zoneIds.some(z => /^house\d$/.test(z))) {
+        const houses = zoneIds.filter(z => /^house\d$/.test(z)).map(z => z.replace("house", "House ")).join(" & ");
+        return `From the perennials/check-out side, head right toward the hoop houses and go to ${houses}.`;
       }
+      if (zoneIds.includes("between123")) {
+        return "From perennials, head right toward the hoop houses and look between Houses 1, 2, and 3.";
+      }
+      if (zoneIds.some(z => ["a", "b", "c", "d"].includes(z))) {
+        return `From perennials, walk straight north toward Ball & Burlap Trees and look in ${zoneIds.map(zoneTitle).join(" / ")}.`;
+      }
+      if (zoneIds.includes("field-tree")) {
+        return "From perennials, head into the central tree field and look for the matching flag color.";
+      }
+      if (zoneIds.includes("field-shrub") || zoneIds.includes("flowering")) {
+        return "From perennials, enter the center shrub field and use the flag color to narrow it down.";
+      }
+      if (zoneIds.includes("playground")) {
+        return "From perennials, head into the shrub field and use the playground as your landmark.";
+      }
+      if (zoneIds.includes("roses")) {
+        return "From perennials, head to the lower-right section marked Roses & Grasses.";
+      }
+      return "Use the highlighted map zone as your guide from the perennials side.";
+    }
+
+    function renderFinderChips() {
+      els.finderTraitChips.innerHTML = FINDER_TRAITS.map(trait => `
+        <button class="finder-chip${state.finderTraits.has(trait) ? " active" : ""}" type="button" data-trait="${trait}">${titleCase(trait.replace(/-/g, " "))}</button>
+      `).join("");
+      els.finderTraitChips.querySelectorAll("[data-trait]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const trait = btn.dataset.trait;
+          if (state.finderTraits.has(trait)) state.finderTraits.delete(trait);
+          else state.finderTraits.add(trait);
+          renderFinderChips();
+          applyFinderFilters();
+        });
+      });
+    }
+
+    function finderMatches(item, query, category, activeTraits) {
+      if (query && !item.searchBlob.includes(query)) return false;
+      if (category && item.category !== category) return false;
+      for (const trait of activeTraits) {
+        if (!item.traits.includes(trait)) return false;
+      }
+      return true;
+    }
+
+    function sortFinderItems(items) {
+      return items.slice().sort((a, b) => {
+        const az = a.locationLabel.localeCompare(b.locationLabel);
+        if (az !== 0) return az;
+        return a.name.localeCompare(b.name);
+      });
+    }
+
+    function renderFinderResults() {
+      const results = state.finderResults;
+      if (!results.length) {
+        els.finderResults.innerHTML = `<div class="empty">No nursery matches found. Try a different plant name or clear a filter.</div>`;
+        return;
+      }
+      els.finderResults.innerHTML = results.map(item => {
+        const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+        const active = state.selectedFinderId === item.id;
+        const tags = item.traits.slice(0, 4).map(trait => `<span class="trait-badge">${titleCase(trait.replace(/-/g, " "))}</span>`).join("");
+        return `
+          <button type="button" class="finder-card${active ? " active" : ""}" data-item-id="${item.id}">
+            <div class="topline">
+              <div>
+                <h3>${escapeHtml(item.name)}</h3>
+                <div class="finder-meta">${escapeHtml(item.locationLabel)} · ${escapeHtml(item.area)}</div>
+              </div>
+              <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")}</span>
+            </div>
+            <div class="finder-tag-row">
+              <span class="location-badge">${escapeHtml(item.category)}</span>
+              ${tags}
+            </div>
+            <div class="details-text">${escapeHtml(item.notes || directionFromZone(item))}</div>
+          </button>
+        `;
+      }).join("");
+
+      els.finderResults.querySelectorAll("[data-item-id]").forEach(btn => {
+        btn.addEventListener("click", () => selectFinderItem(btn.dataset.itemId));
+      });
+    }
+
+    function buildDetailHtml(item, mode = "finder") {
+      const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+      const traits = item.traits.length
+        ? item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, " "))}</span>`).join("")
+        : `<span class="trait-badge">No brochure traits listed</span>`;
+      const extraNote = item.notes ? `<p class="finder-note">${escapeHtml(item.notes)}</p>` : "";
+      const zones = item.zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("");
+      const link = mode === "finder"
+        ? `<a class="map-link primary" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open Suburban in Google Maps</a>`
+        : "";
+      return `
+        <h3>${escapeHtml(item.name)}</h3>
+        <p class="finder-note"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
+        <div class="detail-tag-row">
+          <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")} flag</span>
+          <span class="location-badge">${escapeHtml(item.category)}</span>
+        </div>
+        <div class="detail-tag-row">${zones}</div>
+        <div class="detail-tag-row">${traits}</div>
+        <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
+        ${extraNote}
+        <div class="detail-actions">
+          ${link}
+          <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Quick line</button>
+        </div>
+      `;
+    }
+
+    function wireCopyButtons(scope) {
+      scope.querySelectorAll("[data-copy-line]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const text = btn.getAttribute("data-copy-line").replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+          try {
+            await navigator.clipboard.writeText(text);
+            btn.textContent = "Copied";
+            setTimeout(() => { btn.textContent = "Quick line"; }, 1200);
+          } catch (_) {
+            btn.textContent = "Copy failed";
+            setTimeout(() => { btn.textContent = "Quick line"; }, 1200);
+          }
+        });
+      });
+    }
+
+    function selectFinderItem(itemId) {
+      const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
+      if (!item) return;
+      state.selectedFinderId = item.id;
+      state.selectedZoneIds = item.zoneIds.slice();
+      renderFinderResults();
+      renderMap(item.zoneIds, [item]);
+      els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
+      wireCopyButtons(els.locationDetails);
+    }
+
+    function handleZoneClick(zoneId) {
+      state.selectedZoneIds = [zoneId];
+      const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
+      renderMap([zoneId], matches.slice(0, 6));
+      const zoneName = zoneTitle(zoneId);
+      if (!matches.length) {
+        els.locationDetails.innerHTML = `
+          <h3>${escapeHtml(zoneName)}</h3>
+          <p class="finder-note">No mapped plants are assigned to this zone yet, but the zone is available on the digital map.</p>
+        `;
+        return;
+      }
+      els.locationDetails.innerHTML = `
+        <h3>${escapeHtml(zoneName)}</h3>
+        <p class="finder-note">Mapped plants in this zone:</p>
+        <div class="detail-tag-row">${matches.slice(0, 14).map(item => `<span class="location-badge">${escapeHtml(item.name)}</span>`).join("")}</div>
+        <p class="zone-directions">${escapeHtml(directionFromZone(matches[0]))}</p>
+      `;
+    }
+
+    function applyFinderFilters() {
+      state.finderQuery = normalizeText(els.finderSearch.value);
+      state.finderCategory = els.finderCategory.value;
+      state.finderResults = sortFinderItems(NURSERY_ITEMS.filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits)));
+      if (state.selectedFinderId && !state.finderResults.some(item => item.id === state.selectedFinderId)) {
+        state.selectedFinderId = "";
+      }
+      renderFinderResults();
+      if (state.selectedFinderId) {
+        selectFinderItem(state.selectedFinderId);
+      } else {
+        renderMap(state.selectedZoneIds, []);
+      }
+    }
+
+    function clearFinder() {
+      els.finderSearch.value = "";
+      els.finderCategory.value = "";
+      state.finderQuery = "";
+      state.finderCategory = "";
+      state.finderTraits.clear();
+      state.selectedFinderId = "";
+      state.selectedZoneIds = [];
+      renderFinderChips();
+      applyFinderFilters();
+      renderMap([], []);
+      els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel will show the location, field-flag cue, and a simple direction note you can use with customers in real life tomorrow.</p>`;
+    }
+
+    function renderKioskActions() {
+      const actions = [
+        { label: "All", value: "" },
+        { label: "Trees", value: "Tree" },
+        { label: "Shrubs", value: "Shrub" },
+        { label: "Shade", value: "shade" },
+        { label: "Deer Resistant", value: "deer-resistant" },
+        { label: "Pollinator", value: "pollinator-friendly" },
+        { label: "Wet Areas", value: "wet-tolerant" }
+      ];
+      els.kioskActions.innerHTML = actions.map(action => `
+        <button type="button" class="kiosk-btn${state.kioskTrait === action.value ? " active" : ""}" data-kiosk-value="${action.value}">${action.label}</button>
+      `).join("");
+      els.kioskActions.querySelectorAll("[data-kiosk-value]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.kioskTrait = btn.dataset.kioskValue;
+          renderKioskActions();
+          applyKioskFilters();
+        });
+      });
+    }
+
+    function applyKioskFilters() {
+      const query = normalizeText(els.kioskSearch.value);
+      const picked = state.kioskTrait;
+      state.kioskResults = sortFinderItems(NURSERY_ITEMS.filter(item => {
+        if (query && !item.searchBlob.includes(query)) return false;
+        if (!picked) return true;
+        if (picked === "Tree" || picked === "Shrub") return item.category === picked || item.category === `${picked}/Shrub`;
+        return item.traits.includes(picked);
+      })).slice(0, 24);
+      renderKioskResults();
+    }
+
+    function renderKioskResults() {
+      if (!state.kioskResults.length) {
+        els.kioskResults.innerHTML = `<div class="empty">No matches in kiosk mode. Try another search or clear a quick filter.</div>`;
+        return;
+      }
+      els.kioskResults.innerHTML = state.kioskResults.map(item => {
+        const active = state.selectedKioskId === item.id;
+        const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+        return `
+          <button type="button" class="kiosk-card${active ? " active" : ""}" data-kiosk-id="${item.id}">
+            <div class="topline">
+              <div>
+                <h3>${escapeHtml(item.name)}</h3>
+                <div class="kiosk-meta">Go to ${escapeHtml(item.locationLabel)}</div>
+              </div>
+              <span class="mini-flag" style="--flag:${flagColor}"></span>
+            </div>
+            <div class="details-text">${escapeHtml(item.traits.slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area)}</div>
+          </button>
+        `;
+      }).join("");
+      els.kioskResults.querySelectorAll("[data-kiosk-id]").forEach(btn => {
+        btn.addEventListener("click", () => selectKioskItem(btn.dataset.kioskId));
+      });
+    }
+
+    function selectKioskItem(itemId) {
+      const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
+      if (!item) return;
+      state.selectedKioskId = item.id;
+      renderKioskResults();
+      els.kioskDetailPanel.innerHTML = `
+        <h2>${escapeHtml(item.name)}</h2>
+        <p class="kiosk-lead"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
+        <div class="detail-tag-row">
+          <span class="flag-inline"><span class="mini-flag" style="--flag:${FLAG_COLORS[item.flagColor] || item.flagColor || '#666'}"></span>${titleCase(item.flagColor || 'field')} flag</span>
+        </div>
+        <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
+        <div class="detail-tag-row">${item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
+        <div class="detail-actions">
+          <a class="map-link primary" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open Maps</a>
+          <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Quick line</button>
+        </div>
+      `;
+      wireCopyButtons(els.kioskDetailPanel);
     }
 
     async function loadPlants() {
@@ -1235,6 +2349,10 @@
         setTheme(state.theme === "dark" ? "light" : "dark");
       });
 
+      els.viewTabs.forEach(btn => {
+        btn.addEventListener("click", () => showView(btn.dataset.view));
+      });
+
       els.searchInput.addEventListener("input", applyFilters);
       els.exposureFilter.addEventListener("change", applyFilters);
       els.groupFilter.addEventListener("change", applyFilters);
@@ -1242,36 +2360,45 @@
       els.heightFilter.addEventListener("change", applyFilters);
       els.showCount.addEventListener("change", applyFilters);
 
-      els.clearFilters.addEventListener("click", () => {
-        clearFilters();
-      });
-
-      els.findSkuBtn.addEventListener("click", () => {
-        runSkuLookup(els.scanSkuInput.value, "manual");
-      });
-
-      els.startScannerBtn.addEventListener("click", () => {
-        startLiveScanner();
-      });
-
-      els.stopScannerBtn.addEventListener("click", () => {
-        stopLiveScanner(false);
-      });
+      els.clearFilters.addEventListener("click", () => { clearFilters(); });
+      els.findSkuBtn.addEventListener("click", () => { runSkuLookup(els.scanSkuInput.value, "manual"); });
+      els.startScannerBtn.addEventListener("click", () => { startLiveScanner(); });
+      els.stopScannerBtn.addEventListener("click", () => { stopLiveScanner(false); });
 
       els.scanSkuInput.addEventListener("input", updateActionButtons);
       els.scanSkuInput.addEventListener("focus", updateActionButtons);
-
-      els.scanSkuInput.addEventListener("keydown", (e) => {
+      els.scanSkuInput.addEventListener("keydown", e => {
         if (e.key === "Enter") {
           e.preventDefault();
           runSkuLookup(els.scanSkuInput.value, "manual");
         }
       });
+
+      els.finderSearch.addEventListener("input", applyFinderFilters);
+      els.finderCategory.addEventListener("change", applyFinderFilters);
+      els.finderClearBtn.addEventListener("click", clearFinder);
+      els.zoneJumpButtons.forEach(btn => {
+        btn.addEventListener("click", () => handleZoneClick(btn.dataset.zoneJump));
+      });
+
+      els.kioskSearch.addEventListener("input", applyKioskFilters);
+    }
+
+    function initFinder() {
+      renderDefinitions();
+      renderFlagLegend();
+      renderFinderChips();
+      renderMap([], []);
+      applyFinderFilters();
+      renderKioskActions();
+      applyKioskFilters();
     }
 
     setTheme(state.theme);
     updateScannerUi();
     wireEvents();
+    initFinder();
+    showView("browser");
     loadPlants();
   </script>
 </body>
