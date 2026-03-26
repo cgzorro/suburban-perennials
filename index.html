@@ -290,6 +290,21 @@
       border-radius: 18px;
       overflow: hidden;
       background: #000;
+      position: relative;
+    }
+
+    #reader video {
+      width: 100% !important;
+      height: auto !important;
+      display: block !important;
+      object-fit: cover;
+      background: #000;
+      border-radius: 18px;
+    }
+
+    #reader canvas {
+      max-width: 100%;
+      border-radius: 18px;
     }
 
     .results-grid {
@@ -1082,16 +1097,6 @@
       });
     }
 
-    function getScannerBox(viewfinderWidth, viewfinderHeight) {
-      const width = Math.min(Math.floor(viewfinderWidth * 0.82), 420);
-      const height = Math.min(Math.floor(viewfinderHeight * 0.26), 160);
-
-      return {
-        width: Math.max(width, 240),
-        height: Math.max(height, 90)
-      };
-    }
-
     function ensureScannerLibrary() {
       if (!window.Html5Qrcode) {
         setScanStatus("Scanner library did not load.", "error");
@@ -1108,17 +1113,30 @@
         return;
       }
 
+      els.scannerShell.classList.add("active");
       setScanStatus("Requesting camera access…", "");
-      state.scanner = new Html5Qrcode("reader");
 
       try {
+        const cameras = await Html5Qrcode.getCameras();
+
+        if (!cameras || !cameras.length) {
+          throw new Error("No cameras found.");
+        }
+
+        let chosen = cameras[0];
+        const rearCam =
+          cameras.find(c => /back|rear|environment|world/i.test(c.label || "")) ||
+          cameras[cameras.length - 1];
+
+        if (rearCam) chosen = rearCam;
+
+        state.scanner = new Html5Qrcode("reader");
+
         const config = {
           fps: 10,
-          qrbox: getScannerBox,
-          aspectRatio: 1.777778,
+          qrbox: { width: 320, height: 120 },
           disableFlip: false,
-          rememberLastUsedCamera: true,
-          supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+          rememberLastUsedCamera: true
         };
 
         const onScanSuccess = async (decodedText) => {
@@ -1139,25 +1157,16 @@
           // keep scanning silently
         };
 
-        try {
-          await state.scanner.start(
-            { facingMode: { exact: "environment" } },
-            config,
-            onScanSuccess,
-            onScanFailure
-          );
-        } catch (err) {
-          await state.scanner.start(
-            { facingMode: "environment" },
-            config,
-            onScanSuccess,
-            onScanFailure
-          );
-        }
+        await state.scanner.start(
+          chosen.id,
+          config,
+          onScanSuccess,
+          onScanFailure
+        );
 
         state.scannerActive = true;
         updateScannerUi();
-        setScanStatus("Scanner is live. Hold barcode inside the box.", "success");
+        setScanStatus(`Scanner is live. Using: ${chosen.label || "camera"}`, "success");
       } catch (err) {
         console.error("Scanner start failed:", err);
 
@@ -1170,7 +1179,8 @@
         state.scanner = null;
         state.scannerActive = false;
         updateScannerUi();
-        setScanStatus("Could not start live scanner. Check HTTPS and camera permissions.", "error");
+        els.scannerShell.classList.remove("active");
+        setScanStatus("Could not start live scanner cleanly on this device.", "error");
       }
     }
 
