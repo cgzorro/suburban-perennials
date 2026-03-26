@@ -692,6 +692,70 @@
       height: auto;
     }
 
+
+    .map-pan-shell {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--map-bg);
+    }
+
+    .mobile-map-tools {
+      display: none;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .mobile-map-tools .location-btn {
+      width: 100%;
+      padding: 12px 14px;
+      min-height: 48px;
+    }
+
+    .legend-disclosure {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--bg-soft);
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+
+    .legend-disclosure summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--text);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .legend-disclosure summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .legend-disclosure summary::after {
+      content: "Show";
+      color: var(--text-muted);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .legend-disclosure[open] summary::after {
+      content: "Hide";
+    }
+
+    .legend-disclosure .flag-legend,
+    .legend-disclosure .map-help {
+      margin-top: 12px;
+    }
+
+    .mobile-swipe-note {
+      display: none;
+    }
+
     .map-zone-shape {
       fill: var(--map-zone);
       stroke: var(--map-line);
@@ -943,7 +1007,31 @@
       .map-small,
       .map-static { font-size: 13px; }
     }
-  
+
+    @media (min-width: 901px) {
+      .mobile-map-tools,
+      .mobile-swipe-note {
+        display: none !important;
+      }
+
+      .legend-disclosure {
+        padding: 0;
+        background: transparent;
+        border: 0;
+        margin-bottom: 12px;
+      }
+
+      .legend-disclosure summary {
+        display: none;
+      }
+
+      .legend-disclosure .flag-legend,
+      .legend-disclosure .map-help {
+        margin-top: 0;
+      }
+    }
+
+
 /* Map cleanup update */
 .flag-chip-note {
   background: transparent;
@@ -1337,9 +1425,21 @@ html[data-theme="light"] .map-bench-strip {
         <div class="map-shell">
           <section class="panel">
             <h2>Nursery map</h2>
-            <div class="flag-legend" id="flagLegend"></div>
-            <p class="map-help">Flags are drawn only where they appear on the paper map example. Zone highlighting stays interactive for plant lookup.</p>
-            <div class="map-board" id="mapBoard"></div>
+            <details class="legend-disclosure" id="legendDisclosure" open>
+              <summary>Field flag legend</summary>
+              <div class="flag-legend" id="flagLegend"></div>
+              <p class="map-help">Flags are drawn only where they appear on the paper map example. Zone highlighting stays interactive for plant lookup.</p>
+            </details>
+            <div class="mobile-map-tools" id="mobileMapTools" aria-label="Mobile map jump controls">
+              <button type="button" class="location-btn" data-map-focus="left">Left yard</button>
+              <button type="button" class="location-btn" data-map-focus="center">Center</button>
+              <button type="button" class="location-btn" data-map-focus="houses">Hoop houses</button>
+              <button type="button" class="location-btn" data-map-focus="perennials">Perennials</button>
+            </div>
+            <div class="map-pan-shell" id="mapPanShell">
+              <div class="map-board" id="mapBoard"></div>
+            </div>
+            <p class="map-help mobile-swipe-note">Swipe the map horizontally on mobile. Use the quick jump buttons if you want to move straight to hoop houses or perennials.</p>
             <div class="map-help-row quick-links">
               <button type="button" class="location-btn" data-zone-jump="house4">Azaleas / Rhododendron</button>
               <button type="button" class="location-btn" data-zone-jump="house5">Hydrangeas</button>
@@ -1732,6 +1832,9 @@ const MAP_FLAG_MARKERS = [
       finderClearBtn: document.getElementById("finderClearBtn"),
       flagLegend: document.getElementById("flagLegend"),
       mapBoard: document.getElementById("mapBoard"),
+      mapPanShell: document.getElementById("mapPanShell"),
+      legendDisclosure: document.getElementById("legendDisclosure"),
+      mobileMapTools: document.getElementById("mobileMapTools"),
       locationDetails: document.getElementById("locationDetails"),
       definitionsGrid: document.getElementById("definitionsGrid"),
       zoneJumpButtons: Array.from(document.querySelectorAll("[data-zone-jump]")),
@@ -2350,6 +2453,27 @@ function escapeHtml(value) {
   });
 }
 
+function syncMobileMapUi() {
+  if (window.innerWidth <= 900) {
+    if (els.legendDisclosure) els.legendDisclosure.open = false;
+  } else if (els.legendDisclosure) {
+    els.legendDisclosure.open = true;
+  }
+}
+
+function jumpMapFocus(target) {
+  if (!els.mapPanShell) return;
+  const shell = els.mapPanShell;
+  const maxLeft = Math.max(0, shell.scrollWidth - shell.clientWidth);
+  const points = {
+    left: 0,
+    center: Math.round(maxLeft * 0.42),
+    houses: Math.round(maxLeft * 0.88),
+    perennials: Math.round(maxLeft * 0.66)
+  };
+  shell.scrollTo({ left: points[target] ?? 0, behavior: "smooth" });
+}
+
 function zoneTitle(zoneId) {
       const zone = MAP_ZONES.find(z => z.id === zoneId);
       return zone ? `${zone.title} — ${zone.subtitle}` : zoneId;
@@ -2684,6 +2808,12 @@ function zoneTitle(zoneId) {
         btn.addEventListener("click", () => handleZoneClick(btn.dataset.zoneJump));
       });
 
+      els.mobileMapTools?.querySelectorAll("[data-map-focus]").forEach(btn => {
+        btn.addEventListener("click", () => jumpMapFocus(btn.dataset.mapFocus));
+      });
+
+      window.addEventListener("resize", syncMobileMapUi);
+
       els.kioskSearch.addEventListener("input", applyKioskFilters);
     }
 
@@ -2701,6 +2831,7 @@ function zoneTitle(zoneId) {
     updateScannerUi();
     wireEvents();
     initFinder();
+    syncMobileMapUi();
     showView("browser");
     loadPlants();
   </script>
