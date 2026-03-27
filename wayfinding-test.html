@@ -3,693 +3,208 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Suburban Wayfinding v1</title>
+  <title>Suburban Wayfinding — Test Index v4</title>
   <style>
-    :root {
-      --bg: #071325;
-      --bg-elev: #0d1d36;
-      --bg-soft: #132746;
-      --panel: #10233f;
-      --text: #eef4ff;
-      --text-muted: #b7c4da;
-      --border: #29456f;
-      --accent: #7bd05f;
-      --accent-2: #88d87b;
-      --chip-bg: #17325a;
-      --chip-text: #eef4ff;
-      --shadow: 0 14px 34px rgba(0,0,0,.28);
-      --success: #67c35f;
-      --warning: #efc45e;
-      --danger: #f08b8b;
-      --map-muted: rgba(255,255,255,.06);
-      --map-soft: rgba(255,255,255,.12);
-      --yhi: #ffd34f;
+    :root{
+      --bg:#071325; --bg-elev:#0d1d36; --bg-soft:#132746; --panel:#10233f; --text:#eef4ff; --text-muted:#b7c4da;
+      --border:#29456f; --accent:#7bd05f; --accent-2:#88d87b; --chip:#17325a; --shadow:0 14px 34px rgba(0,0,0,.28);
+      --map-fill:#dfe7f3; --map-stroke:#5b739a; --map-muted:#cad6e7; --map-ground:#edf3fb; --route:#ffb648; --you:#e54d42; --focus:#8ed54b;
+      --good:#68c75d; --warn:#efc45e; --bad:#ef8f8f;
     }
-
-    html[data-theme="light"] {
-      --bg: #eef4fb;
-      --bg-elev: #ffffff;
-      --bg-soft: #e7eef8;
-      --panel: #dde7f5;
-      --text: #182435;
-      --text-muted: #526274;
-      --border: #c5d3e8;
-      --accent: #58b641;
-      --accent-2: #65c24d;
-      --chip-bg: #d8e5f7;
-      --chip-text: #182435;
-      --shadow: 0 10px 24px rgba(0,0,0,.08);
-      --map-muted: rgba(24,36,53,.05);
-      --map-soft: rgba(24,36,53,.11);
-      --yhi: #d39500;
+    html[data-theme="light"]{
+      --bg:#eef4fb; --bg-elev:#ffffff; --bg-soft:#e7eef8; --panel:#dde7f5; --text:#182435; --text-muted:#526274;
+      --border:#c5d3e8; --accent:#58b641; --accent-2:#65c24d; --chip:#d8e5f7; --shadow:0 10px 24px rgba(0,0,0,.08);
     }
-
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      padding: 0;
-      min-height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, Segoe UI, Arial, sans-serif;
-    }
-
-    body {
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+    body{
       background:
         radial-gradient(circle at top left, rgba(89,156,93,.12), transparent 28%),
         radial-gradient(circle at top right, rgba(89,156,93,.08), transparent 24%),
         var(--bg);
     }
-
-    .shell {
-      width: min(1100px, calc(100% - 20px));
-      margin: 0 auto;
-      padding: 14px 0 92px;
-    }
-
-    .hero, .panel, .map-card, .result-card, .browse-card, .zone-card, .staff-zone {
-      background: var(--bg-elev);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-    }
-
-    .hero {
-      border-radius: 26px;
-      padding: 18px 18px 16px;
-      display: flex;
-      gap: 12px;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-size: clamp(1.5rem, 5vw, 2.4rem);
-      line-height: 1.02;
-    }
-
-    .hero p {
-      margin: 8px 0 0;
-      color: var(--text-muted);
-      line-height: 1.34;
-      font-size: .98rem;
-      max-width: 700px;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: flex-end;
-      min-width: fit-content;
-    }
-
-    .mode-switch, .tab-switch {
-      display: inline-flex;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 4px;
-      background: var(--bg-soft);
-      gap: 4px;
-    }
-
-    .seg-btn, .tab-btn, .theme-toggle, .action-btn, .chip, .quick-btn, .browse-btn, .map-toggle, .staff-search-btn {
-      border: 1px solid var(--border);
-      background: var(--bg-elev);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 11px 14px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
-      text-decoration: none;
-      font-size: .95rem;
-    }
-
-    .seg-btn.active, .tab-btn.active, .chip.active, .map-toggle.active, .browse-btn.active {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-
-    .theme-toggle {
-      white-space: nowrap;
-    }
-
-    .sticky-tabs {
-      position: sticky;
-      top: 8px;
-      z-index: 20;
-      margin-bottom: 12px;
-      backdrop-filter: blur(8px);
-    }
-
-    .tab-switch {
-      width: 100%;
-      overflow-x: auto;
-      scrollbar-width: none;
-      background: rgba(16,35,63,.84);
-    }
-    .tab-switch::-webkit-scrollbar { display: none; }
-
-    .tab-btn {
-      white-space: nowrap;
-      flex: 1 0 auto;
-    }
-
-    .view { display: none; }
-    .view.active { display: block; }
-
-    .search-panel {
-      border-radius: 28px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    .search-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: stretch;
-      margin-bottom: 12px;
-    }
-
-    .search-input, .staff-search-input {
-      width: 100%;
-      border: 1px solid var(--border);
-      background: var(--bg-soft);
-      color: var(--text);
-      border-radius: 20px;
-      padding: 16px 18px;
-      font-size: 1.03rem;
-      outline: none;
-    }
-
-    .search-input::placeholder, .staff-search-input::placeholder { color: var(--text-muted); }
-
-    .section-title {
-      margin: 0 0 8px;
-      font-size: 1.05rem;
-      font-weight: 900;
-    }
-
-    .subcopy {
-      margin: 0 0 12px;
-      color: var(--text-muted);
-      line-height: 1.4;
-      font-size: .96rem;
-    }
-
-    .quick-grid, .browse-grid, .results-list, .staff-zone-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .browse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-
-    .quick-btn, .browse-btn {
-      border-radius: 18px;
-      padding: 16px 14px;
-      text-align: left;
-      background: linear-gradient(180deg, rgba(98,126,176,.18), rgba(30,48,80,.18));
-      min-height: 74px;
-    }
-
-    .quick-btn .small, .browse-btn .small {
-      display: block;
-      margin-top: 6px;
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: .86rem;
-    }
-
-    .chip-row, .meta-row, .inline-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip {
-      border-radius: 999px;
-      padding: 9px 12px;
-      font-size: .9rem;
-      background: var(--chip-bg);
-      color: var(--chip-text);
-    }
-
-    .summary-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 12px 0;
-    }
-
-    .pill {
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: var(--bg-soft);
-      padding: 9px 12px;
-      font-weight: 800;
-      font-size: .9rem;
-    }
-
-    .result-card {
-      border-radius: 26px;
-      padding: 16px;
-    }
-
-    .result-card.primary {
-      border-color: rgba(123,208,95,.55);
-      box-shadow: 0 0 0 1px rgba(123,208,95,.22), var(--shadow);
-    }
-
-    .result-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: flex-start;
-      margin-bottom: 10px;
-    }
-
-    .result-title {
-      margin: 0;
-      font-size: 1.18rem;
-      line-height: 1.1;
-      font-weight: 900;
-    }
-
-    .result-type {
-      color: var(--text-muted);
-      font-size: .9rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-
-    .destination-line {
-      margin: 2px 0 0;
-      font-size: 1.18rem;
-      line-height: 1.2;
-      font-weight: 900;
-    }
-
-    .destination-line strong { color: var(--accent); }
-
-    .cue-line {
-      margin: 8px 0 0;
-      color: var(--text);
-      font-weight: 700;
-      line-height: 1.35;
-    }
-
-    .detail-line {
-      margin: 6px 0 0;
-      color: var(--text-muted);
-      line-height: 1.38;
-      font-size: .95rem;
-    }
-
-    .tag {
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: rgba(123,208,95,.12);
-      color: var(--text);
-      padding: 8px 11px;
-      font-size: .84rem;
-      font-weight: 800;
-    }
-
-    .action-btn {
-      border-radius: 16px;
-      padding: 13px 14px;
-      flex: 1 1 0;
-      text-align: center;
-    }
-
-    .action-btn.primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: white;
-    }
-
-    .focus-header, .map-header, .staff-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .map-card {
-      border-radius: 30px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    .map-stage {
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(19,39,70,.65), rgba(11,24,43,.8));
-      border-radius: 28px;
-      padding: 14px;
-      min-height: 380px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    html[data-theme="light"] .map-stage {
-      background: linear-gradient(180deg, rgba(231,238,248,.95), rgba(244,247,252,.95));
-    }
-
-    .you-are-here {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      z-index: 3;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0,0,0,.34);
-      color: white;
-      border-radius: 999px;
-      padding: 9px 12px;
-      font-weight: 800;
-      box-shadow: var(--shadow);
-    }
-
-    html[data-theme="light"] .you-are-here {
-      background: rgba(24,36,53,.82);
-    }
-
-    .you-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: var(--yhi);
-      box-shadow: 0 0 0 4px rgba(255,211,79,.18);
-      flex: 0 0 auto;
-    }
-
-    .map-group-title {
-      font-size: .9rem;
-      color: var(--text-muted);
-      font-weight: 800;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .group-note {
-      color: var(--text-muted);
-      font-size: .9rem;
-      margin: 8px 0 0;
-      line-height: 1.35;
-    }
-
-    .hoop-grid, .field-grid, .main-grid, .central-grid, .full-map-grid {
-      display: grid;
-      gap: 10px;
-    }
-
-    .hoop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 54px; }
-    .field-grid, .main-grid, .central-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 54px; }
-    .full-map-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 54px; }
-
-    .map-zone {
-      min-height: 96px;
-      border-radius: 22px;
-      border: 1px solid transparent;
-      background: var(--map-muted);
-      color: var(--text);
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .map-zone.highlight {
-      background: linear-gradient(180deg, rgba(123,208,95,.22), rgba(123,208,95,.12));
-      border-color: rgba(123,208,95,.65);
-      box-shadow: 0 0 0 1px rgba(123,208,95,.18);
-    }
-
-    .map-zone.faded {
-      opacity: .42;
-    }
-
-    .zone-label {
-      font-size: .84rem;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      color: var(--text-muted);
-      font-weight: 800;
-    }
-
-    .zone-title {
-      font-weight: 900;
-      font-size: 1rem;
-      line-height: 1.14;
-    }
-
-    .zone-copy {
-      color: var(--text-muted);
-      font-size: .88rem;
-      line-height: 1.28;
-    }
-
-    .flag-badge {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border-radius: 999px;
-      padding: 5px 8px;
-      background: rgba(0,0,0,.18);
-      font-size: .78rem;
-      font-weight: 800;
-    }
-
-    .flag-tri {
-      width: 0; height: 0;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-bottom: 12px solid currentColor;
-      transform: rotate(90deg);
-      display: inline-block;
-    }
-
-
-    .map-stage {
-      min-height: 0;
-    }
-
-    .map-svg-shell {
-      position: relative;
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      background: linear-gradient(180deg, rgba(19,39,70,.72), rgba(11,24,43,.86));
-      overflow: hidden;
-    }
-
-    html[data-theme="light"] .map-svg-shell {
-      background: linear-gradient(180deg, rgba(231,238,248,.96), rgba(244,247,252,.96));
-    }
-
-    .map-svg-shell svg {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .map-zoom-note {
-      margin-top: 10px;
-      color: var(--text-muted);
-      font-size: .92rem;
-      line-height: 1.38;
-    }
-    .direction-card {
-      margin-top: 12px;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 16px;
-      background: var(--bg-soft);
-    }
-
-    .direction-card h3 {
-      margin: 0 0 8px;
-      font-size: 1.1rem;
-    }
-
-    .direction-card p {
-      margin: 6px 0;
-      line-height: 1.4;
-      color: var(--text-muted);
-    }
-
-    .full-map-note {
-      margin-top: 10px;
-      color: var(--text-muted);
-      font-size: .92rem;
-      line-height: 1.4;
-    }
-
-    .staff-search {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .staff-zone {
-      border-radius: 22px;
-      padding: 14px;
-    }
-
-    .staff-zone h3 {
-      margin: 0 0 6px;
-      font-size: 1rem;
-    }
-
-    .staff-zone p {
-      margin: 6px 0;
-      color: var(--text-muted);
-      line-height: 1.36;
-      font-size: .94rem;
-    }
-
-    .soft-link {
-      color: var(--accent-2);
-      font-weight: 800;
-      text-decoration: none;
-    }
-
-    @media (min-width: 860px) {
-      .quick-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-      .browse-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .results-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .staff-zone-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .hoop-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .field-grid, .main-grid, .central-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .full-map-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .map-stage { min-height: 420px; }
-    }
-
-    @media (max-width: 720px) {
-      .shell { width: min(100%, calc(100% - 12px)); padding-top: 10px; }
-      .hero {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 16px 14px;
-        border-radius: 22px;
-      }
-      .hero-actions { align-items: stretch; }
-      .search-row, .staff-search { grid-template-columns: 1fr; }
-      .action-btn { flex: 1 1 100%; }
-      .map-stage { min-height: 360px; padding: 12px; }
-      .hoop-grid, .field-grid, .main-grid, .central-grid, .full-map-grid { padding-top: 50px; }
-      .map-zone { min-height: 90px; }
-      .tab-btn { min-width: 100px; }
+    .shell{width:min(1220px,calc(100% - 18px));margin:0 auto;padding:14px 0 64px}
+    .hero,.panel,.result-card,.search-result-btn,.browse-btn,.zone-card,.staff-note,.map-card,.inventory-pill{background:var(--bg-elev);border:1px solid var(--border);box-shadow:var(--shadow)}
+    .hero{padding:18px;border-radius:28px;margin-bottom:12px;display:flex;gap:16px;justify-content:space-between;align-items:flex-start}
+    .hero h1{margin:0;font-size:clamp(1.65rem,5vw,2.8rem);line-height:1.02}
+    .hero p{margin:8px 0 0;color:var(--text-muted);line-height:1.38;max-width:800px}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .seg,.mini-toggle,.chip,.search-result-btn,.browse-btn,.pill-btn,.theme-btn,.action-btn{
+      border:1px solid var(--border);background:var(--bg-soft);color:var(--text);border-radius:999px;padding:11px 14px;font-weight:800;
+      cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+    .seg.active,.mini-toggle.active,.chip.active,.browse-btn.active,.pill-btn.active,.action-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    .theme-btn{white-space:nowrap}
+    .seg:hover,.mini-toggle:hover,.chip:hover,.search-result-btn:hover,.browse-btn:hover,.pill-btn:hover,.theme-btn:hover,.action-btn:hover{transform:translateY(-1px)}
+    .top-grid{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;margin-bottom:12px}
+    .seg-wrap,.mode-wrap{display:flex;gap:8px;flex-wrap:wrap}
+    .search-panel{padding:16px;border-radius:24px;margin-bottom:14px}
+    .search-grid{display:grid;grid-template-columns:2.2fr auto;gap:10px;align-items:end}
+    .field label{display:block;margin:0 0 8px;font-size:.92rem;font-weight:800}
+    .field input{width:100%;border:1px solid var(--border);background:var(--bg-soft);color:var(--text);padding:16px;border-radius:18px;font-size:1rem;outline:none}
+    .field input::placeholder{color:var(--text-muted)}
+    .quick-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:12px}
+    .browse-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .browse-btn{border-radius:22px;padding:14px;text-align:left;justify-content:flex-start;align-items:flex-start;flex-direction:column;min-height:110px;white-space:normal}
+    .browse-btn strong{font-size:1rem;line-height:1.18}
+    .browse-btn span{font-size:.9rem;color:var(--text-muted);font-weight:700;line-height:1.25}
+    .content-grid{display:grid;grid-template-columns:390px minmax(0,1fr);gap:14px;align-items:start}
+    .result-card{padding:16px;border-radius:24px;position:sticky;top:12px}
+    .eyebrow{font-size:.82rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)}
+    .result-card h2{margin:6px 0 6px;font-size:1.55rem;line-height:1.05}
+    .destination-line{font-size:1.12rem;font-weight:900;margin-bottom:8px}
+    .copy{color:var(--text-muted);line-height:1.38;margin-bottom:10px}
+    .tag-row,.meta-row,.helper-row{display:flex;flex-wrap:wrap;gap:8px}
+    .tag,.meta-pill,.inventory-pill{border:1px solid var(--border);background:var(--chip);color:var(--text);border-radius:999px;padding:8px 11px;font-size:.86rem;font-weight:800}
+    .inventory-pill.good{color:#d5ffd0;background:rgba(91,176,76,.18)}
+    .inventory-pill.warn{color:#fff3ca;background:rgba(239,196,94,.18)}
+    .inventory-pill.bad{color:#ffe0e0;background:rgba(239,143,143,.18)}
+    html[data-theme="light"] .inventory-pill.good{color:#1f5b13}
+    html[data-theme="light"] .inventory-pill.warn{color:#7b5600}
+    html[data-theme="light"] .inventory-pill.bad{color:#8a2222}
+    .result-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+    .action-btn{border-radius:16px;padding:12px 14px}
+    .action-btn.secondary{background:var(--bg-elev)}
+    .status-line{margin-top:12px;color:var(--text-muted);font-size:.92rem;line-height:1.35}
+    .map-stack{display:grid;grid-template-columns:1fr;gap:14px}
+    .map-card{padding:14px;border-radius:26px}
+    .map-card h3{margin:0 0 6px;font-size:1.15rem}
+    .map-card p{margin:0 0 10px;color:var(--text-muted);line-height:1.34}
+    .map-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+    .map-frame,.detail-frame{background:#ecf2fb;border-radius:24px;padding:10px;overflow:hidden}
+    .map-frame svg,.detail-frame svg{display:block;width:100%;height:auto;border-radius:18px;box-shadow:0 6px 18px rgba(11,22,48,.12)}
+    .detail-caption{font-size:.92rem;color:var(--text-muted);line-height:1.34;margin-top:10px}
+    .search-results{display:grid;gap:10px;margin-top:12px}
+    .search-result-btn{padding:14px;border-radius:18px;text-align:left;justify-content:flex-start;align-items:flex-start;flex-direction:column;white-space:normal}
+    .search-result-btn strong{font-size:1rem;line-height:1.16}
+    .search-result-btn span{color:var(--text-muted);font-size:.88rem;line-height:1.24;font-weight:700}
+    .search-result-btn.active{background:rgba(123,208,95,.14);border-color:var(--accent)}
+    .helper,.empty{padding:14px;border:1px dashed var(--border);border-radius:18px;color:var(--text-muted);background:rgba(255,255,255,.03)}
+    .staff-layout{display:grid;grid-template-columns:1.05fr 1fr;gap:14px}
+    .zone-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .zone-card{padding:14px;border-radius:22px}
+    .zone-card h4{margin:0 0 8px;font-size:1.02rem}
+    .zone-card p{margin:0 0 8px;color:var(--text-muted);line-height:1.3;font-size:.92rem}
+    .zone-card ul{margin:10px 0 0 18px;padding:0;color:var(--text-muted);font-size:.9rem;line-height:1.25}
+    .staff-note{padding:14px;border-radius:22px;margin-bottom:12px}
+    .staff-note h3{margin:0 0 8px}
+    .staff-note p{margin:0;color:var(--text-muted);line-height:1.35}
+    .hidden{display:none!important}
+    .footer-note{margin-top:12px;color:var(--text-muted);font-size:.9rem;line-height:1.35}
+    @media (max-width:1100px){
+      .content-grid,.staff-layout{grid-template-columns:1fr}
+      .result-card{position:static}
+      .quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+    @media (max-width:760px){
+      .shell{width:min(100%,calc(100% - 12px));padding:10px 0 48px}
+      .hero{padding:14px;border-radius:22px;flex-direction:column}
+      .hero h1{font-size:1.72rem}
+      .top-grid,.search-grid{grid-template-columns:1fr}
+      .quick-grid,.browse-grid,.zone-grid{grid-template-columns:1fr 1fr}
+      .map-frame,.detail-frame{padding:7px;border-radius:18px}
+      .result-card,.search-panel,.map-card,.staff-note,.zone-card{border-radius:20px}
+      .result-card h2{font-size:1.35rem}
+    }
+    @media (max-width:520px){
+      .quick-grid,.browse-grid,.zone-grid{grid-template-columns:1fr}
+      .seg-wrap,.mode-wrap,.result-actions,.helper-row{gap:6px}
+      .seg,.mini-toggle,.chip,.theme-btn,.action-btn{padding:10px 12px;font-size:.92rem}
+      .search-result-btn{padding:12px}
     }
   </style>
 </head>
 <body>
   <div class="shell">
-    <header class="hero">
+    <section class="hero">
       <div>
-        <h1>Find It at Suburban</h1>
-        <p id="heroCopy">Search first, answer fast, and only show the part of the nursery map that matters. This version is designed for live customer use on mobile.</p>
+        <h1>Suburban Wayfinding — Test Index v4</h1>
+        <p>Testing model for <strong>SKU-level search + property location</strong>. Search should answer the question first, then keep the full nursery map visible so customers and staff never lose context.</p>
       </div>
       <div class="hero-actions">
-        <div class="mode-switch" aria-label="Audience mode">
-          <button class="seg-btn active" type="button" data-mode="customer">Customer</button>
-          <button class="seg-btn" type="button" data-mode="staff">Staff</button>
-        </div>
-        <button id="themeToggle" class="theme-toggle" type="button">Theme: Dark</button>
+        <button class="theme-btn" id="themeBtn" type="button">Theme: Dark</button>
       </div>
-    </header>
+    </section>
 
-    <div class="sticky-tabs">
-      <nav class="tab-switch" aria-label="Primary navigation">
-        <button class="tab-btn active" type="button" data-tab="find">Find</button>
-        <button class="tab-btn" type="button" data-tab="browse">Browse</button>
-        <button class="tab-btn" type="button" data-tab="map">Map</button>
-        <button class="tab-btn" type="button" data-tab="staff">Staff</button>
-      </nav>
+    <div class="top-grid">
+      <div class="seg-wrap" id="viewSeg" aria-label="Views">
+        <button class="seg active" type="button" data-view="find">Find</button>
+        <button class="seg" type="button" data-view="browse">Browse</button>
+        <button class="seg" type="button" data-view="staff">Staff</button>
+      </div>
+      <div class="mode-wrap" id="modeSeg" aria-label="Language mode">
+        <button class="mini-toggle active" type="button" data-mode="customer">Customer copy</button>
+        <button class="mini-toggle" type="button" data-mode="staff">Staff copy</button>
+      </div>
+      <button class="pill-btn active" id="routeToggle" type="button">Route cue on</button>
     </div>
 
-    <section id="findView" class="view active">
-      <div class="panel search-panel">
-        <div class="search-row">
-          <input id="findSearch" class="search-input" type="search" placeholder="Find hydrangea, dogwood, yew, Japanese maple..." />
-          <button id="clearSearchBtn" class="action-btn" type="button">Clear</button>
+    <section class="panel search-panel" id="findView">
+      <div class="search-grid">
+        <div class="field">
+          <label for="findInput">Find a plant, category, or SKU</label>
+          <input id="findInput" type="search" placeholder="Hydrangea, dogwood, yew, Japanese maple, PPXCVP1_75881..." />
         </div>
-
-        <h2 class="section-title">Quick finds</h2>
-        <p class="subcopy">These are the asks most likely to come up in the aisle. Tap one and you should have an answer in seconds.</p>
-        <div id="quickGrid" class="quick-grid"></div>
-
-        <div class="summary-pills" id="findSummary"></div>
-
-        <h2 class="section-title">Quick filters</h2>
-        <div id="filterChips" class="chip-row"></div>
+        <div class="helper-row" style="justify-content:flex-end;align-items:end;">
+          <button class="action-btn secondary" id="clearSearch" type="button">Clear</button>
+        </div>
       </div>
-
-      <div id="findResults" class="results-list"></div>
+      <div class="quick-grid" id="quickGrid"></div>
+      <div class="search-results hidden" id="searchResults"></div>
     </section>
 
-    <section id="browseView" class="view">
-      <div class="panel search-panel">
-        <h2 class="section-title">Browse by category</h2>
-        <p class="subcopy">Use browse when the customer knows the type of plant but not the exact name.</p>
-        <div id="browseGrid" class="browse-grid"></div>
-      </div>
-      <div class="summary-pills" id="browseSummary"></div>
-      <div id="browseResults" class="results-list"></div>
-    </section>
-
-    <section id="mapView" class="view">
-      <div class="map-card">
-        <div class="focus-header">
-          <div>
-            <h2 class="section-title" style="margin-bottom:4px;">Focused map</h2>
-            <p class="subcopy" id="mapIntro">Choose a result to show a clear, mobile-sized map slice instead of the whole nursery at once.</p>
+    <section class="content-grid" id="findContent">
+      <article class="result-card" id="resultCard"></article>
+      <div class="map-stack">
+        <section class="map-card">
+          <div class="map-toolbar">
+            <div>
+              <h3>Full nursery map</h3>
+              <p>Context stays visible. Search and selection highlight the destination instead of replacing the whole map.</p>
+            </div>
           </div>
-          <div class="inline-actions">
-            <button id="focusMapBtn" class="map-toggle active" type="button">Focus Map</button>
-            <button id="fullMapBtn" class="map-toggle" type="button">Full Map</button>
+          <div class="map-frame"><div id="overviewMapWrap"></div></div>
+          <div class="detail-caption" id="overviewCaption"></div>
+        </section>
+        <section class="map-card">
+          <div class="map-toolbar">
+            <div>
+              <h3>Closer look</h3>
+              <p>The selected section is shown in a tighter crop, but the overview above keeps the customer oriented.</p>
+            </div>
           </div>
-        </div>
-
-        <div id="mapStage" class="map-stage"></div>
-        <div id="directionCard" class="direction-card"></div>
+          <div class="detail-frame"><div id="detailMapWrap"></div></div>
+          <div class="detail-caption" id="detailCaption"></div>
+        </section>
       </div>
     </section>
 
-    <section id="staffView" class="view">
-      <div class="panel search-panel">
-        <div class="staff-header">
-          <div>
-            <h2 class="section-title">Staff quick reference</h2>
-            <p class="subcopy">This is the richer internal layer: exact zone names, grouped contents, and alternate wording customers might use.</p>
-          </div>
-        </div>
-
-        <div class="staff-search">
-          <input id="staffSearch" class="staff-search-input" type="search" placeholder="Search a zone, plant, or customer phrase..." />
-          <button id="staffClearBtn" class="staff-search-btn" type="button">Clear</button>
-        </div>
-
-        <div class="summary-pills" id="staffSummary"></div>
+    <section class="panel search-panel hidden" id="browseView">
+      <div class="staff-note">
+        <h3>Browse groups seeded from live Suburban category pages</h3>
+        <p>Use these buckets to expand the wayfinding search model before adding a scraper. They are connected to likely nursery zones, not treated as exact physical placement by themselves.</p>
       </div>
+      <div class="browse-grid" id="browseGrid"></div>
+    </section>
 
-      <div id="staffZones" class="staff-zone-list"></div>
+    <section class="hidden" id="staffView">
+      <div class="staff-layout">
+        <div>
+          <section class="staff-note">
+            <h3>SKU and location status</h3>
+            <p id="inventorySummary">Loading inventory status…</p>
+          </section>
+          <section class="staff-note">
+            <h3>What this build is testing</h3>
+            <p>Search can now blend curated nursery locations with plant-level inventory from <code>plants.json</code>. Curated results are treated as verified yard destinations. Inventory results are matched to a likely zone using aliases, group logic, and section inference so you can move toward true SKU-level wayfinding.</p>
+          </section>
+          <section class="staff-note">
+            <h3>Next data step</h3>
+            <p>Keep this index separate for testing. After the UX is right, add a lightweight taxonomy scraper for category pages and then tighten the zone mapping until each high-value SKU has a verified property location.</p>
+          </section>
+        </div>
+        <div class="zone-grid" id="zoneGrid"></div>
+      </div>
     </section>
   </div>
 
@@ -697,779 +212,598 @@
     const state = {
       theme: localStorage.getItem('suburban-theme') || 'dark',
       mode: 'customer',
-      tab: 'find',
-      findTerm: '',
-      activeFilter: 'all',
-      browseCategory: 'trees',
-      selectedItemId: 'hydrangeas',
-      mapMode: 'focus',
-      staffTerm: ''
+      view: 'find',
+      routeCue: true,
+      search: '',
+      selectedKey: 'curated:hydrangeas',
+      plants: [],
+      inventoryLoaded: false,
+      exactSkuMode: false
     };
 
+    const YOU_ARE_HERE = { x: 606, y: 658, label: 'You are here · Perennials entry' };
+
     const ZONES = [
-      { id: 'sun-perennials', label: 'Sun Perennials', short: 'Sun Perennials', focusGroup: 'main', customerCue: 'Main perennial area', staffCue: 'Main building / perennial court', nearby: 'Near shade perennials and annuals' },
-      { id: 'shade-perennials', label: 'Shade Perennials', short: 'Shade Perennials', focusGroup: 'main', customerCue: 'Main perennial area', staffCue: 'Main building / perennial court', nearby: 'Near sun perennials' },
-      { id: 'annuals', label: 'Annuals', short: 'Annuals', focusGroup: 'main', customerCue: 'Main annual color area', staffCue: 'Main building annual beds', nearby: 'Near tropicals' },
-      { id: 'tropicals', label: 'Tropicals', short: 'Tropicals', focusGroup: 'main', customerCue: 'Main tropical area', staffCue: 'Main building tropical display', nearby: 'Near annuals' },
-      { id: 'checkout', label: 'Checkout', short: 'Checkout', focusGroup: 'main', customerCue: 'Front service area', staffCue: 'Front register and customer service', nearby: 'Near entrance' },
+      { id:'zone-a', name:'Ball & Burlap A', short:'A', display:'Arborvitae', group:'field', x:120, y:55, w:110, h:60, zoom:{x:50,y:20,w:720,h:340}, contents:['Upright Arborvitae'] },
+      { id:'zone-b', name:'Ball & Burlap B', short:'B', display:'Juniper / Pine', group:'field', x:300, y:55, w:130, h:60, zoom:{x:50,y:20,w:720,h:340}, contents:['Juniper','Pine'] },
+      { id:'zone-c', name:'Ball & Burlap C', short:'C', display:'Conifers / Evergreens', group:'field', x:70, y:165, w:180, h:70, zoom:{x:40,y:30,w:760,h:350}, contents:['Spruce','Cedar','Cypress','Fir','Hemlock'] },
+      { id:'zone-d', name:'Ball & Burlap D', short:'D', display:'Deciduous Trees', group:'field', x:260, y:165, w:360, h:70, zoom:{x:40,y:30,w:760,h:350}, contents:['Maple','Oak','Linden','Ginkgo','Serviceberry','Willow'] },
 
-      { id: 'house-1', label: 'House 1', short: '1', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 1', nearby: 'Near House 2' },
-      { id: 'house-2', label: 'House 2', short: '2', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 2', nearby: 'Near House 1 and House 3' },
-      { id: 'house-3', label: 'House 3', short: '3', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 3', nearby: 'Near House 2 and House 4' },
-      { id: 'house-4', label: 'House 4', short: '4', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 4', nearby: 'Near House 3 and House 5' },
-      { id: 'house-5', label: 'House 5', short: '5', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 5', nearby: 'Near House 4 and House 6' },
-      { id: 'house-6', label: 'House 6', short: '6', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 6', nearby: 'Near House 5 and House 7' },
-      { id: 'house-7', label: 'House 7', short: '7', focusGroup: 'hoop', customerCue: 'Upper-right hoop houses', staffCue: 'Hoop House 7', nearby: 'Near House 6 and House 8' },
-      { id: 'house-8', label: 'House 8', short: '8', focusGroup: 'hoop', customerCue: 'Upper-right hoop houses', staffCue: 'Hoop House 8', nearby: 'Near House 7' },
+      { id:'container-trees', name:'Container Trees', short:'Container Trees', display:'Container Trees', group:'central', x:260, y:280, w:220, h:72, zoom:{x:200,y:230,w:650,h:330}, contents:['Container-grown trees'] },
+      { id:'center-bed', name:'Center Bed E', short:'E', display:'Center Bed', group:'central', x:500, y:270, w:72, h:92, zoom:{x:200,y:230,w:650,h:330}, contents:['Mixed bed'] },
+      { id:'flowering-shrubs', name:'Flowering Shrubs', short:'Flowering Shrubs', display:'Flowering Shrubs', group:'central', x:590, y:280, w:155, h:170, zoom:{x:200,y:230,w:650,h:330}, contents:['Abelia','Barberry','Spirea','Viburnum','Weigela'] },
+      { id:'playground', name:'Playground Edge', short:'Playground', display:'Playground Edge', group:'central', x:618, y:375, w:105, h:55, zoom:{x:200,y:230,w:650,h:330}, contents:['Landmark'] },
+      { id:'roses-grasses', name:'Roses & Grasses', short:'Roses & Grasses', display:'Roses / Grasses', group:'central', x:760, y:320, w:180, h:110, zoom:{x:500,y:235,w:430,h:290}, contents:['Roses','Ornamental grasses','Yucca'] },
+      { id:'evergreen-shrubs', name:'Evergreen Shrubs', short:'Evergreen Shrubs', display:'Evergreen Shrubs', group:'central', x:770, y:445, w:170, h:95, zoom:{x:520,y:310,w:420,h:320}, contents:['Boxwood','Holly','Laurel','Euonymus'] },
 
-      { id: 'flowering-shrubs', label: 'Flowering Shrubs', short: 'Flowering Shrubs', focusGroup: 'central', customerCue: 'Central nursery area', staffCue: 'Open flowering shrub section', nearby: 'Near Roses & Grasses' },
-      { id: 'roses-grasses', label: 'Roses & Grasses', short: 'Roses', focusGroup: 'central', customerCue: 'Central nursery area', staffCue: 'Roses and ornamental grasses', nearby: 'Near Flowering Shrubs' },
-      { id: 'container-trees', label: 'Container Trees', short: 'Container Trees', focusGroup: 'central', customerCue: 'Central nursery area', staffCue: 'Containerized tree stock', nearby: 'Near field trees' },
-      { id: 'evergreen-shrubs', label: 'Evergreen Trees & Shrubs', short: 'Evergreens', focusGroup: 'central', customerCue: 'Central nursery area', staffCue: 'Evergreen trees and shrubs', nearby: 'Near container trees' },
+      { id:'shade-perennials', name:'Shade Perennials', short:'Shade Perennials', display:'Shade Perennials', group:'main', x:516, y:565, w:125, h:88, zoom:{x:440,y:510,w:300,h:220}, contents:['Shade perennial area'] },
+      { id:'sun-perennials', name:'Sun Perennials', short:'Sun Perennials', display:'Sun Perennials', group:'main', x:648, y:565, w:150, h:88, zoom:{x:520,y:510,w:330,h:220}, contents:['Sun perennial area'] },
+      { id:'tropicals', name:'Tropicals', short:'Tropicals', display:'Tropicals', group:'main', x:810, y:570, w:104, h:80, zoom:{x:720,y:510,w:230,h:220}, contents:['Tropicals'] },
+      { id:'annuals', name:'Annuals', short:'Annuals', display:'Annuals', group:'main', x:810, y:652, w:104, h:80, zoom:{x:720,y:585,w:230,h:220}, contents:['Annuals'] },
+      { id:'checkout', name:'Checkout', short:'Checkout', display:'Front Entry', group:'main', x:524, y:676, w:256, h:50, zoom:{x:470,y:610,w:380,h:170}, contents:['Checkout'] },
 
-      { id: 'zone-a', label: 'Ball & Burlap A', short: 'A', focusGroup: 'field', customerCue: 'Top field trees', staffCue: 'Ball & Burlap A', nearby: 'Near B' },
-      { id: 'zone-b', label: 'Ball & Burlap B', short: 'B', focusGroup: 'field', customerCue: 'Top field trees', staffCue: 'Ball & Burlap B', nearby: 'Near A and C' },
-      { id: 'zone-c', label: 'Ball & Burlap C', short: 'C', focusGroup: 'field', customerCue: 'Top field trees', staffCue: 'Ball & Burlap C', nearby: 'Near B and D' },
-      { id: 'zone-d', label: 'Ball & Burlap D', short: 'D', focusGroup: 'field', customerCue: 'Top field trees', staffCue: 'Ball & Burlap D', nearby: 'Near C' }
+      { id:'house-1', name:'House 1', short:'House 1', display:'Groundcovers / Vines', group:'hoop', x:818, y:64, w:110, h:54, zoom:{x:760,y:36,w:210,h:140}, contents:['Groundcovers','Vines','Liriope'] },
+      { id:'house-2', name:'House 2', short:'House 2', display:'Yews', group:'hoop', x:818, y:135, w:110, h:54, zoom:{x:760,y:100,w:210,h:150}, contents:['Yews'] },
+      { id:'house-3', name:'House 3', short:'House 3', display:'Shade Shrubs', group:'hoop', x:818, y:206, w:110, h:54, zoom:{x:760,y:170,w:210,h:150}, contents:['Holly','Laurel','Mahonia','Clethra'] },
+      { id:'house-4', name:'House 4', short:'House 4', display:'Azaleas / Rhodies', group:'hoop', x:818, y:277, w:110, h:54, zoom:{x:760,y:240,w:210,h:150}, contents:['Azaleas','Rhododendron'] },
+      { id:'house-5', name:'House 5', short:'House 5', display:'Hydrangeas', group:'hoop', x:818, y:348, w:110, h:54, zoom:{x:760,y:308,w:210,h:160}, contents:['Hydrangeas'] },
+      { id:'house-6', name:'House 6', short:'House 6', display:'Redbud / Magnolia', group:'hoop', x:818, y:419, w:110, h:54, zoom:{x:760,y:380,w:210,h:160}, contents:['Redbud','Magnolia'] },
+      { id:'house-7', name:'House 7', short:'House 7', display:'Japanese Maples', group:'hoop', x:818, y:490, w:110, h:54, zoom:{x:760,y:450,w:210,h:160}, contents:['Japanese Maples'] },
+      { id:'house-8', name:'House 8', short:'House 8', display:'Dogwoods', group:'hoop', x:818, y:561, w:110, h:54, zoom:{x:760,y:520,w:210,h:160}, contents:['Dogwoods'] },
+
+      { id:'between-houses-123', name:'Between Houses 1–3', short:'Fruit Trees', display:'Fruit Trees', group:'hoop', x:685, y:135, w:112, h:68, zoom:{x:630,y:95,w:220,h:170}, contents:['Fruit trees'] }
     ];
 
-    const ITEMS = [
-      {
-        id: 'hydrangeas', name: 'Hydrangeas', category: 'shrubs', zoneId: 'house-5',
-        traits: ['shade-friendly', 'pollinator-friendly'], quick: true,
-        searchAliases: ['hydrangea'],
-        customerCopy: 'Go to House 5. Right-side hoop houses.',
-        staffCopy: 'Primary hydrangea house.',
-        landmark: 'Near House 4 and House 6',
-        zoneContents: ['Hydrangeas'],
-        confidence: 'verified'
-      },
-      {
-        id: 'japanese-maples', name: 'Japanese Maples', category: 'trees', zoneId: 'house-7',
-        traits: ['deer-resistant'], quick: true,
-        searchAliases: ['japanese maple', 'maples'],
-        customerCopy: 'Go to House 7. Upper-right hoop houses.',
-        staffCopy: 'Primary Japanese maple house.',
-        landmark: 'Near Dogwoods in House 8',
-        zoneContents: ['Japanese Maples'],
-        confidence: 'verified'
-      },
-      {
-        id: 'dogwoods', name: 'Dogwoods', category: 'trees', zoneId: 'house-8',
-        traits: ['pollinator-friendly', 'bird-friendly'], quick: true,
-        searchAliases: ['dogwood', 'dogwood trees'],
-        customerCopy: 'Go to House 8. Upper-right hoop houses.',
-        staffCopy: 'Dogwood tree house.',
-        landmark: 'Near Japanese Maples in House 7',
-        zoneContents: ['Dogwood Trees'],
-        confidence: 'verified'
-      },
-      {
-        id: 'yews', name: 'Yews', category: 'shrubs', zoneId: 'house-2',
-        traits: ['deer-resistant', 'shade-friendly'], quick: true,
-        searchAliases: ['yew'],
-        customerCopy: 'Go to House 2. Right-side hoop houses.',
-        staffCopy: 'Primary yew house.',
-        landmark: 'Evergreen shrub section',
-        zoneContents: ['Yews'],
-        confidence: 'verified'
-      },
-      {
-        id: 'shade-shrubs', name: 'Shade Shrubs', category: 'shrubs', zoneId: 'house-3',
-        traits: ['shade-friendly'], quick: true,
-        searchAliases: ['hollies', 'holly', 'laurel', 'inkberry', 'pieris', 'clethra', 'winterberry', 'fothergilla', 'mahonia'],
-        customerCopy: 'Go to House 3. Right-side hoop houses.',
-        staffCopy: 'Shade shrub house.',
-        landmark: 'Includes hollies, laurels, and related shrubs',
-        zoneContents: ['Holly', 'Inkberry Holly', 'Laurel', 'Mahonia', 'Pieris Japonica', 'Clethra', 'Winterberry', 'Fothergilla', 'Potentilla'],
-        confidence: 'verified'
-      },
-      {
-        id: 'azaleas-rhodies', name: 'Azaleas / Rhododendron', category: 'shrubs', zoneId: 'house-4',
-        traits: ['shade-friendly', 'pollinator-friendly'], quick: true,
-        searchAliases: ['azalea', 'azaleas', 'rhododendron', 'rhodies'],
-        customerCopy: 'Go to House 4. Right-side hoop houses.',
-        staffCopy: 'Azalea and rhododendron house.',
-        landmark: 'Between Shade Shrubs and Hydrangeas',
-        zoneContents: ['Azaleas', 'Rhododendron'],
-        confidence: 'verified'
-      },
-      {
-        id: 'redbuds-magnolias', name: 'Redbuds / Magnolias', category: 'trees', zoneId: 'house-6',
-        traits: ['pollinator-friendly', 'deer-resistant'], quick: true,
-        searchAliases: ['redbud', 'whitebud', 'magnolia', 'magnolias'],
-        customerCopy: 'Go to House 6. Right-side hoop houses.',
-        staffCopy: 'Redbud, whitebud, and magnolia house.',
-        landmark: 'Near House 5 and House 7',
-        zoneContents: ['Redbud', 'Whitebud', 'Magnolia'],
-        confidence: 'verified'
-      },
-      {
-        id: 'roses', name: 'Roses', category: 'shrubs', zoneId: 'roses-grasses',
-        traits: ['pollinator-friendly'], quick: true,
-        searchAliases: ['rose'],
-        customerCopy: 'Go to Roses & Grasses. Central nursery area.',
-        staffCopy: 'Shared roses and ornamental grasses section.',
-        landmark: 'Near Flowering Shrubs',
-        zoneContents: ['Roses', 'Ornamental Grasses'],
-        confidence: 'verified'
-      },
-      {
-        id: 'sun-perennials', name: 'Sun Perennials', category: 'perennials', zoneId: 'sun-perennials',
-        traits: [], quick: true,
-        searchAliases: ['perennials', 'sun perennial'],
-        customerCopy: 'Go to Sun Perennials. Main perennial area.',
-        staffCopy: 'Primary sun perennial section.',
-        landmark: 'Near Shade Perennials',
-        zoneContents: ['Main sun perennial assortment'],
-        confidence: 'verified'
-      },
-      {
-        id: 'shade-perennials', name: 'Shade Perennials', category: 'perennials', zoneId: 'shade-perennials',
-        traits: ['shade-friendly'], quick: true,
-        searchAliases: ['shade perennial'],
-        customerCopy: 'Go to Shade Perennials. Main perennial area.',
-        staffCopy: 'Primary shade perennial section.',
-        landmark: 'Near Sun Perennials',
-        zoneContents: ['Main shade perennial assortment'],
-        confidence: 'verified'
-      },
-      {
-        id: 'arborvitae', name: 'Arborvitae', category: 'trees', zoneId: 'zone-a',
-        traits: ['deer-resistant'], quick: false,
-        searchAliases: ['arborvitae trees'],
-        customerCopy: 'Go to Ball & Burlap A. Top field trees.',
-        staffCopy: 'Upright arborvitae section.',
-        landmark: 'Look for the A section in field trees',
-        zoneContents: ['Upright Arborvitae'],
-        confidence: 'verified'
-      },
-      {
-        id: 'juniper-pine', name: 'Juniper / Pine', category: 'trees', zoneId: 'zone-b',
-        traits: ['deer-resistant', 'drought-tolerant'], quick: false,
-        searchAliases: ['juniper', 'pine'],
-        customerCopy: 'Go to Ball & Burlap B. Top field trees.',
-        staffCopy: 'Juniper and pine section.',
-        landmark: 'Between A and C',
-        zoneContents: ['Juniper', 'Pine'],
-        confidence: 'verified'
-      },
-      {
-        id: 'evergreen-trees', name: 'Evergreen Trees', category: 'trees', zoneId: 'zone-c',
-        traits: ['deer-resistant'], quick: false,
-        searchAliases: ['spruce', 'cedar', 'cypress', 'evergreens'],
-        customerCopy: 'Go to Ball & Burlap C. Top field trees.',
-        staffCopy: 'Evergreen field tree section.',
-        landmark: 'Near Ball & Burlap D',
-        zoneContents: ['Spruce', 'Cedar', 'Cypress', 'Evergreens'],
-        confidence: 'verified'
-      },
-      {
-        id: 'deciduous-trees', name: 'Deciduous Trees', category: 'trees', zoneId: 'zone-d',
-        traits: ['shade-friendly'], quick: false,
-        searchAliases: ['maple', 'oak', 'linden', 'ginkgo', 'serviceberry', 'willow', 'tulip tree', 'dawn redwood', 'birch', 'elm', 'honeylocust'],
-        customerCopy: 'Go to Ball & Burlap D. Top field trees.',
-        staffCopy: 'Primary deciduous tree field section.',
-        landmark: 'Near Ball & Burlap C',
-        zoneContents: ['Aspen', 'Bald Cypress', 'Birch', 'Black Gum', 'Cherry', 'Crabapple', 'Elm', 'Ginkgo', 'Honeylocust', 'Hornbeam', 'Kentucky Coffee Tree', 'Linden', 'London Plane', 'Maple', 'Oak', 'Dawn Redwood', 'Serviceberry', 'Seven Sons', 'Tulip Tree', 'Willow'],
-        confidence: 'verified'
-      },
-      {
-        id: 'flowering-shrubs', name: 'Flowering Shrubs', category: 'shrubs', zoneId: 'flowering-shrubs',
-        traits: ['pollinator-friendly'], quick: false,
-        searchAliases: ['abelia', 'althea', 'barberry', 'butterfly bush', 'caryopteris', 'chokeberry', 'forsythia', 'ninebark', 'viburnum', 'weigela', 'spirea', 'sweetspire'],
-        customerCopy: 'Go to Flowering Shrubs. Central nursery area.',
-        staffCopy: 'Open flowering shrub section.',
-        landmark: 'Near Roses & Grasses',
-        zoneContents: ['Abelia', 'Althea', 'Barberry', 'Butterfly Bush', 'Caryopteris', 'Chokeberry', 'Cotoneaster', 'Euonymus', 'Forsythia', 'Mockorange', 'Ninebark', 'Privet', 'Quince', 'Sand Cherry', 'Spirea', 'Sweetspire', 'Viburnum', 'Weigela', 'Yucca'],
-        confidence: 'verified'
-      }
+    const CURATED = [
+      { id:'hydrangeas', name:'Hydrangeas', zoneId:'house-5', quick:true, category:'Shrubs', traits:['Shade Friendly','Pollinator Friendly'], aliases:['hydrangea'], customer:'Go to House 5. Right-side hoop houses.', staff:'Primary hydrangea house.', landmark:'Near House 4 and House 6', confidence:'verified' },
+      { id:'japanese-maples', name:'Japanese Maples', zoneId:'house-7', quick:true, category:'Trees', traits:['Deer Resistant'], aliases:['japanese maple','maples'], customer:'Go to House 7. Upper-right hoop houses.', staff:'Primary Japanese maple house.', landmark:'Near Dogwoods in House 8', confidence:'verified' },
+      { id:'dogwoods', name:'Dogwoods', zoneId:'house-8', quick:true, category:'Trees', traits:['Pollinator Friendly','Bird Friendly'], aliases:['dogwood','dogwood trees'], customer:'Go to House 8. Upper-right hoop houses.', staff:'Dogwood tree house.', landmark:'Near Japanese Maples in House 7', confidence:'verified' },
+      { id:'yews', name:'Yews', zoneId:'house-2', quick:true, category:'Shrubs', traits:['Deer Resistant','Shade Friendly'], aliases:['yew'], customer:'Go to House 2. Right-side hoop houses.', staff:'Primary yew house.', landmark:'Evergreen shrub section', confidence:'verified' },
+      { id:'shade-shrubs', name:'Shade Shrubs', zoneId:'house-3', quick:true, category:'Shrubs', traits:['Shade Friendly'], aliases:['hollies','holly','laurel','inkberry','pieris','clethra','winterberry','mahonia'], customer:'Go to House 3. Right-side hoop houses.', staff:'Shade shrub house.', landmark:'Includes hollies, laurels, and related shrubs', confidence:'verified' },
+      { id:'azaleas-rhodies', name:'Azaleas / Rhododendron', zoneId:'house-4', quick:true, category:'Shrubs', traits:['Shade Friendly','Pollinator Friendly'], aliases:['azalea','rhododendron','rhodies'], customer:'Go to House 4. Right-side hoop houses.', staff:'Azalea and rhododendron house.', landmark:'Just before Hydrangeas in House 5', confidence:'verified' },
+      { id:'redbuds-magnolias', name:'Redbuds / Magnolias', zoneId:'house-6', quick:true, category:'Trees', traits:['Pollinator Friendly'], aliases:['redbud','magnolia','whitebud'], customer:'Go to House 6. Right-side hoop houses.', staff:'Shared ornamental tree house.', landmark:'Between Hydrangeas and Japanese Maples', confidence:'verified' },
+      { id:'roses', name:'Roses', zoneId:'roses-grasses', quick:true, category:'Shrubs', traits:['Pollinator Friendly'], aliases:['rose'], customer:'Go to Roses & Grasses in the central nursery.', staff:'Roses share the central area with ornamental grasses.', landmark:'Near Flowering Shrubs', confidence:'verified' },
+      { id:'sun-perennials', name:'Sun Perennials', zoneId:'sun-perennials', quick:true, category:'Perennials', traits:['Sun Friendly'], aliases:['perennials sun'], customer:'Go to the Sun Perennials area.', staff:'Main sun perennial department.', landmark:'Near checkout and annuals', confidence:'verified' },
+      { id:'shade-perennials', name:'Shade Perennials', zoneId:'shade-perennials', quick:true, category:'Perennials', traits:['Shade Friendly'], aliases:['perennials shade'], customer:'Go to the Shade Perennials area.', staff:'Main shade perennial department.', landmark:'Near Sun Perennials and checkout', confidence:'verified' },
+      { id:'conifers', name:'Conifers', zoneId:'zone-c', quick:false, category:'Browse Group', traits:['Evergreen'], aliases:['conifer','arborvitae','cedar','cypress','fir','hemlock','juniper','junipers','pine','spruce'], customer:'Start in the Ball & Burlap conifer zones and evergreen shrub areas.', staff:'Typically spans Ball & Burlap A, B, C and House 2 depending on plant type.', landmark:'Field tree rows + yew house', confidence:'grouped' },
+      { id:'evergreen-shrubs-group', name:'Evergreen Shrubs', zoneId:'evergreen-shrubs', quick:false, category:'Browse Group', traits:['Evergreen'], aliases:['evergreen shrub','boxwood','euonymus','holly','laurel','pyracantha','broadleaf evergreen'], customer:'Start in the evergreen shrub and nearby hoop-house shrub sections.', staff:'Usually evergreen shrub area plus Houses 2–4 depending on species.', landmark:'Central evergreen shrubs near roses and flowering shrubs', confidence:'grouped' },
+      { id:'perennial-grasses-group', name:'Perennial Grasses', zoneId:'roses-grasses', quick:false, category:'Browse Group', traits:['Sun Friendly'], aliases:['ornamental grasses','liriope','maiden grass','switch grass','fountain grass','bluestem','yucca'], customer:'Start in Roses & Grasses, then check the perennial areas for specialty grasses.', staff:'Likely Roses & Grasses plus Sun/Shade Perennials and House 1 for liriope.', landmark:'Central nursery and perennial departments', confidence:'grouped' },
+      { id:'trees-group', name:'Trees', zoneId:'zone-d', quick:false, category:'Browse Group', traits:['Browse'], aliases:['flowering trees','fruit trees','ornamental trees','shade trees'], customer:'Start with the field tree zones or the ornamental tree hoop houses.', staff:'Likely Ball & Burlap A–D, Container Trees, Houses 6–8, and fruit trees between Houses 1–3.', landmark:'Field trees at top, ornamental houses on right', confidence:'grouped' }
     ];
 
-    const BROWSE = [
-      { id: 'trees', label: 'Trees', helper: 'Japanese maples, dogwoods, field trees' },
-      { id: 'shrubs', label: 'Shrubs', helper: 'Hydrangeas, roses, flowering shrubs' },
-      { id: 'perennials', label: 'Perennials', helper: 'Sun and shade perennial zones' },
-      { id: 'shade-friendly', label: 'Shade Plants', helper: 'House 2, 3, 4 and shade perennials' },
-      { id: 'deer-resistant', label: 'Deer Resistant', helper: 'Useful staff and customer shortcut' },
-      { id: 'pollinator-friendly', label: 'Pollinator Friendly', helper: 'Flowering shrubs, hydrangeas, dogwoods' },
-      { id: 'field-trees', label: 'Field Trees', helper: 'Ball & Burlap A, B, C, D' },
-      { id: 'central', label: 'Central Nursery', helper: 'Flowering shrubs, roses, container trees' }
+    const BROWSE_CARDS = [
+      { id:'conifers', title:'Conifers', sub:'Arborvitae, Cedar, Cypress, Fir, Hemlock, Junipers, Pines, Spruce, Yews', select:'curated:conifers' },
+      { id:'evergreen-shrubs-group', title:'Evergreen Shrubs', sub:'Abelia, Broadleaf Evergreens, Azaleas, Euonymus, Holly, Boxwoods, Laurel, Pyracantha, Rhododendron', select:'curated:evergreen-shrubs-group' },
+      { id:'perennial-grasses-group', title:'Perennial Grasses', sub:'Bluestem, Feather Reed, Liriope & Border Grasses, Maiden, Native & Prairie, Shade Grasses, Switch, Yucca', select:'curated:perennial-grasses-group' },
+      { id:'trees-group', title:'Trees', sub:'Flowering Trees, Fruit Trees, Ornamental Trees, Shade Trees', select:'curated:trees-group' },
+      { id:'hydrangeas', title:'Hydrangeas', sub:'Quick-find favorite · House 5', select:'curated:hydrangeas' },
+      { id:'shade-shrubs', title:'Shade Shrubs', sub:'Hollies, Laurels, Inkberry, Clethra, Winterberry', select:'curated:shade-shrubs' },
+      { id:'roses', title:'Roses & Grasses', sub:'Roses, ornamental grasses, and nearby shrub context', select:'curated:roses' },
+      { id:'sun-perennials', title:'Perennial Departments', sub:'Sun Perennials and Shade Perennials near entry/checkouts', select:'curated:sun-perennials' }
     ];
 
     const els = {
       html: document.documentElement,
-      heroCopy: document.getElementById('heroCopy'),
-      themeToggle: document.getElementById('themeToggle'),
-      modeButtons: [...document.querySelectorAll('.seg-btn')],
-      tabButtons: [...document.querySelectorAll('.tab-btn')],
-      views: {
-        find: document.getElementById('findView'),
-        browse: document.getElementById('browseView'),
-        map: document.getElementById('mapView'),
-        staff: document.getElementById('staffView')
-      },
-      findSearch: document.getElementById('findSearch'),
-      clearSearchBtn: document.getElementById('clearSearchBtn'),
+      themeBtn: document.getElementById('themeBtn'),
+      viewButtons: Array.from(document.querySelectorAll('#viewSeg .seg')),
+      modeButtons: Array.from(document.querySelectorAll('#modeSeg .mini-toggle')),
+      routeToggle: document.getElementById('routeToggle'),
+      findInput: document.getElementById('findInput'),
+      clearSearch: document.getElementById('clearSearch'),
       quickGrid: document.getElementById('quickGrid'),
-      filterChips: document.getElementById('filterChips'),
-      findSummary: document.getElementById('findSummary'),
-      findResults: document.getElementById('findResults'),
+      searchResults: document.getElementById('searchResults'),
+      resultCard: document.getElementById('resultCard'),
+      overviewMapWrap: document.getElementById('overviewMapWrap'),
+      detailMapWrap: document.getElementById('detailMapWrap'),
+      overviewCaption: document.getElementById('overviewCaption'),
+      detailCaption: document.getElementById('detailCaption'),
+      findView: document.getElementById('findView'),
+      findContent: document.getElementById('findContent'),
+      browseView: document.getElementById('browseView'),
       browseGrid: document.getElementById('browseGrid'),
-      browseSummary: document.getElementById('browseSummary'),
-      browseResults: document.getElementById('browseResults'),
-      focusMapBtn: document.getElementById('focusMapBtn'),
-      fullMapBtn: document.getElementById('fullMapBtn'),
-      mapIntro: document.getElementById('mapIntro'),
-      mapStage: document.getElementById('mapStage'),
-      directionCard: document.getElementById('directionCard'),
-      staffSearch: document.getElementById('staffSearch'),
-      staffClearBtn: document.getElementById('staffClearBtn'),
-      staffSummary: document.getElementById('staffSummary'),
-      staffZones: document.getElementById('staffZones')
+      staffView: document.getElementById('staffView'),
+      inventorySummary: document.getElementById('inventorySummary'),
+      zoneGrid: document.getElementById('zoneGrid')
     };
 
-    function normalizeText(v) {
-      return String(v || '').trim().toLowerCase();
-    }
-
-    function getZone(zoneId) {
-      return ZONES.find(z => z.id === zoneId);
-    }
-
-    function getItem(id) {
-      return ITEMS.find(item => item.id === id);
-    }
-
-    function setTheme(theme) {
+    function setTheme(theme){
       state.theme = theme;
       localStorage.setItem('suburban-theme', theme);
       els.html.setAttribute('data-theme', theme);
-      els.themeToggle.textContent = theme === 'dark' ? 'Theme: Dark' : 'Theme: Light';
+      els.themeBtn.textContent = `Theme: ${theme === 'dark' ? 'Dark' : 'Light'}`;
     }
 
-    function setMode(mode) {
-      state.mode = mode;
-      els.modeButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
-      renderHeroCopy();
-      renderFind();
-      renderMap();
-      renderStaff();
+    function norm(v){ return String(v || '').trim().toLowerCase(); }
+    function slug(v){ return norm(v).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+    function normSku(v){ return String(v || '').trim().toUpperCase().replace(/[^A-Z0-9]/g,''); }
+    function unique(arr){ return [...new Set(arr.filter(Boolean))]; }
+    function getZone(id){ return ZONES.find(z => z.id === id); }
+    function getCurated(id){ return CURATED.find(i => i.id === id); }
+    function isTruthy(value){
+      if (value === true) return true;
+      if (value === false || value == null) return false;
+      return ['true','yes','y','1','x'].includes(String(value).trim().toLowerCase());
     }
 
-    function setTab(tab) {
-      state.tab = tab;
-      els.tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
-      Object.entries(els.views).forEach(([key, view]) => view.classList.toggle('active', key === tab));
-      if (tab === 'map') renderMap();
-      if (tab === 'staff') renderStaff();
-      if (tab === 'browse') renderBrowse();
-      if (tab === 'find') renderFind();
+    function getPlantGroup(plant){
+      const group = plant.plant_group || plant.category || plant.section || 'Perennials';
+      const text = String(group).toLowerCase();
+      if(text.includes('clematis')) return 'Clematis';
+      if(text.includes('grapes') || text.includes('berries')) return 'Grapes & Berries';
+      if(text.includes('ground cover')) return 'Ground Covers';
+      if(text.includes('hardy vining')) return 'Hardy Vining Plants';
+      if(text.includes('native perennial')) return 'Native Perennials';
+      if(text.includes('peonies') || text.includes('peony')) return 'Peonies';
+      if(text.includes('perennials - shade')) return 'Perennials - Shade';
+      if(text.includes('perennials - sun')) return 'Perennials - Sun';
+      if(text.includes('roses') || text === 'rose') return 'Roses';
+      return group;
     }
 
-    function setSelectedItem(id, goToMap = false) {
-      state.selectedItemId = id;
-      if (goToMap) setTab('map');
-      renderFind();
-      renderBrowse();
-      renderMap();
-      renderStaff();
+    function getExposure(plant){
+      const light = String(plant.light || '').toLowerCase();
+      const group = String(getPlantGroup(plant)).toLowerCase();
+      if(group.includes('perennials - sun')) return 'Sun';
+      if(group.includes('perennials - shade')) return 'Shade';
+      const hasSun = light.includes('sun');
+      const hasShade = light.includes('shade');
+      if ((hasSun && hasShade) || light.includes('part sun') || light.includes('part shade')) return 'Mixed';
+      if (hasSun) return 'Sun';
+      if (hasShade) return 'Shade';
+      return 'Unknown';
     }
 
-    function itemMatchesTerm(item, term) {
-      if (!term) return true;
-      const haystack = [
-        item.name,
-        item.category,
-        item.customerCopy,
-        item.staffCopy,
-        item.landmark,
-        ...item.zoneContents,
-        ...item.searchAliases
-      ].join(' ').toLowerCase();
-      return haystack.includes(term);
+    function inferTraits(plant){
+      const exposure = getExposure(plant);
+      const haystack = [plant.name,plant.common,plant.genus,plant.category,plant.plant_group,plant.section,plant.light,plant.description,plant.notes].join(' ').toLowerCase();
+      const traits = [];
+      if (exposure === 'Sun') traits.push('Sun Friendly');
+      if (exposure === 'Shade') traits.push('Shade Friendly');
+      if (isTruthy(plant.pollinator) || /pollinator|butterfly|bee/.test(haystack)) traits.push('Pollinator Friendly');
+      if (isTruthy(plant.drought) || /drought/.test(haystack)) traits.push('Drought Tolerant');
+      if (isTruthy(plant.deer) || isTruthy(plant.deer_resistant) || isTruthy(plant.deerResistant) || /deer/.test(haystack)) traits.push('Deer Resistant');
+      return unique(traits);
     }
 
-    function itemMatchesFilter(item, filter) {
-      if (filter === 'all') return true;
-      if (['trees', 'shrubs', 'perennials'].includes(filter)) return item.category === filter;
-      if (filter === 'field-trees') return getZone(item.zoneId)?.focusGroup === 'field';
-      if (filter === 'central') return getZone(item.zoneId)?.focusGroup === 'central';
-      return item.traits.includes(filter);
-    }
+    function inferZoneForPlant(plant){
+      const name = norm(plant.name);
+      const group = norm(getPlantGroup(plant));
+      const category = norm(plant.category);
+      const common = norm(plant.common);
+      const text = [name, group, category, common].join(' ');
 
-    function getFindResults() {
-      const term = normalizeText(state.findTerm);
-      let results = ITEMS.filter(item => itemMatchesTerm(item, term) && itemMatchesFilter(item, state.activeFilter));
-      results = results.sort((a, b) => {
-        const aq = a.quick ? 0 : 1;
-        const bq = b.quick ? 0 : 1;
-        if (aq !== bq) return aq - bq;
-        return a.name.localeCompare(b.name);
-      });
-      return results;
-    }
-
-    function getBrowseResults() {
-      const key = state.browseCategory;
-      if (key === 'field-trees') return ITEMS.filter(item => getZone(item.zoneId)?.focusGroup === 'field');
-      if (key === 'central') return ITEMS.filter(item => getZone(item.zoneId)?.focusGroup === 'central');
-      if (['trees', 'shrubs', 'perennials'].includes(key)) return ITEMS.filter(item => item.category === key);
-      return ITEMS.filter(item => item.traits.includes(key));
-    }
-
-    function renderHeroCopy() {
-      const item = getItem(state.selectedItemId);
-      if (state.tab === 'find') {
-        els.heroCopy.textContent = state.mode === 'customer'
-          ? 'Search first, answer fast, and only show the part of the nursery map that matters. This version is designed for live customer use on mobile.'
-          : 'Staff mode adds more exact zone language, grouped contents, and alternate wording customers might use when asking where something is.';
-        return;
-      }
-      if (state.tab === 'browse') {
-        els.heroCopy.textContent = 'Browse is for customers who know the kind of plant they want but not the exact name. Cards stay first; map stays secondary.';
-        return;
-      }
-      if (state.tab === 'map') {
-        els.heroCopy.textContent = item
-          ? `Focused map for ${item.name}. The idea is to show only the part of the nursery that helps someone take the next step.`
-          : 'Focused map view highlights one destination at a time and keeps the rest of the nursery quiet.';
-        return;
-      }
-      els.heroCopy.textContent = 'Staff quick reference brings together zone contents, common synonyms, and a more operational way to answer questions on the floor.';
-    }
-
-    function quickCardHtml(item) {
-      const zone = getZone(item.zoneId);
-      return `
-        <button class="quick-btn" type="button" data-quick-id="${item.id}">
-          ${item.name}
-          <span class="small">${zone.label} · ${zone.customerCue}</span>
-        </button>
-      `;
-    }
-
-    function resultCardHtml(item, primary = false) {
-      const zone = getZone(item.zoneId);
-      const detailCopy = state.mode === 'customer' ? item.customerCopy : item.staffCopy;
-      return `
-        <article class="result-card ${primary ? 'primary' : ''}">
-          <div class="result-top">
-            <div>
-              <div class="result-type">${item.category}</div>
-              <h3 class="result-title">${item.name}</h3>
-            </div>
-            <div class="pill">${item.confidence}</div>
-          </div>
-          <p class="destination-line">Go to <strong>${zone.label}</strong></p>
-          <p class="cue-line">${state.mode === 'customer' ? zone.customerCue : zone.staffCue}</p>
-          <p class="detail-line">${item.landmark}</p>
-          <p class="detail-line">${detailCopy}</p>
-          <div class="meta-row" style="margin-top:12px;">
-            ${item.traits.map(trait => `<span class="tag">${trait.replace(/-/g, ' ')}</span>`).join('')}
-          </div>
-          <div class="inline-actions" style="margin-top:12px;">
-            <button class="action-btn primary" type="button" data-map-id="${item.id}">Show on map</button>
-            <button class="action-btn" type="button" data-detail-id="${item.id}">More details</button>
-          </div>
-        </article>
-      `;
-    }
-
-    function renderFind() {
-      const quickItems = ITEMS.filter(item => item.quick);
-      els.quickGrid.innerHTML = quickItems.map(quickCardHtml).join('');
-
-      const filters = [
-        { id: 'all', label: 'All' },
-        { id: 'trees', label: 'Trees' },
-        { id: 'shrubs', label: 'Shrubs' },
-        { id: 'perennials', label: 'Perennials' },
-        { id: 'shade-friendly', label: 'Shade Friendly' },
-        { id: 'deer-resistant', label: 'Deer Resistant' },
-        { id: 'pollinator-friendly', label: 'Pollinator Friendly' }
+      const exact = [
+        [['hydrangea'], 'house-5', 'verified', 'Hydrangea house'],
+        [['japanese maple'], 'house-7', 'verified', 'Japanese maple house'],
+        [['dogwood'], 'house-8', 'verified', 'Dogwood house'],
+        [['yew'], 'house-2', 'verified', 'Yew house'],
+        [['azalea','rhododendron'], 'house-4', 'verified', 'Azalea / rhododendron house'],
+        [['holly','inkberry','laurel','pieris','clethra','winterberry','mahonia','fothergilla','potentilla'], 'house-3', 'verified', 'Shade shrub house'],
+        [['redbud','whitebud','magnolia'], 'house-6', 'verified', 'Ornamental tree house'],
+        [['arborvitae'], 'zone-a', 'grouped', 'Conifer field zone A'],
+        [['juniper','pine'], 'zone-b', 'grouped', 'Conifer field zone B'],
+        [['spruce','cedar','cypress','fir','hemlock'], 'zone-c', 'grouped', 'Conifer field zone C'],
+        [['maple','oak','linden','ginkgo','serviceberry','willow','aspen','bald cypress','birch','black gum','cherry','crabapple','elm','honeylocust','hornbeam','kentucky coffee tree','london plane','dawn redwood','seven sons','tulip'], 'zone-d', 'grouped', 'Deciduous tree field zone D'],
+        [['rose'], 'roses-grasses', 'grouped', 'Roses & Grasses'],
+        [['liriope'], 'house-1', 'grouped', 'Groundcovers / vines house'],
+        [['wisteria','honeysuckle'], 'house-1', 'grouped', 'Groundcovers / vines house'],
+        [['fruit tree','apple','pear','peach','plum'], 'between-houses-123', 'grouped', 'Fruit tree staging']
       ];
-      els.filterChips.innerHTML = filters.map(filter => `
-        <button class="chip ${state.activeFilter === filter.id ? 'active' : ''}" type="button" data-filter-id="${filter.id}">${filter.label}</button>
-      `).join('');
-
-      const results = getFindResults();
-      els.findSummary.innerHTML = `
-        <span class="pill">${results.length} matches</span>
-        <span class="pill">Filter: ${state.activeFilter.replace(/-/g, ' ')}</span>
-        <span class="pill">Mode: ${state.mode}</span>
-      `;
-
-      if (!results.length) {
-        els.findResults.innerHTML = `<div class="result-card"><h3 class="result-title">No matches yet</h3><p class="detail-line">Try a plant name, category, or ask a staff member.</p></div>`;
-      } else {
-        els.findResults.innerHTML = results.map((item, index) => resultCardHtml(item, index === 0)).join('');
+      for (const [keys, zoneId, confidence, note] of exact){
+        if (keys.some(k => text.includes(k))) return { zoneId, confidence, note };
       }
 
-      els.quickGrid.querySelectorAll('[data-quick-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.dataset.quickId;
-          state.findTerm = getItem(id).name;
-          els.findSearch.value = state.findTerm;
-          setSelectedItem(id);
-        });
-      });
-
-      els.filterChips.querySelectorAll('[data-filter-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.activeFilter = btn.dataset.filterId;
-          renderFind();
-        });
-      });
-
-      els.findResults.querySelectorAll('[data-map-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.mapMode = 'focus';
-          state.selectedItemId = btn.dataset.mapId;
-          setTab('map');
-        });
-      });
-
-      els.findResults.querySelectorAll('[data-detail-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.selectedItemId = btn.dataset.detailId;
-          setTab('staff');
-        });
-      });
+      if(group.includes('perennials - sun')) return { zoneId:'sun-perennials', confidence:'grouped', note:'Mapped from plant group' };
+      if(group.includes('perennials - shade')) return { zoneId:'shade-perennials', confidence:'grouped', note:'Mapped from plant group' };
+      if(group.includes('ground covers') || group.includes('hardy vining') || group.includes('clematis')) return { zoneId:'house-1', confidence:'grouped', note:'Mapped from vine / groundcover group' };
+      if(group.includes('roses')) return { zoneId:'roses-grasses', confidence:'grouped', note:'Mapped from roses group' };
+      if(group.includes('peonies') || group.includes('native perennials')) return { zoneId:'sun-perennials', confidence:'approximate', note:'Mapped to perennial area' };
+      if(text.includes('grass') || text.includes('yucca')) return { zoneId:'roses-grasses', confidence:'grouped', note:'Mapped from perennial grasses / grasses area' };
+      if(text.includes('boxwood') || text.includes('euonymus') || text.includes('pyracantha') || text.includes('evergreen shrub')) return { zoneId:'evergreen-shrubs', confidence:'grouped', note:'Mapped from evergreen shrub grouping' };
+      if(text.includes('conifer')) return { zoneId:'zone-c', confidence:'grouped', note:'General conifer grouping' };
+      if(text.includes('shade tree') || text.includes('ornamental tree') || text.includes('flowering tree')) return { zoneId:'zone-d', confidence:'grouped', note:'General tree grouping' };
+      return { zoneId:'sun-perennials', confidence:'needs verification', note:'Defaulted to perennial area until verified' };
     }
 
-    function renderBrowse() {
-      els.browseGrid.innerHTML = BROWSE.map(item => `
-        <button class="browse-btn ${state.browseCategory === item.id ? 'active' : ''}" type="button" data-browse-id="${item.id}">
-          ${item.label}
-          <span class="small">${item.helper}</span>
-        </button>
-      `).join('');
-
-      const results = getBrowseResults();
-      els.browseSummary.innerHTML = `
-        <span class="pill">${results.length} results</span>
-        <span class="pill">Category: ${BROWSE.find(item => item.id === state.browseCategory)?.label || state.browseCategory}</span>
-      `;
-      els.browseResults.innerHTML = results.map(item => resultCardHtml(item, item.id === state.selectedItemId)).join('');
-
-      els.browseGrid.querySelectorAll('[data-browse-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.browseCategory = btn.dataset.browseId;
-          renderBrowse();
-        });
-      });
-
-      els.browseResults.querySelectorAll('[data-map-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.mapMode = 'focus';
-          state.selectedItemId = btn.dataset.mapId;
-          setTab('map');
-        });
-      });
-
-      els.browseResults.querySelectorAll('[data-detail-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.selectedItemId = btn.dataset.detailId;
-          setTab('staff');
-        });
-      });
-    }
-
-
-    function buildZoneCard(zone, highlighted, faded, showFlag = false, flagLabel = '') {
-      return `
-        <div class="map-zone ${highlighted ? 'highlight' : ''} ${faded ? 'faded' : ''}">
-          ${showFlag ? `<div class="flag-badge"><span class="flag-tri"></span>${flagLabel}</div>` : ''}
-          <div class="zone-label">${zone.focusGroup}</div>
-          <div class="zone-title">${zone.label}</div>
-          <div class="zone-copy">${highlighted ? zone.customerCue : zone.nearby}</div>
-        </div>
-      `;
-    }
-
-    function getMapShapes() {
+    function curatedEntry(item){
+      const zone = getZone(item.zoneId);
       return {
-        'zone-a': { x: 70, y: 28, w: 120, h: 58, flag: false },
-        'zone-b': { x: 255, y: 28, w: 145, h: 58, flag: false },
-        'zone-c': { x: 28, y: 128, w: 200, h: 92, flag: false },
-        'zone-d': { x: 248, y: 128, w: 485, h: 92, flag: false },
-
-        'container-trees': { x: 230, y: 274, w: 245, h: 96, flag: true, flagColor: '#2d3342' },
-        'center-bed': { x: 495, y: 262, w: 86, h: 122, flag: true, flagColor: '#60b96d' },
-        'flowering-shrubs': { x: 600, y: 262, w: 165, h: 210, flag: true, flagColor: '#8d61d6' },
-        'playground': { x: 632, y: 382, w: 101, h: 60, flag: false },
-        'roses-grasses': { x: 630, y: 512, w: 150, h: 66, flag: true, flagColor: '#f09a34' },
-
-        'house-8': { x: 795, y: 258, w: 136, h: 42, flag: false },
-        'house-7': { x: 795, y: 307, w: 136, h: 42, flag: false },
-        'house-6': { x: 795, y: 356, w: 136, h: 42, flag: false },
-        'house-5': { x: 795, y: 405, w: 136, h: 42, flag: false },
-        'house-4': { x: 795, y: 454, w: 136, h: 42, flag: false },
-        'house-3': { x: 795, y: 503, w: 136, h: 42, flag: false },
-        'house-2': { x: 795, y: 552, w: 136, h: 42, flag: false },
-        'house-1': { x: 795, y: 601, w: 136, h: 42, flag: false },
-
-        'sun-perennials': { x: 615, y: 650, w: 152, h: 62, flag: true, flagColor: '#4dc89c' },
-        'shade-perennials': { x: 415, y: 700, w: 182, h: 70, flag: false },
-        'tropicals': { x: 255, y: 700, w: 145, h: 70, flag: false },
-        'annuals': { x: 615, y: 700, w: 145, h: 70, flag: false },
-
-        'employees-only': { x: 28, y: 268, w: 120, h: 86, flag: true, flagColor: '#cf4c94' },
-        'left-yard': { x: 25, y: 520, w: 165, h: 132, flag: false }
+        key:`curated:${item.id}`,
+        source:'curated',
+        id:item.id,
+        name:item.name,
+        zoneId:item.zoneId,
+        zoneName:zone ? zone.name : item.zoneId,
+        category:item.category,
+        landmark:item.landmark,
+        headline:item.name,
+        destination:`Go to ${zone ? zone.name : item.zoneId}.`,
+        customer:item.customer,
+        staff:item.staff,
+        traits:item.traits || [],
+        confidence:item.confidence || 'verified',
+        sku:'',
+        price:'',
+        plantGroup:'',
+        image:'',
+        link:''
       };
     }
 
-    function escapeHtml(str) {
-      return String(str || '').replace(/[&<>\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[ch] || ch));
+    function plantEntry(plant){
+      const mapping = inferZoneForPlant(plant);
+      const zone = getZone(mapping.zoneId);
+      return {
+        key:`inventory:${normSku(plant.sku) || slug(plant.name)}`,
+        source:'inventory',
+        id:normSku(plant.sku) || slug(plant.name),
+        name:plant.name || 'Inventory item',
+        zoneId:mapping.zoneId,
+        zoneName:zone ? zone.name : mapping.zoneId,
+        category:'Inventory / SKU',
+        landmark:mapping.note,
+        headline:plant.name || 'Inventory item',
+        destination:`Likely in ${zone ? zone.name : mapping.zoneId}.`,
+        customer:`${plant.name || 'This item'} is likely in ${zone ? zone.name : mapping.zoneId}.`,
+        staff:`${plant.name || 'This item'} was mapped to ${zone ? zone.name : mapping.zoneId} from SKU/inventory data.`,
+        traits:inferTraits(plant),
+        confidence:mapping.confidence,
+        sku:plant.sku || '',
+        price:plant.price || '',
+        plantGroup:getPlantGroup(plant),
+        image:plant.image || '',
+        link:plant.link || ''
+      };
     }
 
-    function flagSvg(x, y, color = '#8d61d6') {
-      return `
-        <g transform="translate(${x} ${y})">
-          <polygon points="0,0 0,26 20,13" fill="${color}" stroke="rgba(24,36,53,.5)" stroke-width="2"></polygon>
-          <line x1="21" y1="13" x2="21" y2="38" stroke="rgba(24,36,53,.35)" stroke-width="3" />
-        </g>
-      `;
+    function getSelectedEntry(){
+      const [source, id] = String(state.selectedKey || '').split(':');
+      if(source === 'curated') return curatedEntry(getCurated(id) || CURATED[0]);
+      const plant = state.plants.find(p => (normSku(p.sku) || slug(p.name)) === id);
+      if(plant) return plantEntry(plant);
+      return curatedEntry(CURATED[0]);
     }
 
-    function zoneRectSvg(zone, shape, highlighted, faded, showFlag, concise = false) {
-      const fill = highlighted
-        ? 'rgba(123,208,95,.34)'
-        : (faded ? 'rgba(255,255,255,.04)' : 'rgba(255,255,255,.08)');
-      const stroke = highlighted ? 'rgba(123,208,95,.95)' : 'rgba(76,96,132,.95)';
-      const opacity = faded ? 0.35 : 1;
-      const title = concise ? zone.short : zone.label;
-      const copy = concise ? (zone.shortSecondary || zone.short) : zone.shortSecondary;
-      const centerX = shape.x + (shape.w / 2);
-      const titleY = shape.y + Math.min(30, shape.h / 2);
-      const copyY = titleY + 24;
+    function getAllCuratedEntries(){ return CURATED.map(curatedEntry); }
 
+    function scoreCurated(entry, term){
+      const t = norm(term);
+      if(!t) return entry.source === 'curated' && CURATED.find(i=>i.id===entry.id)?.quick ? 4 : 1;
+      const skuish = normSku(term);
+      const hay = [entry.name, entry.category, entry.customer, entry.staff, entry.landmark, ...((getCurated(entry.id)?.aliases)||[])].join(' ').toLowerCase();
+      if(entry.name.toLowerCase() === t) return 150;
+      if(((getCurated(entry.id)?.aliases)||[]).some(a => norm(a) === t)) return 130;
+      if(hay.includes(t)) return 85 + (CURATED.find(i=>i.id===entry.id)?.quick ? 10 : 0);
+      if(skuish && hay.includes(term.toLowerCase())) return 40;
+      return 0;
+    }
+
+    function scorePlant(plant, term){
+      const t = norm(term);
+      const skuTerm = normSku(term);
+      const plantSku = normSku(plant.sku);
+      const hay = [plant.name, plant.common, plant.genus, plant.category, plant.plant_group, plant.section, getPlantGroup(plant), plant.light].join(' ').toLowerCase();
+      if(!t) return 0;
+      if(skuTerm && plantSku === skuTerm) return 400;
+      if(skuTerm && plantSku.startsWith(skuTerm)) return 330;
+      if(skuTerm && plantSku.includes(skuTerm)) return 300;
+      if(norm(plant.name) === t) return 220;
+      if(norm(plant.common) === t) return 180;
+      if(hay.includes(t)) return 120;
+      return 0;
+    }
+
+    function getSearchResults(){
+      const term = state.search;
+      const curated = getAllCuratedEntries()
+        .map(entry => ({ entry, score: scoreCurated(entry, term) }))
+        .filter(r => r.score > 0);
+      const inventory = state.plants
+        .map(plant => ({ plant, score: scorePlant(plant, term) }))
+        .filter(r => r.score > 0)
+        .sort((a,b) => b.score - a.score)
+        .slice(0, 18)
+        .map(r => ({ entry: plantEntry(r.plant), score: r.score }));
+
+      const merged = [...curated, ...inventory]
+        .sort((a,b) => b.score - a.score || a.entry.name.localeCompare(b.entry.name));
+
+      const seen = new Set();
+      return merged.filter(row => {
+        if(seen.has(row.entry.key)) return false;
+        seen.add(row.entry.key);
+        return true;
+      }).map(row => row.entry);
+    }
+
+    function zoneCenter(zone){ return { x: zone.x + zone.w/2, y: zone.y + zone.h/2 }; }
+    function routePoints(zone){
+      const c = zoneCenter(zone);
+      if(zone.group === 'hoop') return `606,658 690,658 690,${c.y} ${c.x-10},${c.y}`;
+      if(zone.group === 'main') return `606,658 ${c.x},${c.y}`;
+      if(zone.group === 'central') return `606,658 606,${c.y+30} ${c.x},${c.y}`;
+      return `606,658 606,370 450,370 450,${c.y} ${c.x},${c.y}`;
+    }
+
+    function buildZoneShape(zone, selectedId, subdued = false){
+      const isSelected = zone.id === selectedId;
+      const fill = isSelected ? '#426d49' : subdued ? '#d6dfec' : '#dfe7f3';
+      const stroke = isSelected ? '#8ed54b' : '#6077a0';
+      const sw = isSelected ? 4 : 2.4;
+      const opacity = subdued && !isSelected ? .72 : 1;
+      const radius = zone.group === 'hoop' ? 22 : 16;
+      const label1 = zone.short;
+      const label2 = zone.display;
       return `
         <g opacity="${opacity}">
-          <rect x="${shape.x}" y="${shape.y}" rx="16" ry="16" width="${shape.w}" height="${shape.h}"
-            fill="${fill}" stroke="${stroke}" stroke-width="${highlighted ? 3 : 2}" />
-          <text x="${centerX}" y="${titleY}" text-anchor="middle" fill="var(--text)"
-            font-size="${highlighted ? 17 : 15}" font-weight="800" font-family="Inter, Segoe UI, Arial, sans-serif">${escapeHtml(title)}</text>
-          ${shape.h >= 60 ? `<text x="${centerX}" y="${copyY}" text-anchor="middle" fill="var(--text-muted)"
-            font-size="12" font-weight="700" font-family="Inter, Segoe UI, Arial, sans-serif">${escapeHtml(copy || '')}</text>` : ''}
-          ${showFlag && shape.flag ? flagSvg(shape.x + shape.w - 42, shape.y + 18, shape.flagColor || '#8d61d6') : ''}
-        </g>
-      `;
+          <rect x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${radius}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"></rect>
+          <text x="${zone.x + zone.w/2}" y="${zone.y + (zone.group === 'hoop' ? 25 : 22)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${zone.group === 'hoop' ? 17 : 15}" font-weight="900" fill="${isSelected ? '#eef4ff' : '#17243a'}">${label1}</text>
+          <text x="${zone.x + zone.w/2}" y="${zone.y + (zone.group === 'hoop' ? 42 : 42)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" fill="${isSelected ? '#eef4ff' : '#20304c'}">${label2}</text>
+        </g>`;
     }
 
-    function labelSvg(x, y, text, size = 14, weight = 800, fill = 'var(--text-muted)') {
-      return `<text x="${x}" y="${y}" fill="${fill}" font-size="${size}" font-weight="${weight}" font-family="Inter, Segoe UI, Arial, sans-serif">${escapeHtml(text)}</text>`;
-    }
+    function baseMapSvg(selectedId, viewBox){
+      const selected = getZone(selectedId);
+      const subtleHoop = selected && selected.group !== 'hoop';
+      const subtleField = selected && selected.group !== 'field';
+      const subtleCentral = selected && selected.group !== 'central';
+      const subtleMain = selected && selected.group !== 'main';
 
-    function drawYouAreHere() {
-      return `
-        <g>
-          <circle cx="602" cy="686" r="13" fill="#df4f4a" stroke="rgba(24,36,53,.55)" stroke-width="3"></circle>
-          <circle cx="602" cy="686" r="28" fill="rgba(223,79,74,.13)"></circle>
-          <text x="592" y="722" fill="#df4f4a" font-size="16" font-weight="900" font-family="Inter, Segoe UI, Arial, sans-serif">You are here</text>
-        </g>
-      `;
-    }
+      const zoneShapes = ZONES.map(zone => {
+        const subdued = (subtleHoop && zone.group === 'hoop') || (subtleField && zone.group === 'field') || (subtleCentral && zone.group === 'central') || (subtleMain && zone.group === 'main');
+        return buildZoneShape(zone, selectedId, subdued);
+      }).join('');
 
-    function renderSchematicSvg(item, mode = 'focus') {
-      const shapes = getMapShapes();
-      const selectedZone = item ? getZone(item.zoneId) : null;
-      const focusGroup = selectedZone?.focusGroup || 'main';
-      const viewBoxes = {
-        hoop: '520 220 430 570',
-        field: '0 0 760 520',
-        central: '460 220 360 520',
-        main: '220 610 580 190',
-        full: '0 0 980 800'
-      };
-      const viewBox = mode === 'full' ? viewBoxes.full : (viewBoxes[focusGroup] || viewBoxes.full);
-
-      const visibleIds = mode === 'full'
-        ? ZONES.map(z => z.id)
-        : ZONES.filter(z => z.focusGroup === focusGroup || z.id === selectedZone?.id || z.id === 'sun-perennials' || z.id === 'shade-perennials').map(z => z.id);
-
-      const decorative = mode === 'full'
-        ? `
-          <rect x="18" y="18" rx="30" ry="30" width="930" height="760" fill="none" stroke="rgba(130,150,185,.35)" stroke-width="2"></rect>
-          ${labelSvg(265, 118, 'Ball & Burlap Trees', 28, 900, 'var(--text)')}
-          ${labelSvg(777, 245, 'Hoop Houses', 26, 900, 'var(--text)')}
-          ${labelSvg(798, 272, '(shade tolerant)', 14, 800, 'var(--text-muted)')}
-          ${labelSvg(178, 362, 'Container Trees', 18, 900, 'var(--text)')}
-          ${labelSvg(600, 365, 'Flowering Shrubs', 18, 900, 'var(--text)')}
-          ${labelSvg(38, 380, 'Employees Only', 16, 900, 'var(--text)')}
-          ${labelSvg(37, 548, 'Bulk Mulch', 14, 800)}
-          ${labelSvg(37, 590, 'Rock Yard', 14, 800)}
-          ${labelSvg(37, 633, 'Bagged Goods & Loading', 14, 800)}
-          ${labelSvg(37, 682, 'Bulk Soils, Sand & Compost', 14, 800)}
-        `
-        : `
-          ${labelSvg(542, 236, focusGroup === 'hoop' ? 'HOOP HOUSES FOCUS' : focusGroup === 'central' ? 'CENTRAL NURSERY FOCUS' : focusGroup === 'field' ? 'FIELD TREES FOCUS' : 'MAIN BUILDING FOCUS', 16, 900, 'var(--text-muted)')}
-        `;
-
-      const bgShapes = `
-        <rect x="0" y="0" width="980" height="800" fill="transparent"></rect>
-        <rect x="594" y="245" rx="18" ry="18" width="180" height="240" fill="rgba(255,255,255,.03)"></rect>
-        <rect x="604" y="640" rx="20" ry="20" width="170" height="138" fill="rgba(255,255,255,.03)"></rect>
-        <line x1="300" y1="225" x2="300" y2="420" stroke="rgba(110,128,160,.28)" stroke-width="5" stroke-dasharray="12 9"></line>
-      `;
-
-      const zoneSvgs = ZONES
-        .filter(zone => shapes[zone.id] && (mode === 'full' || visibleIds.includes(zone.id)))
-        .map(zone => {
-          const shape = shapes[zone.id];
-          const highlighted = zone.id === selectedZone?.id;
-          const faded = mode === 'focus' && !highlighted && zone.focusGroup !== focusGroup && zone.id !== 'sun-perennials' && zone.id !== 'shade-perennials';
-          const showFlag = mode === 'full' || highlighted;
-          const concise = mode === 'focus';
-          return zoneRectSvg(zone, shape, highlighted, faded, showFlag, concise);
-        })
-        .join('');
+      const route = state.routeCue && selected ? `
+        <polyline points="${routePoints(selected)}" fill="none" stroke="#ffb648" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" opacity=".94"></polyline>
+        <polyline points="${routePoints(selected)}" fill="none" stroke="#fff" stroke-width="2.3" stroke-dasharray="8 7" stroke-linecap="round" opacity=".88"></polyline>` : '';
 
       return `
-        <div class="map-svg-shell">
-          <svg viewBox="${viewBox}" role="img" aria-label="${mode === 'full' ? 'Full nursery schematic map' : 'Focused nursery schematic map'}">
-            ${bgShapes}
-            ${decorative}
-            ${drawYouAreHere()}
-            ${zoneSvgs}
-          </svg>
+      <svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Suburban nursery map">
+        <defs>
+          <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f3f7fd"></stop>
+            <stop offset="100%" stop-color="#e8eff9"></stop>
+          </linearGradient>
+          <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#0b1630" flood-opacity=".12"/>
+          </filter>
+        </defs>
+        <rect x="0" y="0" width="1000" height="760" fill="url(#bgGrad)"></rect>
+        <rect x="24" y="24" width="952" height="712" rx="28" fill="none" stroke="#cfdaea" stroke-width="2"></rect>
+
+        <path d="M36 72 H960 a28 28 0 0 1 28 28 V272 a34 34 0 0 1 -34 34 H38 a32 32 0 0 1 -32 -32 V104 a32 32 0 0 1 30 -32z"
+          fill="rgba(182,197,220,.16)" stroke="#c7d4e7" stroke-width="2"></path>
+        <text x="360" y="138" font-size="34" font-weight="900" fill="#233657" font-family="Inter, Arial, sans-serif">Ball &amp; Burlap Trees</text>
+
+        <rect x="460" y="248" width="24" height="280" rx="12" fill="rgba(255,255,255,.45)"></rect>
+        <rect x="520" y="364" width="236" height="22" rx="11" fill="rgba(255,255,255,.45)"></rect>
+        <rect x="610" y="452" width="24" height="170" rx="12" fill="rgba(255,255,255,.42)"></rect>
+
+        <rect x="36" y="340" width="180" height="330" rx="22" fill="rgba(255,255,255,.22)" stroke="#cbd7e7"></rect>
+        <text x="58" y="380" font-size="24" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Left Yard / Ops</text>
+        <text x="58" y="414" font-size="15" font-weight="700" fill="#435a82" font-family="Inter, Arial, sans-serif">Bulk mulch · rock yard</text>
+        <text x="58" y="438" font-size="15" font-weight="700" fill="#435a82" font-family="Inter, Arial, sans-serif">Bagged goods · loading</text>
+
+        <rect x="752" y="32" width="196" height="608" rx="28" fill="rgba(255,255,255,.20)" stroke="#c9d6e7" stroke-width="2"></rect>
+        <text x="850" y="58" text-anchor="middle" font-size="20" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Hoop Houses</text>
+
+        <text x="590" y="560" font-size="20" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Perennial / Front Nursery</text>
+
+        ${zoneShapes}
+        ${route}
+
+        <g filter="url(#softShadow)">
+          <circle cx="${YOU_ARE_HERE.x}" cy="${YOU_ARE_HERE.y}" r="14" fill="#e54d42" stroke="#ffffff" stroke-width="4"></circle>
+          <text x="${YOU_ARE_HERE.x + 24}" y="${YOU_ARE_HERE.y - 18}" font-size="14" font-weight="900" fill="#20304c" font-family="Inter, Arial, sans-serif">${YOU_ARE_HERE.label}</text>
+          <text x="${YOU_ARE_HERE.x + 24}" y="${YOU_ARE_HERE.y + 2}" font-size="12" font-weight="700" fill="#526b95" font-family="Inter, Arial, sans-serif">Leaving perennials / greeting point</text>
+        </g>
+      </svg>`;
+    }
+
+    function renderMaps(){
+      const entry = getSelectedEntry();
+      const zone = getZone(entry.zoneId) || ZONES[0];
+      els.overviewMapWrap.innerHTML = baseMapSvg(zone.id, '0 0 1000 760');
+      const detailBox = zone.zoom || {x:0,y:0,w:1000,h:760};
+      els.detailMapWrap.innerHTML = baseMapSvg(zone.id, `${detailBox.x} ${detailBox.y} ${detailBox.w} ${detailBox.h}`);
+      els.overviewCaption.textContent = state.mode === 'customer'
+        ? `${zone.name} stays highlighted while the full map preserves the rest of the nursery.`
+        : `${zone.name} remains highlighted on the full map while the closer look lets staff verify the target section.`;
+      els.detailCaption.textContent = entry.source === 'inventory'
+        ? `This inventory result uses a ${entry.confidence} location match from SKU / group logic. Tighten the zone mapping as you verify live placements.`
+        : `${zone.name} is shown in a tighter crop while the overview above keeps the user's frame of reference.`;
+    }
+
+    function confidenceClass(conf){
+      if(conf === 'verified') return 'good';
+      if(conf === 'grouped' || conf === 'approximate') return 'warn';
+      return 'bad';
+    }
+
+    function renderResultCard(){
+      const entry = getSelectedEntry();
+      const zone = getZone(entry.zoneId) || ZONES[0];
+      const copy = state.mode === 'customer' ? entry.customer : entry.staff;
+      const confidenceText = entry.confidence.replace(/-/g,' ');
+      const traits = entry.traits && entry.traits.length ? entry.traits : [];
+      const extraMeta = [];
+      if(entry.sku) extraMeta.push(`<span class="meta-pill">SKU ${entry.sku}</span>`);
+      if(entry.price) extraMeta.push(`<span class="meta-pill">${entry.price}</span>`);
+      if(entry.plantGroup) extraMeta.push(`<span class="meta-pill">${entry.plantGroup}</span>`);
+      els.resultCard.innerHTML = `
+        <div class="eyebrow">${entry.source === 'inventory' ? 'SKU / Inventory Result' : entry.category}</div>
+        <h2>${entry.headline}</h2>
+        <div class="destination-line">${entry.destination}</div>
+        <div class="copy">${copy} ${entry.landmark ? ` ${entry.landmark}.` : ''}</div>
+        <div class="tag-row">
+          <span class="inventory-pill ${confidenceClass(entry.confidence)}">${confidenceText}</span>
+          <span class="meta-pill">${zone.name}</span>
+          ${traits.slice(0,4).map(t => `<span class="tag">${t}</span>`).join('')}
         </div>
+        ${extraMeta.length ? `<div class="meta-row" style="margin-top:10px;">${extraMeta.join('')}</div>` : ''}
+        <div class="result-actions">
+          <button class="action-btn primary" type="button" id="showOnMapBtn">Show on map</button>
+          <button class="action-btn secondary" type="button" id="browseZoneBtn">Zone contents</button>
+          ${entry.link ? `<a class="action-btn secondary" href="${entry.link}" target="_blank" rel="noopener noreferrer">Open product</a>` : ''}
+        </div>
+        <div class="status-line">${entry.source === 'inventory'
+          ? 'Inventory results are the bridge to SKU-level location. The placement shown here is a likely section until individually verified.'
+          : 'Curated results are the current wayfinding anchors and should feel stable for customer-facing use.'}</div>
       `;
+      document.getElementById('showOnMapBtn').addEventListener('click', () => {
+        state.view = 'find';
+        syncView();
+        window.scrollTo({ top: document.getElementById('findContent').offsetTop - 10, behavior: 'smooth' });
+      });
+      document.getElementById('browseZoneBtn').addEventListener('click', () => {
+        state.view = 'staff';
+        syncView();
+        window.scrollTo({ top: document.getElementById('staffView').offsetTop - 10, behavior: 'smooth' });
+      });
     }
 
-    function renderFocusMap(item) {
-      const zone = getZone(item.zoneId);
-      els.mapStage.innerHTML = `
-        ${renderSchematicSvg(item, 'focus')}
-        <p class="map-zoom-note">Focused map keeps one destination large enough to read on a phone and leaves the rest of the nursery quiet.</p>
-      `;
-
-      els.directionCard.innerHTML = `
-        <h3>${item.name}</h3>
-        <p><strong>Go to:</strong> ${zone.label}</p>
-        <p><strong>Area cue:</strong> ${state.mode === 'customer' ? zone.customerCue : zone.staffCue}</p>
-        <p><strong>Nearby reference:</strong> ${item.landmark}</p>
-        <p><strong>What is here:</strong> ${item.zoneContents.join(', ')}</p>
-      `;
-
-      els.mapIntro.textContent = `${item.name} now opens as an actual focused schematic map instead of a placeholder block layout.`;
+    function renderQuickFinds(){
+      els.quickGrid.innerHTML = CURATED.filter(i => i.quick).map(item => `
+        <button class="browse-btn" type="button" data-select="curated:${item.id}">
+          <strong>${item.name}</strong>
+          <span>${getZone(item.zoneId).name}</span>
+        </button>`).join('');
+      els.quickGrid.querySelectorAll('[data-select]').forEach(btn => btn.addEventListener('click', () => selectKey(btn.dataset.select)));
     }
 
-    function renderFullMap(item) {
-      els.mapStage.innerHTML = `
-        ${renderSchematicSvg(item, 'full')}
-        <p class="map-zoom-note">Full map is for orientation and training. For live customer help, use the focused map first.</p>
-      `;
-
-      if (item) {
-        const zone = getZone(item.zoneId);
-        els.directionCard.innerHTML = `
-          <h3>${item.name}</h3>
-          <p><strong>Best destination:</strong> ${zone.label}</p>
-          <p><strong>Map role:</strong> full overview for context and supervisor review.</p>
-          <p><strong>Best practice:</strong> use Focus Map for fast customer direction, then use Full Map when someone wants the bigger picture.</p>
-        `;
-      } else {
-        els.directionCard.innerHTML = `
-          <h3>Full nursery map</h3>
-          <p>Use this for orientation, training, and understanding the overall nursery layout.</p>
-        `;
-      }
-      els.mapIntro.textContent = 'The full map is a real simplified nursery schematic now, but it still stays secondary to focused map for live mobile use.';
-    }
-
-    function renderMap() {
-
-      els.focusMapBtn.classList.toggle('active', state.mapMode === 'focus');
-      els.fullMapBtn.classList.toggle('active', state.mapMode === 'full');
-      const item = getItem(state.selectedItemId);
-      if (!item) {
-        renderFullMap(null);
+    function renderSearchResults(){
+      const term = norm(state.search);
+      if(!term){
+        els.searchResults.classList.add('hidden');
+        els.searchResults.innerHTML = '';
         return;
       }
-      if (state.mapMode === 'focus') renderFocusMap(item);
-      else renderFullMap(item);
+      const results = getSearchResults().slice(0, 12);
+      els.searchResults.classList.remove('hidden');
+      els.searchResults.innerHTML = results.length ? results.map(entry => `
+        <button class="search-result-btn ${entry.key === state.selectedKey ? 'active' : ''}" type="button" data-select="${entry.key}">
+          <strong>${entry.headline}</strong>
+          <span>${entry.destination} ${entry.sku ? `· SKU ${entry.sku}` : ''} ${entry.landmark ? `· ${entry.landmark}` : ''}</span>
+        </button>`).join('') : `<div class="helper">No matches yet. Try a plant name, category, or SKU.</div>`;
+      els.searchResults.querySelectorAll('[data-select]').forEach(btn => btn.addEventListener('click', () => selectKey(btn.dataset.select)));
     }
 
-    function staffZoneHtml(item) {
-      const zone = getZone(item.zoneId);
-      return `
-        <article class="staff-zone">
-          <h3>${item.name}</h3>
-          <p><strong>Zone:</strong> ${zone.label} · ${zone.staffCue}</p>
-          <p><strong>Customer wording:</strong> ${item.customerCopy}</p>
-          <p><strong>Staff note:</strong> ${item.staffCopy}</p>
-          <p><strong>Search aliases:</strong> ${item.searchAliases.join(', ')}</p>
-          <p><strong>Zone contents:</strong> ${item.zoneContents.join(', ')}</p>
-          <p><strong>Confidence:</strong> ${item.confidence}</p>
-          <div class="inline-actions" style="margin-top:10px;">
-            <button class="action-btn primary" type="button" data-staff-map-id="${item.id}">Show on map</button>
-          </div>
-        </article>
-      `;
+    function renderBrowse(){
+      els.browseGrid.innerHTML = BROWSE_CARDS.map(card => `
+        <button class="browse-btn" type="button" data-select="${card.select}">
+          <strong>${card.title}</strong>
+          <span>${card.sub}</span>
+        </button>`).join('');
+      els.browseGrid.querySelectorAll('[data-select]').forEach(btn => btn.addEventListener('click', () => {
+        selectKey(btn.dataset.select);
+        state.view = 'find';
+        syncView();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }));
     }
 
-    function renderStaff() {
-      const term = normalizeText(state.staffTerm);
-      const results = ITEMS.filter(item => itemMatchesTerm(item, term));
-      els.staffSummary.innerHTML = `
-        <span class="pill">${results.length} records</span>
-        <span class="pill">Selected: ${getItem(state.selectedItemId)?.name || 'None'}</span>
-      `;
-      els.staffZones.innerHTML = results.map(staffZoneHtml).join('');
-      els.staffZones.querySelectorAll('[data-staff-map-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.selectedItemId = btn.dataset.staffMapId;
-          state.mapMode = 'focus';
-          setTab('map');
-        });
-      });
+    function renderStaff(){
+      const curatedCount = CURATED.length;
+      const plantCount = state.plants.length;
+      const mapped = state.plants.filter(p => inferZoneForPlant(p).confidence !== 'needs verification').length;
+      els.inventorySummary.textContent = state.inventoryLoaded
+        ? `${plantCount} inventory rows loaded from plants.json. ${mapped} currently map to a likely property section. ${curatedCount} curated wayfinding anchors are baked into this testing index.`
+        : `plants.json has not loaded yet in this environment. Curated wayfinding anchors still work, but SKU-level matching needs the inventory file next to this page.`;
+
+      els.zoneGrid.innerHTML = ZONES.map(zone => {
+        const curatedHere = CURATED.filter(item => item.zoneId === zone.id).map(item => item.name);
+        const inventoryHere = state.plants.filter(p => inferZoneForPlant(p).zoneId === zone.id).slice(0, 8).map(p => p.name);
+        const aliases = unique([...curatedHere, ...inventoryHere]);
+        return `
+          <article class="zone-card">
+            <h4>${zone.name}</h4>
+            <p>${zone.display}</p>
+            <div class="tag-row">
+              <span class="inventory-pill good">${zone.group}</span>
+              <span class="meta-pill">${aliases.length} indexed names</span>
+            </div>
+            <ul>
+              ${zone.contents.slice(0,5).map(item => `<li>${item}</li>`).join('')}
+              ${aliases.slice(0,5).map(item => `<li>${item}</li>`).join('')}
+            </ul>
+          </article>`;
+      }).join('');
     }
 
-    function wireEvents() {
-      els.themeToggle.addEventListener('click', () => setTheme(state.theme === 'dark' ? 'light' : 'dark'));
-      els.modeButtons.forEach(btn => btn.addEventListener('click', () => setMode(btn.dataset.mode)));
-      els.tabButtons.forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
-
-      els.findSearch.addEventListener('input', () => {
-        state.findTerm = els.findSearch.value;
-        renderFind();
-      });
-      els.clearSearchBtn.addEventListener('click', () => {
-        state.findTerm = '';
-        els.findSearch.value = '';
-        state.activeFilter = 'all';
-        renderFind();
-      });
-
-      els.focusMapBtn.addEventListener('click', () => {
-        state.mapMode = 'focus';
-        renderMap();
-      });
-      els.fullMapBtn.addEventListener('click', () => {
-        state.mapMode = 'full';
-        renderMap();
-      });
-
-      els.staffSearch.addEventListener('input', () => {
-        state.staffTerm = els.staffSearch.value;
-        renderStaff();
-      });
-      els.staffClearBtn.addEventListener('click', () => {
-        state.staffTerm = '';
-        els.staffSearch.value = '';
-        renderStaff();
-      });
+    function syncView(){
+      els.findView.classList.toggle('hidden', state.view !== 'find');
+      els.findContent.classList.toggle('hidden', state.view !== 'find');
+      els.browseView.classList.toggle('hidden', state.view !== 'browse');
+      els.staffView.classList.toggle('hidden', state.view !== 'staff');
+      els.viewButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === state.view));
+      if(state.view === 'staff') renderStaff();
     }
+
+    function selectKey(key){
+      state.selectedKey = key;
+      renderResultCard();
+      renderMaps();
+      renderSearchResults();
+    }
+
+    async function loadPlants(){
+      try {
+        const res = await fetch('./plants.json', { cache: 'no-store' });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        state.plants = Array.isArray(data) ? data : [];
+        state.inventoryLoaded = true;
+      } catch (err) {
+        console.warn('plants.json not loaded in this environment:', err.message);
+        state.plants = [];
+        state.inventoryLoaded = false;
+      }
+      renderSearchResults();
+      renderResultCard();
+      renderMaps();
+      renderStaff();
+    }
+
+    els.themeBtn.addEventListener('click', () => setTheme(state.theme === 'dark' ? 'light' : 'dark'));
+    els.viewButtons.forEach(btn => btn.addEventListener('click', () => { state.view = btn.dataset.view; syncView(); }));
+    els.modeButtons.forEach(btn => btn.addEventListener('click', () => {
+      state.mode = btn.dataset.mode;
+      els.modeButtons.forEach(other => other.classList.toggle('active', other === btn));
+      renderResultCard();
+      renderMaps();
+    }));
+    els.routeToggle.addEventListener('click', () => {
+      state.routeCue = !state.routeCue;
+      els.routeToggle.classList.toggle('active', state.routeCue);
+      els.routeToggle.textContent = `Route cue ${state.routeCue ? 'on' : 'off'}`;
+      renderMaps();
+    });
+    els.findInput.addEventListener('input', e => {
+      state.search = e.target.value;
+      renderSearchResults();
+      const results = getSearchResults();
+      if(results.length) state.selectedKey = results[0].key;
+      renderResultCard();
+      renderMaps();
+    });
+    els.clearSearch.addEventListener('click', () => {
+      state.search = '';
+      els.findInput.value = '';
+      state.selectedKey = 'curated:hydrangeas';
+      renderSearchResults();
+      renderResultCard();
+      renderMaps();
+    });
 
     setTheme(state.theme);
-    wireEvents();
-    renderHeroCopy();
-    renderFind();
+    renderQuickFinds();
     renderBrowse();
-    renderMap();
+    renderResultCard();
+    renderMaps();
     renderStaff();
+    syncView();
+    loadPlants();
   </script>
 </body>
 </html>
