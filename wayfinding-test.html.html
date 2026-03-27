@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suburban Wayfinding v1</title>
+  <style>
+    :root {
+      --bg: #071325;
+      --bg-elev: #0d1d36;
+      --bg-soft: #132746;
+      --panel: #10233f;
+      --text: #eef4ff;
+      --text-muted: #b7c4da;
+      --border: #29456f;
+      --accent: #7bd05f;
+      --accent-2: #88d87b;
+      --chip-bg: #17325a;
+      --chip-text: #eef4ff;
+      --shadow: 0 14px 34px rgba(0,0,0,.28);
+      --success: #67c35f;
+      --warning: #efc45e;
+      --danger: #f08b8b;
+      --map-muted: rgba(255,255,255,.06);
+      --map-soft: rgba(255,255,255,.12);
+      --yhi: #ffd34f;
+    }
+
+    html[data-theme="light"] {
+      --bg: #eef4fb;
+      --bg-elev: #ffffff;
+      --bg-soft: #e7eef8;
+      --panel: #dde7f5;
+      --text: #182435;
+      --text-muted: #526274;
+      --border: #c5d3e8;
+      --accent: #58b641;
+      --accent-2: #65c24d;
+      --chip-bg: #d8e5f7;
+      --chip-text: #182435;
+      --shadow: 0 10px 24px rgba(0,0,0,.08);
+      --map-muted: rgba(24,36,53,.05);
+      --map-soft: rgba(24,36,53,.11);
+      --yhi: #d39500;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(89,156,93,.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(89,156,93,.08), transparent 24%),
+        var(--bg);
+    }
+
+    .shell {
+      width: min(1100px, calc(100% - 20px));
+      margin: 0 auto;
+      padding: 14px 0 92px;
+    }
+
+    .hero, .panel, .map-card, .result-card, .browse-card, .zone-card, .staff-zone {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      border-radius: 26px;
+      padding: 18px 18px 16px;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 5vw, 2.4rem);
+      line-height: 1.02;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      color: var(--text-muted);
+      line-height: 1.34;
+      font-size: .98rem;
+      max-width: 700px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+      min-width: fit-content;
+    }
+
+    .mode-switch, .tab-switch {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px;
+      background: var(--bg-soft);
+      gap: 4px;
+    }
+
+    .seg-btn, .tab-btn, .theme-toggle, .action-btn, .chip, .quick-btn, .browse-btn, .map-toggle, .staff-search-btn {
+      border: 1px solid var(--border);
+      background: var(--bg-elev);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 11px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+      text-decoration: none;
+      font-size: .95rem;
+    }
+
+    .seg-btn.active, .tab-btn.active, .chip.active, .map-toggle.active, .browse-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .theme-toggle {
+      white-space: nowrap;
+    }
+
+    .sticky-tabs {
+      position: sticky;
+      top: 8px;
+      z-index: 20;
+      margin-bottom: 12px;
+      backdrop-filter: blur(8px);
+    }
+
+    .tab-switch {
+      width: 100%;
+      overflow-x: auto;
+      scrollbar-width: none;
+      background: rgba(16,35,63,.84);
+    }
+    .tab-switch::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      white-space: nowrap;
+      flex: 1 0 auto;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .search-panel {
+      border-radius: 28px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: stretch;
+      margin-bottom: 12px;
+    }
+
+    .search-input, .staff-search-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      color: var(--text);
+      border-radius: 20px;
+      padding: 16px 18px;
+      font-size: 1.03rem;
+      outline: none;
+    }
+
+    .search-input::placeholder, .staff-search-input::placeholder { color: var(--text-muted); }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      font-weight: 900;
+    }
+
+    .subcopy {
+      margin: 0 0 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      font-size: .96rem;
+    }
+
+    .quick-grid, .browse-grid, .results-list, .staff-zone-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .browse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .quick-btn, .browse-btn {
+      border-radius: 18px;
+      padding: 16px 14px;
+      text-align: left;
+      background: linear-gradient(180deg, rgba(98,126,176,.18), rgba(30,48,80,.18));
+      min-height: 74px;
+    }
+
+    .quick-btn .small, .browse-btn .small {
+      display: block;
+      margin-top: 6px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: .86rem;
+    }
+
+    .chip-row, .meta-row, .inline-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: .9rem;
+      background: var(--chip-bg);
+      color: var(--chip-text);
+    }
+
+    .summary-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg-soft);
+      padding: 9px 12px;
+      font-weight: 800;
+      font-size: .9rem;
+    }
+
+    .result-card {
+      border-radius: 26px;
+      padding: 16px;
+    }
+
+    .result-card.primary {
+      border-color: rgba(123,208,95,.55);
+      box-shadow: 0 0 0 1px rgba(123,208,95,.22), var(--shadow);
+    }
+
+    .result-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .result-title {
+      margin: 0;
+      font-size: 1.18rem;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .result-type {
+      color: var(--text-muted);
+      font-size: .9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .destination-line {
+      margin: 2px 0 0;
+      font-size: 1.18rem;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .destination-line strong { color: var(--accent); }
+
+    .cue-line {
+      margin: 8px 0 0;
+      color: var(--text);
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .detail-line {
+      margin: 6px 0 0;
+      color: var(--text-muted);
+      line-height: 1.38;
+      font-size: .95rem;
+    }
+
+    .tag {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(123,208,95,.12);
+      color: var(--text);
+      padding: 8px 11px;
+      font-size: .84rem;
+      font-weight: 800;
+    }
+
+    .action-btn {
+      border-radius: 16px;
+      padding: 13px 14px;
+      flex: 1 1 0;
+      text-align: center;
+    }
+
+    .action-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .focus-header, .map-header, .staff-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .map-card {
+      border-radius: 30px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .map-stage {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(19,39,70,.65), rgba(11,24,43,.8));
+      border-radius: 28px;
+      padding: 14px;
+      min-height: 380px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    html[data-theme="light"] .map-stage {
+      background: linear-gradient(180deg, rgba(231,238,248,.95), rgba(244,247,252,.95));
+    }
+
+    .you-are-here {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,0,0,.34);
+      color: white;
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+    }
+
+    html[data-theme="light"] .you-are-here {
+      background: rgba(24,36,53,.82);
+    }
+
+    .you-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--yhi);
+      box-shadow: 0 0 0 4px rgba(255,211,79,.18);
+      flex: 0 0 auto;
+    }
+
+    .map-group-title {
+      font-size: .9rem;
+      color: var(--text-muted);
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .group-note {
+      color: var(--text-muted);
+      font-size: .9rem;
+      margin: 8px 0 0;
+      line-height: 1.35;
+    }
+
+    .hoop-grid, .field-grid, .main-grid, .central-grid, .full-map-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .hoop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 54px; }
+    .field-grid, .main-grid, .central-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 54px; }
+    .full-map-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 54px; }
+
+    .map-zone {
+      min-height: 96px;
+      border-radius: 22px;
+      border: 1px solid transparent;
+      background: var(--map-muted);
+      color: var(--text);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-zone.highlight {
+      background: linear-gradient(180deg, rgba(123,208,95,.22), rgba(123,208,95,.12));
+      border-color: rgba(123,208,95,.65);
+      box-shadow: 0 0 0 1px rgba(123,208,95,.18);
+    }
+
+    .map-zone.faded {
+      opacity: .42;
+    }
+
+    .zone-label {
+      font-size: .84rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text-muted);
+      font-weight: 800;
+    }
+
+    .zone-title {
+      font-weight: 900;
+      font-size: 1rem;
+      line-height: 1.14;
+    }
+
+    .zone-copy {
+      color: var(--text-muted);
+      font-size: .88rem;
+      line-height: 1.28;
+    }
+
+    .flag-badge {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 8px;
+      background: rgba(0,0,0,.18);
+      font-size: .78rem;
+      font-weight: 800;
+    }
+
+    .flag-tri {
+      width: 0; height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-bottom: 12px solid currentColor;
+      transform: rotate(90deg);
+      display: inline-block;
+    }
+
+    .direction-card {
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 16px;
+      background: var(--bg-soft);
+    }
+
+    .direction-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+
+    .direction-card p {
+      margin: 6px 0;
+      line-height: 1.4;
+      color: var(--text-muted);
+    }
+
+    .full-map-note {
+      margin-top: 10px;
+      color: var(--text-muted);
+      font-size: .92rem;
+      line-height: 1.4;
+    }
+
+    .staff-search {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .staff-zone {
+      border-radius: 22px;
+      padding: 14px;
+    }
+
+    .staff-zone h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+    }
+
+    .staff-zone p {
+      margin: 6px 0;
+      color: var(--text-muted);
+      line-height: 1.36;
+      font-size: .94rem;
+    }
+
+    .soft-link {
+      color: var(--accent-2);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    @media (min-width: 860px) {
+      .quick-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .browse-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .results-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .staff-zone-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hoop-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .field-grid, .main-grid, .central-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .full-map-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .map-stage { min-height: 420px; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(100%, calc(100% - 12px)); padding-top: 10px; }
+      .hero {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px 14px;
+        border-radius: 22px;
+      }
+      .hero-actions { align-items: stretch; }
+      .search-row, .staff-search { grid-template-columns: 1fr; }
+      .action-btn { flex: 1 1 100%; }
+      .map-stage { min-height: 360px; padding: 12px; }
+      .hoop-grid, .field-grid, .main-grid, .central-grid, .full-map-grid { padding-top: 50px; }
+      .map-zone { min-height: 90px; }
+      .tab-btn { min-width: 100px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div>
+        <h1>Find It at Suburban</h1>
+        <p id="heroCopy">Search first, answer fast, and only show the part of the nursery map that matters. This version is designed for live customer use on mobile.</p>
+      </div>
+      <div class="hero-actions">
+        <div class="mode-switch" aria-label="Audience mode">
+          <button class="seg-btn active" type="button" data-mode="customer">Customer</button>
+          <button class="seg-btn" type="button" data-mode="staff">Staff</button>
+        </div>
+        <button id="themeToggle" class="theme-toggle" type="button">Theme: Dark</button>
+      </div>
+    </header>
+
+    <div class="sticky-tabs">
+      <nav class="tab-switch" aria-label="Primary navigation">
+        <button class="tab-btn active" type="button" data-tab="find">Find</button>
+        <button class="tab-btn" type="button" data-tab="browse">Browse</button>
+        <button class="tab-btn" type="button" data-tab="map">Map</button>
+        <button class="tab-btn" type="button" data-tab="staff">Staff</button>
+      </nav>
+    </div>
+
+    <section id="findView" class="view active">
+      <div class="panel search-panel">
+        <div class="search-row">
+          <input id="findSearch" class="search-input" type="search" placeholder="Find hydrangea, dogwood, yew, Japanese maple..." />
+          <button id="clearSearchBtn" class="action-btn" type="button">Clear</button>
+        </div>
+
+        <h2 class="section-title">Quick finds</h2>
+        <p class="subcopy">These are the asks most likely to come up in the aisle. Tap one and you should have an answer in seconds.</p>
+        <div id="quickGrid" class="quick-grid"></div>
+
+        <div class="summary-pills" id="findSummary"></div>
+
+        <h2 class="section-title">Quick filters</h2>
+        <div id="filterChips" class="chip-row"></div>
+      </div>
+
+      <div id="findResults" class="results-list"></div>
+    </section>
+
+    <section id="browseView" class="view">
+      <div class="panel search-panel">
+        <h2 class="section-title">Browse by category</h2>
+        <p class="subcopy">Use browse when the customer knows the type of plant but not the exact name.</p>
+        <div id="browseGrid" class="browse-grid"></div>
+      </div>
+      <div class="summary-pills" id="browseSummary"></div>
+      <div id="browseResults" class="results-list"></div>
+    </section>
+
+    <section id="mapView" class="view">
+      <div class="map-card">
+        <div class="focus-header">
+          <div>
+            <h2 class="section-title" style="margin-bottom:4px;">Focused map</h2>
+            <p class="subcopy" id="mapIntro">Choose a result to show a clear, mobile-sized map slice instead of the whole nursery at once.</p>
+          </div>
+          <div class="inline-actions">
+            <button id="focusMapBtn" class="map-toggle active" type="button">Focus Map</button>
+            <button id="fullMapBtn" class="map-toggle" type="button">Full Map</button>
+          </div>
+        </div>
+
+        <div id="mapStage" class="map-stage"></div>
+        <div id="directionCard" class="direction-card"></div>
+      </div>
+    </section>
+
+    <section id="staffView" class="view">
+      <div class="panel search-panel">
+        <div class="staff-header">
+          <div>
+            <h2 class="section-title">Staff quick reference</h2>
+            <p class="subcopy">This is the richer internal layer: exact zone names, grouped contents, and alternate wording customers might use.</p>
+          </div>
+        </div>
+
+        <div class="staff-search">
+          <input id="staffSearch" class="staff-search-input" type="search" placeholder="Search a zone, plant, or customer phrase..." />
+          <button id="staffClearBtn" class="staff-search-btn" type="button">Clear</button>
+        </div>
+
+        <div class="summary-pills" id="staffSummary"></div>
+      </div>
+
+      <div id="staffZones" class="staff-zone-list"></div>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      theme: localStorage.getItem('suburban-theme') || 'dark',
+      mode: 'customer',
+      tab: 'find',
+      findTerm: '',
+      activeFilter: 'all',
+      browseCategory: 'trees',
+      selectedItemId: 'hydrangeas',
+      mapMode: 'focus',
+      staffTerm: ''
+    };
+
+    const ZONES = [
+      { id: 'sun-perennials', label: 'Sun Perennials', short: 'Sun Perennials', focusGroup: 'main', customerCue: 'Main perennial area', staffCue: 'Main building / perennial court', nearby: 'Near shade perennials and annuals' },
+      { id: 'shade-perennials', label: 'Shade Perennials', short: 'Shade Perennials', focusGroup: 'main', customerCue: 'Main perennial area', staffCue: 'Main building / perennial court', nearby: 'Near sun perennials' },
+      { id: 'annuals', label: 'Annuals', short: 'Annuals', focusGroup: 'main', customerCue: 'Main annual color area', staffCue: 'Main building annual beds', nearby: 'Near tropicals' },
+      { id: 'tropicals', label: 'Tropicals', short: 'Tropicals', focusGroup: 'main', customerCue: 'Main tropical area', staffCue: 'Main building tropical display', nearby: 'Near annuals' },
+      { id: 'checkout', label: 'Checkout', short: 'Checkout', focusGroup: 'main', customerCue: 'Front service area', staffCue: 'Front register and customer service', nearby: 'Near entrance' },
+
+      { id: 'house-1', label: 'House 1', short: '1', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 1', nearby: 'Near House 2' },
+      { id: 'house-2', label: 'House 2', short: '2', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 2', nearby: 'Near House 1 and House 3' },
+      { id: 'house-3', label: 'House 3', short: '3', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 3', nearby: 'Near House 2 and House 4' },
+      { id: 'house-4', label: 'House 4', short: '4', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 4', nearby: 'Near House 3 and House 5' },
+      { id: 'house-5', label: 'House 5', short: '5', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 5', nearby: 'Near House 4 and House 6' },
+      { id: 'house-6', label: 'House 6', short: '6', focusGroup: 'hoop', customerCue: 'Right-side hoop houses', staffCue: 'Hoop House 6', nearby: 'Near House 5 and House 7' },
+      { id: 'house-7', label: 'House 7', short: '7', focusGroup: 'hoop', customerCue: 'Upper-right hoop houses', staffCue: 'Hoop House 7', nearby: 'Near House 6 and House 8' },
+      { id: 'house-8', label: 'House 8', short: '8', focusGroup: 'hoop', customerCue: 'Upper-right hoop houses', staffCue: 'Hoop House 8', nearby: 'Near House 7' },
+
+      { id: 'flowering-shrubs', label: 'Flowering Shrubs', short: 'Flowering Shrubs', focusGroup: 'central', customerCue: 'Central nursery area', staffCue: 'Open flowering shrub section', nearby: 'Near Roses & Grasses' },
+      { id: 'roses-grasses', label: 'Roses & Grasses', short: 'Roses', focusGroup: 'central', customerCue: 'Central nursery area', staffCue: 'Roses and ornamental grasses', nearby: 'Near Flowering Shrubs' },
+      { id: 'container-trees', label: 'Container Trees', short: 'Container Trees', focusGroup: 'central', customerCue: 'Central nursery area', staffCue: 'Containerized tree stock', nearby: 'Near field trees' },
+      { id: 'evergreen-shrubs', label: 'Evergreen Trees & Shrubs', short: 'Evergreens', focusGroup: 'central', customerCue: 'Central nursery area', staffCue: 'Evergreen trees and shrubs', nearby: 'Near container trees' },
+
+      { id: 'zone-a', label: 'Ball & Burlap A', short: 'A', focusGroup: 'field', customerCue: 'Top field trees', staffCue: 'Ball & Burlap A', nearby: 'Near B' },
+      { id: 'zone-b', label: 'Ball & Burlap B', short: 'B', focusGroup: 'field', customerCue: 'Top field trees', staffCue: 'Ball & Burlap B', nearby: 'Near A and C' },
+      { id: 'zone-c', label: 'Ball & Burlap C', short: 'C', focusGroup: 'field', customerCue: 'Top field trees', staffCue: 'Ball & Burlap C', nearby: 'Near B and D' },
+      { id: 'zone-d', label: 'Ball & Burlap D', short: 'D', focusGroup: 'field', customerCue: 'Top field trees', staffCue: 'Ball & Burlap D', nearby: 'Near C' }
+    ];
+
+    const ITEMS = [
+      {
+        id: 'hydrangeas', name: 'Hydrangeas', category: 'shrubs', zoneId: 'house-5',
+        traits: ['shade-friendly', 'pollinator-friendly'], quick: true,
+        searchAliases: ['hydrangea'],
+        customerCopy: 'Go to House 5. Right-side hoop houses.',
+        staffCopy: 'Primary hydrangea house.',
+        landmark: 'Near House 4 and House 6',
+        zoneContents: ['Hydrangeas'],
+        confidence: 'verified'
+      },
+      {
+        id: 'japanese-maples', name: 'Japanese Maples', category: 'trees', zoneId: 'house-7',
+        traits: ['deer-resistant'], quick: true,
+        searchAliases: ['japanese maple', 'maples'],
+        customerCopy: 'Go to House 7. Upper-right hoop houses.',
+        staffCopy: 'Primary Japanese maple house.',
+        landmark: 'Near Dogwoods in House 8',
+        zoneContents: ['Japanese Maples'],
+        confidence: 'verified'
+      },
+      {
+        id: 'dogwoods', name: 'Dogwoods', category: 'trees', zoneId: 'house-8',
+        traits: ['pollinator-friendly', 'bird-friendly'], quick: true,
+        searchAliases: ['dogwood', 'dogwood trees'],
+        customerCopy: 'Go to House 8. Upper-right hoop houses.',
+        staffCopy: 'Dogwood tree house.',
+        landmark: 'Near Japanese Maples in House 7',
+        zoneContents: ['Dogwood Trees'],
+        confidence: 'verified'
+      },
+      {
+        id: 'yews', name: 'Yews', category: 'shrubs', zoneId: 'house-2',
+        traits: ['deer-resistant', 'shade-friendly'], quick: true,
+        searchAliases: ['yew'],
+        customerCopy: 'Go to House 2. Right-side hoop houses.',
+        staffCopy: 'Primary yew house.',
+        landmark: 'Evergreen shrub section',
+        zoneContents: ['Yews'],
+        confidence: 'verified'
+      },
+      {
+        id: 'shade-shrubs', name: 'Shade Shrubs', category: 'shrubs', zoneId: 'house-3',
+        traits: ['shade-friendly'], quick: true,
+        searchAliases: ['hollies', 'holly', 'laurel', 'inkberry', 'pieris', 'clethra', 'winterberry', 'fothergilla', 'mahonia'],
+        customerCopy: 'Go to House 3. Right-side hoop houses.',
+        staffCopy: 'Shade shrub house.',
+        landmark: 'Includes hollies, laurels, and related shrubs',
+        zoneContents: ['Holly', 'Inkberry Holly', 'Laurel', 'Mahonia', 'Pieris Japonica', 'Clethra', 'Winterberry', 'Fothergilla', 'Potentilla'],
+        confidence: 'verified'
+      },
+      {
+        id: 'azaleas-rhodies', name: 'Azaleas / Rhododendron', category: 'shrubs', zoneId: 'house-4',
+        traits: ['shade-friendly', 'pollinator-friendly'], quick: true,
+        searchAliases: ['azalea', 'azaleas', 'rhododendron', 'rhodies'],
+        customerCopy: 'Go to House 4. Right-side hoop houses.',
+        staffCopy: 'Azalea and rhododendron house.',
+        landmark: 'Between Shade Shrubs and Hydrangeas',
+        zoneContents: ['Azaleas', 'Rhododendron'],
+        confidence: 'verified'
+      },
+      {
+        id: 'redbuds-magnolias', name: 'Redbuds / Magnolias', category: 'trees', zoneId: 'house-6',
+        traits: ['pollinator-friendly', 'deer-resistant'], quick: true,
+        searchAliases: ['redbud', 'whitebud', 'magnolia', 'magnolias'],
+        customerCopy: 'Go to House 6. Right-side hoop houses.',
+        staffCopy: 'Redbud, whitebud, and magnolia house.',
+        landmark: 'Near House 5 and House 7',
+        zoneContents: ['Redbud', 'Whitebud', 'Magnolia'],
+        confidence: 'verified'
+      },
+      {
+        id: 'roses', name: 'Roses', category: 'shrubs', zoneId: 'roses-grasses',
+        traits: ['pollinator-friendly'], quick: true,
+        searchAliases: ['rose'],
+        customerCopy: 'Go to Roses & Grasses. Central nursery area.',
+        staffCopy: 'Shared roses and ornamental grasses section.',
+        landmark: 'Near Flowering Shrubs',
+        zoneContents: ['Roses', 'Ornamental Grasses'],
+        confidence: 'verified'
+      },
+      {
+        id: 'sun-perennials', name: 'Sun Perennials', category: 'perennials', zoneId: 'sun-perennials',
+        traits: [], quick: true,
+        searchAliases: ['perennials', 'sun perennial'],
+        customerCopy: 'Go to Sun Perennials. Main perennial area.',
+        staffCopy: 'Primary sun perennial section.',
+        landmark: 'Near Shade Perennials',
+        zoneContents: ['Main sun perennial assortment'],
+        confidence: 'verified'
+      },
+      {
+        id: 'shade-perennials', name: 'Shade Perennials', category: 'perennials', zoneId: 'shade-perennials',
+        traits: ['shade-friendly'], quick: true,
+        searchAliases: ['shade perennial'],
+        customerCopy: 'Go to Shade Perennials. Main perennial area.',
+        staffCopy: 'Primary shade perennial section.',
+        landmark: 'Near Sun Perennials',
+        zoneContents: ['Main shade perennial assortment'],
+        confidence: 'verified'
+      },
+      {
+        id: 'arborvitae', name: 'Arborvitae', category: 'trees', zoneId: 'zone-a',
+        traits: ['deer-resistant'], quick: false,
+        searchAliases: ['arborvitae trees'],
+        customerCopy: 'Go to Ball & Burlap A. Top field trees.',
+        staffCopy: 'Upright arborvitae section.',
+        landmark: 'Look for the A section in field trees',
+        zoneContents: ['Upright Arborvitae'],
+        confidence: 'verified'
+      },
+      {
+        id: 'juniper-pine', name: 'Juniper / Pine', category: 'trees', zoneId: 'zone-b',
+        traits: ['deer-resistant', 'drought-tolerant'], quick: false,
+        searchAliases: ['juniper', 'pine'],
+        customerCopy: 'Go to Ball & Burlap B. Top field trees.',
+        staffCopy: 'Juniper and pine section.',
+        landmark: 'Between A and C',
+        zoneContents: ['Juniper', 'Pine'],
+        confidence: 'verified'
+      },
+      {
+        id: 'evergreen-trees', name: 'Evergreen Trees', category: 'trees', zoneId: 'zone-c',
+        traits: ['deer-resistant'], quick: false,
+        searchAliases: ['spruce', 'cedar', 'cypress', 'evergreens'],
+        customerCopy: 'Go to Ball & Burlap C. Top field trees.',
+        staffCopy: 'Evergreen field tree section.',
+        landmark: 'Near Ball & Burlap D',
+        zoneContents: ['Spruce', 'Cedar', 'Cypress', 'Evergreens'],
+        confidence: 'verified'
+      },
+      {
+        id: 'deciduous-trees', name: 'Deciduous Trees', category: 'trees', zoneId: 'zone-d',
+        traits: ['shade-friendly'], quick: false,
+        searchAliases: ['maple', 'oak', 'linden', 'ginkgo', 'serviceberry', 'willow', 'tulip tree', 'dawn redwood', 'birch', 'elm', 'honeylocust'],
+        customerCopy: 'Go to Ball & Burlap D. Top field trees.',
+        staffCopy: 'Primary deciduous tree field section.',
+        landmark: 'Near Ball & Burlap C',
+        zoneContents: ['Aspen', 'Bald Cypress', 'Birch', 'Black Gum', 'Cherry', 'Crabapple', 'Elm', 'Ginkgo', 'Honeylocust', 'Hornbeam', 'Kentucky Coffee Tree', 'Linden', 'London Plane', 'Maple', 'Oak', 'Dawn Redwood', 'Serviceberry', 'Seven Sons', 'Tulip Tree', 'Willow'],
+        confidence: 'verified'
+      },
+      {
+        id: 'flowering-shrubs', name: 'Flowering Shrubs', category: 'shrubs', zoneId: 'flowering-shrubs',
+        traits: ['pollinator-friendly'], quick: false,
+        searchAliases: ['abelia', 'althea', 'barberry', 'butterfly bush', 'caryopteris', 'chokeberry', 'forsythia', 'ninebark', 'viburnum', 'weigela', 'spirea', 'sweetspire'],
+        customerCopy: 'Go to Flowering Shrubs. Central nursery area.',
+        staffCopy: 'Open flowering shrub section.',
+        landmark: 'Near Roses & Grasses',
+        zoneContents: ['Abelia', 'Althea', 'Barberry', 'Butterfly Bush', 'Caryopteris', 'Chokeberry', 'Cotoneaster', 'Euonymus', 'Forsythia', 'Mockorange', 'Ninebark', 'Privet', 'Quince', 'Sand Cherry', 'Spirea', 'Sweetspire', 'Viburnum', 'Weigela', 'Yucca'],
+        confidence: 'verified'
+      }
+    ];
+
+    const BROWSE = [
+      { id: 'trees', label: 'Trees', helper: 'Japanese maples, dogwoods, field trees' },
+      { id: 'shrubs', label: 'Shrubs', helper: 'Hydrangeas, roses, flowering shrubs' },
+      { id: 'perennials', label: 'Perennials', helper: 'Sun and shade perennial zones' },
+      { id: 'shade-friendly', label: 'Shade Plants', helper: 'House 2, 3, 4 and shade perennials' },
+      { id: 'deer-resistant', label: 'Deer Resistant', helper: 'Useful staff and customer shortcut' },
+      { id: 'pollinator-friendly', label: 'Pollinator Friendly', helper: 'Flowering shrubs, hydrangeas, dogwoods' },
+      { id: 'field-trees', label: 'Field Trees', helper: 'Ball & Burlap A, B, C, D' },
+      { id: 'central', label: 'Central Nursery', helper: 'Flowering shrubs, roses, container trees' }
+    ];
+
+    const els = {
+      html: document.documentElement,
+      heroCopy: document.getElementById('heroCopy'),
+      themeToggle: document.getElementById('themeToggle'),
+      modeButtons: [...document.querySelectorAll('.seg-btn')],
+      tabButtons: [...document.querySelectorAll('.tab-btn')],
+      views: {
+        find: document.getElementById('findView'),
+        browse: document.getElementById('browseView'),
+        map: document.getElementById('mapView'),
+        staff: document.getElementById('staffView')
+      },
+      findSearch: document.getElementById('findSearch'),
+      clearSearchBtn: document.getElementById('clearSearchBtn'),
+      quickGrid: document.getElementById('quickGrid'),
+      filterChips: document.getElementById('filterChips'),
+      findSummary: document.getElementById('findSummary'),
+      findResults: document.getElementById('findResults'),
+      browseGrid: document.getElementById('browseGrid'),
+      browseSummary: document.getElementById('browseSummary'),
+      browseResults: document.getElementById('browseResults'),
+      focusMapBtn: document.getElementById('focusMapBtn'),
+      fullMapBtn: document.getElementById('fullMapBtn'),
+      mapIntro: document.getElementById('mapIntro'),
+      mapStage: document.getElementById('mapStage'),
+      directionCard: document.getElementById('directionCard'),
+      staffSearch: document.getElementById('staffSearch'),
+      staffClearBtn: document.getElementById('staffClearBtn'),
+      staffSummary: document.getElementById('staffSummary'),
+      staffZones: document.getElementById('staffZones')
+    };
+
+    function normalizeText(v) {
+      return String(v || '').trim().toLowerCase();
+    }
+
+    function getZone(zoneId) {
+      return ZONES.find(z => z.id === zoneId);
+    }
+
+    function getItem(id) {
+      return ITEMS.find(item => item.id === id);
+    }
+
+    function setTheme(theme) {
+      state.theme = theme;
+      localStorage.setItem('suburban-theme', theme);
+      els.html.setAttribute('data-theme', theme);
+      els.themeToggle.textContent = theme === 'dark' ? 'Theme: Dark' : 'Theme: Light';
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      els.modeButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+      renderHeroCopy();
+      renderFind();
+      renderMap();
+      renderStaff();
+    }
+
+    function setTab(tab) {
+      state.tab = tab;
+      els.tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+      Object.entries(els.views).forEach(([key, view]) => view.classList.toggle('active', key === tab));
+      if (tab === 'map') renderMap();
+      if (tab === 'staff') renderStaff();
+      if (tab === 'browse') renderBrowse();
+      if (tab === 'find') renderFind();
+    }
+
+    function setSelectedItem(id, goToMap = false) {
+      state.selectedItemId = id;
+      if (goToMap) setTab('map');
+      renderFind();
+      renderBrowse();
+      renderMap();
+      renderStaff();
+    }
+
+    function itemMatchesTerm(item, term) {
+      if (!term) return true;
+      const haystack = [
+        item.name,
+        item.category,
+        item.customerCopy,
+        item.staffCopy,
+        item.landmark,
+        ...item.zoneContents,
+        ...item.searchAliases
+      ].join(' ').toLowerCase();
+      return haystack.includes(term);
+    }
+
+    function itemMatchesFilter(item, filter) {
+      if (filter === 'all') return true;
+      if (['trees', 'shrubs', 'perennials'].includes(filter)) return item.category === filter;
+      if (filter === 'field-trees') return getZone(item.zoneId)?.focusGroup === 'field';
+      if (filter === 'central') return getZone(item.zoneId)?.focusGroup === 'central';
+      return item.traits.includes(filter);
+    }
+
+    function getFindResults() {
+      const term = normalizeText(state.findTerm);
+      let results = ITEMS.filter(item => itemMatchesTerm(item, term) && itemMatchesFilter(item, state.activeFilter));
+      results = results.sort((a, b) => {
+        const aq = a.quick ? 0 : 1;
+        const bq = b.quick ? 0 : 1;
+        if (aq !== bq) return aq - bq;
+        return a.name.localeCompare(b.name);
+      });
+      return results;
+    }
+
+    function getBrowseResults() {
+      const key = state.browseCategory;
+      if (key === 'field-trees') return ITEMS.filter(item => getZone(item.zoneId)?.focusGroup === 'field');
+      if (key === 'central') return ITEMS.filter(item => getZone(item.zoneId)?.focusGroup === 'central');
+      if (['trees', 'shrubs', 'perennials'].includes(key)) return ITEMS.filter(item => item.category === key);
+      return ITEMS.filter(item => item.traits.includes(key));
+    }
+
+    function renderHeroCopy() {
+      const item = getItem(state.selectedItemId);
+      if (state.tab === 'find') {
+        els.heroCopy.textContent = state.mode === 'customer'
+          ? 'Search first, answer fast, and only show the part of the nursery map that matters. This version is designed for live customer use on mobile.'
+          : 'Staff mode adds more exact zone language, grouped contents, and alternate wording customers might use when asking where something is.';
+        return;
+      }
+      if (state.tab === 'browse') {
+        els.heroCopy.textContent = 'Browse is for customers who know the kind of plant they want but not the exact name. Cards stay first; map stays secondary.';
+        return;
+      }
+      if (state.tab === 'map') {
+        els.heroCopy.textContent = item
+          ? `Focused map for ${item.name}. The idea is to show only the part of the nursery that helps someone take the next step.`
+          : 'Focused map view highlights one destination at a time and keeps the rest of the nursery quiet.';
+        return;
+      }
+      els.heroCopy.textContent = 'Staff quick reference brings together zone contents, common synonyms, and a more operational way to answer questions on the floor.';
+    }
+
+    function quickCardHtml(item) {
+      const zone = getZone(item.zoneId);
+      return `
+        <button class="quick-btn" type="button" data-quick-id="${item.id}">
+          ${item.name}
+          <span class="small">${zone.label} · ${zone.customerCue}</span>
+        </button>
+      `;
+    }
+
+    function resultCardHtml(item, primary = false) {
+      const zone = getZone(item.zoneId);
+      const detailCopy = state.mode === 'customer' ? item.customerCopy : item.staffCopy;
+      return `
+        <article class="result-card ${primary ? 'primary' : ''}">
+          <div class="result-top">
+            <div>
+              <div class="result-type">${item.category}</div>
+              <h3 class="result-title">${item.name}</h3>
+            </div>
+            <div class="pill">${item.confidence}</div>
+          </div>
+          <p class="destination-line">Go to <strong>${zone.label}</strong></p>
+          <p class="cue-line">${state.mode === 'customer' ? zone.customerCue : zone.staffCue}</p>
+          <p class="detail-line">${item.landmark}</p>
+          <p class="detail-line">${detailCopy}</p>
+          <div class="meta-row" style="margin-top:12px;">
+            ${item.traits.map(trait => `<span class="tag">${trait.replace(/-/g, ' ')}</span>`).join('')}
+          </div>
+          <div class="inline-actions" style="margin-top:12px;">
+            <button class="action-btn primary" type="button" data-map-id="${item.id}">Show on map</button>
+            <button class="action-btn" type="button" data-detail-id="${item.id}">More details</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderFind() {
+      const quickItems = ITEMS.filter(item => item.quick);
+      els.quickGrid.innerHTML = quickItems.map(quickCardHtml).join('');
+
+      const filters = [
+        { id: 'all', label: 'All' },
+        { id: 'trees', label: 'Trees' },
+        { id: 'shrubs', label: 'Shrubs' },
+        { id: 'perennials', label: 'Perennials' },
+        { id: 'shade-friendly', label: 'Shade Friendly' },
+        { id: 'deer-resistant', label: 'Deer Resistant' },
+        { id: 'pollinator-friendly', label: 'Pollinator Friendly' }
+      ];
+      els.filterChips.innerHTML = filters.map(filter => `
+        <button class="chip ${state.activeFilter === filter.id ? 'active' : ''}" type="button" data-filter-id="${filter.id}">${filter.label}</button>
+      `).join('');
+
+      const results = getFindResults();
+      els.findSummary.innerHTML = `
+        <span class="pill">${results.length} matches</span>
+        <span class="pill">Filter: ${state.activeFilter.replace(/-/g, ' ')}</span>
+        <span class="pill">Mode: ${state.mode}</span>
+      `;
+
+      if (!results.length) {
+        els.findResults.innerHTML = `<div class="result-card"><h3 class="result-title">No matches yet</h3><p class="detail-line">Try a plant name, category, or ask a staff member.</p></div>`;
+      } else {
+        els.findResults.innerHTML = results.map((item, index) => resultCardHtml(item, index === 0)).join('');
+      }
+
+      els.quickGrid.querySelectorAll('[data-quick-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.quickId;
+          state.findTerm = getItem(id).name;
+          els.findSearch.value = state.findTerm;
+          setSelectedItem(id);
+        });
+      });
+
+      els.filterChips.querySelectorAll('[data-filter-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.activeFilter = btn.dataset.filterId;
+          renderFind();
+        });
+      });
+
+      els.findResults.querySelectorAll('[data-map-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.mapMode = 'focus';
+          state.selectedItemId = btn.dataset.mapId;
+          setTab('map');
+        });
+      });
+
+      els.findResults.querySelectorAll('[data-detail-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.selectedItemId = btn.dataset.detailId;
+          setTab('staff');
+        });
+      });
+    }
+
+    function renderBrowse() {
+      els.browseGrid.innerHTML = BROWSE.map(item => `
+        <button class="browse-btn ${state.browseCategory === item.id ? 'active' : ''}" type="button" data-browse-id="${item.id}">
+          ${item.label}
+          <span class="small">${item.helper}</span>
+        </button>
+      `).join('');
+
+      const results = getBrowseResults();
+      els.browseSummary.innerHTML = `
+        <span class="pill">${results.length} results</span>
+        <span class="pill">Category: ${BROWSE.find(item => item.id === state.browseCategory)?.label || state.browseCategory}</span>
+      `;
+      els.browseResults.innerHTML = results.map(item => resultCardHtml(item, item.id === state.selectedItemId)).join('');
+
+      els.browseGrid.querySelectorAll('[data-browse-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.browseCategory = btn.dataset.browseId;
+          renderBrowse();
+        });
+      });
+
+      els.browseResults.querySelectorAll('[data-map-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.mapMode = 'focus';
+          state.selectedItemId = btn.dataset.mapId;
+          setTab('map');
+        });
+      });
+
+      els.browseResults.querySelectorAll('[data-detail-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.selectedItemId = btn.dataset.detailId;
+          setTab('staff');
+        });
+      });
+    }
+
+    function buildZoneCard(zone, highlighted, faded, showFlag = false, flagLabel = '') {
+      return `
+        <div class="map-zone ${highlighted ? 'highlight' : ''} ${faded ? 'faded' : ''}">
+          ${showFlag ? `<div class="flag-badge"><span class="flag-tri"></span>${flagLabel}</div>` : ''}
+          <div class="zone-label">${zone.focusGroup}</div>
+          <div class="zone-title">${zone.label}</div>
+          <div class="zone-copy">${highlighted ? zone.customerCue : zone.nearby}</div>
+        </div>
+      `;
+    }
+
+    function renderFocusMap(item) {
+      const zone = getZone(item.zoneId);
+      const focusGroup = zone.focusGroup;
+      let list = ZONES.filter(z => z.focusGroup === focusGroup);
+      let groupClass = 'hoop-grid';
+      let title = 'Focused destination';
+      let note = zone.customerCue;
+      let flagZoneIds = [];
+
+      if (focusGroup === 'field') {
+        groupClass = 'field-grid';
+        title = 'Field trees focus';
+        note = 'Top field trees';
+        flagZoneIds = ['zone-a','zone-b','zone-c','zone-d'];
+      } else if (focusGroup === 'central') {
+        groupClass = 'central-grid';
+        title = 'Central nursery focus';
+        note = 'Central nursery area';
+      } else if (focusGroup === 'main') {
+        groupClass = 'main-grid';
+        title = 'Main building focus';
+        note = 'Main customer-facing court';
+      }
+
+      const cards = list.map(z => buildZoneCard(z, z.id === zone.id, z.id !== zone.id, flagZoneIds.includes(z.id), z.short)).join('');
+      els.mapStage.innerHTML = `
+        <div class="you-are-here"><span class="you-dot"></span>You are here</div>
+        <div class="map-group-title">${title}</div>
+        <div class="${groupClass}">${cards}</div>
+        <p class="group-note">Only the most relevant area is shown here so the destination stays easy to read on a phone.</p>
+      `;
+
+      els.directionCard.innerHTML = `
+        <h3>${item.name}</h3>
+        <p><strong>Go to:</strong> ${zone.label}</p>
+        <p><strong>Area cue:</strong> ${state.mode === 'customer' ? zone.customerCue : zone.staffCue}</p>
+        <p><strong>Nearby reference:</strong> ${item.landmark}</p>
+        <p><strong>What is here:</strong> ${item.zoneContents.join(', ')}</p>
+      `;
+
+      els.mapIntro.textContent = `${item.name} is shown as a focused map so the user sees the right slice of the nursery instead of a tiny full-site poster.`;
+    }
+
+    function renderFullMap(item) {
+      const highlightZoneId = item?.zoneId || '';
+      const cards = ZONES.filter(z => ['main','hoop','central','field'].includes(z.focusGroup)).map(z => buildZoneCard(z, z.id === highlightZoneId, false, z.focusGroup === 'field', z.short)).join('');
+      els.mapStage.innerHTML = `
+        <div class="you-are-here"><span class="you-dot"></span>You are here</div>
+        <div class="map-group-title">Full nursery overview</div>
+        <div class="full-map-grid">${cards}</div>
+        <p class="full-map-note">This is an orientation view only. It stays secondary because it is harder to read quickly on a phone than the focused map.</p>
+      `;
+
+      if (item) {
+        const zone = getZone(item.zoneId);
+        els.directionCard.innerHTML = `
+          <h3>${item.name}</h3>
+          <p><strong>Best destination:</strong> ${zone.label}</p>
+          <p><strong>Reason this view exists:</strong> overview and orientation, not primary navigation.</p>
+          <p><strong>Recommended use:</strong> use Focus Map for live customer direction, then fall back to this when the shopper wants the bigger picture.</p>
+        `;
+      } else {
+        els.directionCard.innerHTML = `
+          <h3>Full nursery map</h3>
+          <p>Use this as an overview and training aid. For live customer help, pick a result first so the app can show a cleaner focused map.</p>
+        `;
+      }
+      els.mapIntro.textContent = 'The full map is still available, but it is intentionally secondary. The primary live-use behavior should stay lookup-first and focus-map-driven.';
+    }
+
+    function renderMap() {
+      els.focusMapBtn.classList.toggle('active', state.mapMode === 'focus');
+      els.fullMapBtn.classList.toggle('active', state.mapMode === 'full');
+      const item = getItem(state.selectedItemId);
+      if (!item) {
+        renderFullMap(null);
+        return;
+      }
+      if (state.mapMode === 'focus') renderFocusMap(item);
+      else renderFullMap(item);
+    }
+
+    function staffZoneHtml(item) {
+      const zone = getZone(item.zoneId);
+      return `
+        <article class="staff-zone">
+          <h3>${item.name}</h3>
+          <p><strong>Zone:</strong> ${zone.label} · ${zone.staffCue}</p>
+          <p><strong>Customer wording:</strong> ${item.customerCopy}</p>
+          <p><strong>Staff note:</strong> ${item.staffCopy}</p>
+          <p><strong>Search aliases:</strong> ${item.searchAliases.join(', ')}</p>
+          <p><strong>Zone contents:</strong> ${item.zoneContents.join(', ')}</p>
+          <p><strong>Confidence:</strong> ${item.confidence}</p>
+          <div class="inline-actions" style="margin-top:10px;">
+            <button class="action-btn primary" type="button" data-staff-map-id="${item.id}">Show on map</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderStaff() {
+      const term = normalizeText(state.staffTerm);
+      const results = ITEMS.filter(item => itemMatchesTerm(item, term));
+      els.staffSummary.innerHTML = `
+        <span class="pill">${results.length} records</span>
+        <span class="pill">Selected: ${getItem(state.selectedItemId)?.name || 'None'}</span>
+      `;
+      els.staffZones.innerHTML = results.map(staffZoneHtml).join('');
+      els.staffZones.querySelectorAll('[data-staff-map-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.selectedItemId = btn.dataset.staffMapId;
+          state.mapMode = 'focus';
+          setTab('map');
+        });
+      });
+    }
+
+    function wireEvents() {
+      els.themeToggle.addEventListener('click', () => setTheme(state.theme === 'dark' ? 'light' : 'dark'));
+      els.modeButtons.forEach(btn => btn.addEventListener('click', () => setMode(btn.dataset.mode)));
+      els.tabButtons.forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
+
+      els.findSearch.addEventListener('input', () => {
+        state.findTerm = els.findSearch.value;
+        renderFind();
+      });
+      els.clearSearchBtn.addEventListener('click', () => {
+        state.findTerm = '';
+        els.findSearch.value = '';
+        state.activeFilter = 'all';
+        renderFind();
+      });
+
+      els.focusMapBtn.addEventListener('click', () => {
+        state.mapMode = 'focus';
+        renderMap();
+      });
+      els.fullMapBtn.addEventListener('click', () => {
+        state.mapMode = 'full';
+        renderMap();
+      });
+
+      els.staffSearch.addEventListener('input', () => {
+        state.staffTerm = els.staffSearch.value;
+        renderStaff();
+      });
+      els.staffClearBtn.addEventListener('click', () => {
+        state.staffTerm = '';
+        els.staffSearch.value = '';
+        renderStaff();
+      });
+    }
+
+    setTheme(state.theme);
+    wireEvents();
+    renderHeroCopy();
+    renderFind();
+    renderBrowse();
+    renderMap();
+    renderStaff();
+  </script>
+</body>
+</html>
