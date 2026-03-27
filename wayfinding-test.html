@@ -226,15 +226,15 @@
     const ZONES = [
       { id:'zone-a', name:'Ball & Burlap A', short:'A', display:'Arborvitae', group:'field', x:118, y:78, w:104, h:58, zoom:{x:70,y:40,w:520,h:260}, contents:['Upright Arborvitae'] },
       { id:'zone-b', name:'Ball & Burlap B', short:'B', display:'Juniper / Pine', group:'field', x:272, y:78, w:134, h:58, zoom:{x:120,y:40,w:560,h:260}, contents:['Juniper','Pine'] },
-      { id:'zone-c', name:'Ball & Burlap C', short:'C', display:'Conifers / Evergreens', group:'field', x:94, y:168, w:170, h:74, zoom:{x:58,y:48,w:650,h:310}, contents:['Spruce','Cedar','Cypress','Fir','Hemlock'] },
-      { id:'zone-d', name:'Ball & Burlap D', short:'D', display:'Deciduous Trees', group:'field', x:284, y:168, w:390, h:74, zoom:{x:150,y:48,w:660,h:310}, contents:['Maple','Oak','Linden','Ginkgo','Serviceberry','Willow'] },
+      { id:'zone-c', name:'Ball & Burlap C', short:'C', display:'Conifers / Evergreens', group:'field', x:94, y:168, w:170, h:74, zoom:{x:58,y:48,w:650,h:310}, contents:['Cedar','Cypress','Spruce','Evergreens'] },
+      { id:'zone-d', name:'Ball & Burlap D', short:'D', display:'Deciduous Trees', group:'field', x:284, y:168, w:390, h:74, zoom:{x:150,y:48,w:660,h:310}, contents:['Aspen','Bald Cypress','Birch','Black Gum','Cherry','Crabapple','Elm','Ginkgo','Honeylocust','Hornbeam','Kentucky Coffee Tree','Linden','London Plane','Maple','Oak','Dawn Redwood','Serviceberry','Seven Sons','Tulip Tree','Willow'] },
 
       { id:'container-trees', name:'Container Trees', short:'Container Trees', display:'Front tree rows', group:'central', x:236, y:286, w:224, h:74, zoom:{x:180,y:230,w:620,h:330}, contents:['Container-grown trees'] },
       { id:'center-bed', name:'Center Bed E', short:'E', display:'Center bed', group:'central', x:482, y:282, w:74, h:96, zoom:{x:240,y:236,w:560,h:320}, contents:['Mixed bed'] },
-      { id:'flowering-shrubs', name:'Flowering Shrubs', short:'Flowering Shrubs', display:'Open shrub beds', group:'central', x:578, y:286, w:148, h:186, zoom:{x:420,y:250,w:420,h:320}, contents:['Abelia','Barberry','Spirea','Viburnum','Weigela'] },
+      { id:'flowering-shrubs', name:'Flowering Shrubs', short:'Flowering Shrubs', display:'Open shrub beds', group:'central', x:578, y:286, w:148, h:186, zoom:{x:420,y:250,w:420,h:320}, contents:['Abelia','Althea','Barberry','Beautyberry','Burning Bush','Butterfly Bush','Caryopteris','Chokeberry','Cotoneaster','Forsythia','Mockorange','Ninebark','Privet','Quince','Sand Cherry','Spirea','Sweetspire','Viburnum','Weigela'] },
       { id:'playground', name:'Playground Edge', short:'Playground', display:'Landmark', group:'central', x:607, y:386, w:92, h:58, zoom:{x:470,y:300,w:310,h:220}, contents:['Landmark'] },
-      { id:'roses-grasses', name:'Roses & Grasses', short:'Roses & Grasses', display:'Lower central beds', group:'central', x:650, y:486, w:184, h:78, zoom:{x:500,y:360,w:380,h:280}, contents:['Roses','Ornamental grasses','Yucca'] },
-      { id:'evergreen-shrubs', name:'Evergreen Shrubs', short:'Evergreen Shrubs', display:'Evergreen trees & shrubs', group:'central', x:384, y:395, w:184, h:58, zoom:{x:260,y:300,w:400,h:240}, contents:['Boxwood','Holly','Laurel','Euonymus'] },
+      { id:'roses-grasses', name:'Roses & Grasses', short:'Roses & Grasses', display:'Lower central beds', group:'central', x:650, y:486, w:184, h:78, zoom:{x:500,y:360,w:380,h:280}, contents:['Roses','Ornamental Grasses','Yucca'] },
+      { id:'evergreen-shrubs', name:'Evergreen Shrubs', short:'Evergreen Shrubs', display:'Evergreen trees & shrubs', group:'central', x:384, y:395, w:184, h:58, zoom:{x:260,y:300,w:400,h:240}, contents:['Arborvitae Shrub','Boxwood','Euonymus','False Cypress','Juniper','Pine','Spruce'] },
 
       { id:'shade-perennials', name:'Shade Perennials', short:'Shade Perennials', display:'Main shade beds', group:'main', x:438, y:604, w:152, h:74, zoom:{x:360,y:540,w:360,h:210}, contents:['Shade perennial area'] },
       { id:'sun-perennials', name:'Sun Perennials', short:'Sun Perennials', display:'Sun perennial beds', group:'main', x:598, y:568, w:182, h:60, zoom:{x:500,y:520,w:360,h:210}, contents:['Sun perennial area'] },
@@ -244,7 +244,7 @@
 
       { id:'house-1', name:'House 1', short:'House 1', display:'Groundcovers / Vines', group:'hoop', x:782, y:126, w:156, h:52, zoom:{x:520,y:108,w:430,h:420}, contents:['Groundcovers','Vines','Liriope'] },
       { id:'house-2', name:'House 2', short:'House 2', display:'Yews', group:'hoop', x:782, y:186, w:156, h:52, zoom:{x:520,y:108,w:430,h:420}, contents:['Yews'] },
-      { id:'house-3', name:'House 3', short:'House 3', display:'Shade Shrubs', group:'hoop', x:782, y:246, w:156, h:52, zoom:{x:520,y:108,w:430,h:420}, contents:['Holly','Laurel','Mahonia','Clethra'] },
+      { id:'house-3', name:'House 3', short:'House 3', display:'Shade Shrubs', group:'hoop', x:782, y:246, w:156, h:52, zoom:{x:520,y:108,w:430,h:420}, contents:['Bayberry','Clethra','Fothergilla','Holly','Inkberry Holly','Laurel','Mahonia','Nandina','Pieris Japonica','Potentilla','Winterberry'] },
       { id:'house-4', name:'House 4', short:'House 4', display:'Azaleas / Rhodies', group:'hoop', x:782, y:306, w:156, h:52, zoom:{x:520,y:108,w:430,h:420}, contents:['Azaleas','Rhododendron'] },
       { id:'house-5', name:'House 5', short:'House 5', display:'Hydrangeas', group:'hoop', x:782, y:366, w:156, h:52, zoom:{x:520,y:160,w:430,h:450}, contents:['Hydrangeas'] },
       { id:'house-6', name:'House 6', short:'House 6', display:'Redbud / Magnolia', group:'hoop', x:782, y:426, w:156, h:52, zoom:{x:520,y:160,w:430,h:450}, contents:['Redbud','Magnolia'] },
@@ -269,6 +269,110 @@
       { id:'teal', x:658, y:620, color:'#29b6a2', label:'Teal flag', groups:['main'] },
       { id:'red', x:778, y:586, color:'#de5a4b', label:'Red flag', groups:['main','hoop'] }
     ];
+
+
+    const FLAG_LOOKUP = Object.fromEntries(MAP_FLAGS.map(flag => [flag.id, flag]));
+
+    const PLANT_SYNC = [
+      { aliases:['arborvitae tree','upright arborvitae'], zoneId:'zone-a', flagIds:['black','white'], confidence:'verified', note:'Ball & Burlap A · look for the black / white marker.' },
+      { aliases:['aspen'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['bald cypress'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['birch'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['black gum'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['cedar'], zoneId:'zone-c', flagIds:['pink'], confidence:'verified', note:'Ball & Burlap C · look for the pink flag.' },
+      { aliases:['cherry'], zoneId:'zone-d', flagIds:['pink'], confidence:'field-flag based', note:'Deciduous trees area · look for the pink flag.' },
+      { aliases:['crabapple'], zoneId:'zone-d', flagIds:['pink'], confidence:'field-flag based', note:'Deciduous trees area · look for the pink flag.' },
+      { aliases:['cypress'], zoneId:'zone-c', flagIds:['pink'], confidence:'verified', note:'Ball & Burlap C · look for the pink flag.' },
+      { aliases:['dogwood tree','dogwood trees','dogwood'], zoneId:'house-8', flagIds:[], confidence:'verified', note:'House 8 in the hoop houses.' },
+      { aliases:['elm'], zoneId:'zone-d', flagIds:[], confidence:'verified', note:'Ball & Burlap D.' },
+      { aliases:['fruit trees','fruit tree'], zoneId:'between-houses-123', flagIds:[], confidence:'verified', note:'Between Houses 1, 2, and 3.' },
+      { aliases:['hornbeam'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['ginkgo'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['japanese maple','japanese maples'], zoneId:'house-7', flagIds:['blue'], confidence:'verified', note:'House 7 / 8 area · look for the blue flag.' },
+      { aliases:['juniper'], zoneId:'zone-b', flagIds:['blue'], confidence:'verified', note:'Ball & Burlap B · look for the blue flag.' },
+      { aliases:['ky coffee tree','kentucky coffee tree'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['lilac tree'], zoneId:'zone-d', flagIds:['pink'], confidence:'field-flag based', note:'Deciduous trees area · look for the pink flag.' },
+      { aliases:['linden'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['honeylocust'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['london plane'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['magnolia'], zoneId:'house-6', flagIds:['brown'], confidence:'verified', note:'House 6 · brown flag on the paper sheet.' },
+      { aliases:['maple'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['oak'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['pine'], zoneId:'zone-b', flagIds:['green'], confidence:'verified', note:'Ball & Burlap B · look for the green flag.' },
+      { aliases:['redbud'], zoneId:'house-6', flagIds:['brown'], confidence:'verified', note:'House 6 · brown flag on the paper sheet.' },
+      { aliases:['dawn redwood'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['serviceberry'], zoneId:'zone-d', flagIds:['magenta'], confidence:'field-flag based', note:'Deciduous trees area · look for the magenta flag.' },
+      { aliases:['seven sons'], zoneId:'flowering-shrubs', flagIds:['purple'], confidence:'field-flag based', note:'Central shrub beds · look for the purple flag.' },
+      { aliases:['smoketree'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Central shrub beds · look for the yellow flag.' },
+      { aliases:['spruce'], zoneId:'zone-c', flagIds:['green'], confidence:'verified', note:'Ball & Burlap C · look for the green flag.' },
+      { aliases:['tulip tree'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+      { aliases:['whitebud'], zoneId:'house-6', flagIds:['brown'], confidence:'verified', note:'House 6 · brown flag on the paper sheet.' },
+      { aliases:['willow'], zoneId:'zone-d', flagIds:['brown'], confidence:'verified', note:'Ball & Burlap D · look for the brown flag.' },
+
+      { aliases:['abelia'], zoneId:'flowering-shrubs', flagIds:['orange'], confidence:'field-flag based', note:'Flowering shrub beds · look for the orange flag.' },
+      { aliases:['althea'], zoneId:'flowering-shrubs', flagIds:['orange'], confidence:'field-flag based', note:'Flowering shrub beds · look for the orange flag.' },
+      { aliases:['arborvitae shrub'], zoneId:'evergreen-shrubs', flagIds:['magenta'], confidence:'field-flag based', note:'Evergreen shrub beds · look for the magenta flag.' },
+      { aliases:['azalea'], zoneId:'house-4', flagIds:[], confidence:'verified', note:'House 4 in the hoop houses.' },
+      { aliases:['barberry'], zoneId:'flowering-shrubs', flagIds:['orange'], confidence:'field-flag based', note:'Flowering shrub beds · look for the orange flag.' },
+      { aliases:['bayberry'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['beautyberry'], zoneId:'flowering-shrubs', flagIds:['orange'], confidence:'field-flag based', note:'Flowering shrub beds · look for the orange flag.' },
+      { aliases:['boxwood'], zoneId:'evergreen-shrubs', flagIds:['teal'], confidence:'field-flag based', note:'Evergreen shrub beds · look for the teal flag.' },
+      { aliases:['buckthorn'], zoneId:'flowering-shrubs', flagIds:['orange'], confidence:'field-flag based', note:'Flowering shrub beds · look for the orange flag.' },
+      { aliases:['burning bush'], zoneId:'flowering-shrubs', flagIds:['orange'], confidence:'field-flag based', note:'Flowering shrub beds · look for the orange flag.' },
+      { aliases:['butterfly bush'], zoneId:'flowering-shrubs', flagIds:['orange'], confidence:'field-flag based', note:'Flowering shrub beds · look for the orange flag.' },
+      { aliases:['caryopteris'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['chokeberry'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['clethra'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['cotoneaster'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['crapemyrtle','crape myrtle'], zoneId:'playground', flagIds:[], confidence:'verified', note:'Playground edge on the paper sheet.' },
+      { aliases:['false cypress'], zoneId:'evergreen-shrubs', flagIds:['magenta'], confidence:'field-flag based', note:'Evergreen shrub beds · look for the magenta flag.' },
+      { aliases:['deutzia'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['dogwood shrub'], zoneId:'house-8', flagIds:[], confidence:'verified', note:'House 8 in the hoop houses.' },
+      { aliases:['elderberry'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['euonymus'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+
+      { aliases:['forsythia'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['fothergilla'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['grasses','ornamental grasses'], zoneId:'roses-grasses', flagIds:['red'], confidence:'field-flag based', note:'Roses & Grasses area · look for the red flag.' },
+      { aliases:['holly'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['honeysuckle'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['hydrangea','hydrangeas'], zoneId:'house-5', flagIds:[], confidence:'verified', note:'House 5 in the hoop houses.' },
+      { aliases:['hypericum'], zoneId:'playground', flagIds:[], confidence:'verified', note:'Playground edge on the paper sheet.' },
+      { aliases:['inkberry holly'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['juniper shrub','juniper*'], zoneId:'evergreen-shrubs', flagIds:['charcoal'], confidence:'field-flag based', note:'Evergreen shrub beds · look for the charcoal flag.' },
+      { aliases:['laurel'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['lilac'], zoneId:'playground', flagIds:[], confidence:'verified', note:'Playground edge on the paper sheet.' },
+      { aliases:['liriope'], zoneId:'house-1', flagIds:[], confidence:'verified', note:'House 1 in the hoop houses.' },
+      { aliases:['mahonia'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['mockorange'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['nandina'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['ninebark'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['pieris japonica','pieris'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['pine shrub','pine*'], zoneId:'evergreen-shrubs', flagIds:['green'], confidence:'field-flag based', note:'Evergreen shrub beds · look for the green flag.' },
+      { aliases:['potentilla'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['privet'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['pyracantha'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+
+      { aliases:['quince'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['rhododendron'], zoneId:'house-4', flagIds:[], confidence:'verified', note:'House 4 in the hoop houses.' },
+      { aliases:['roses','rose'], zoneId:'roses-grasses', flagIds:['red'], confidence:'field-flag based', note:'Roses & Grasses area · look for the red flag.' },
+      { aliases:['rose of sharon'], zoneId:'flowering-shrubs', flagIds:['orange'], confidence:'field-flag based', note:'Flowering shrub beds · look for the orange flag.' },
+      { aliases:['sand cherry'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['sorbaria'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['spirea'], zoneId:'flowering-shrubs', flagIds:['purple'], confidence:'field-flag based', note:'Flowering shrub beds · look for the purple flag.' },
+      { aliases:['spruce shrub','spruce*'], zoneId:'evergreen-shrubs', flagIds:['green'], confidence:'field-flag based', note:'Evergreen shrub beds · look for the green flag.' },
+      { aliases:["st. john's wort",'st johns wort'], zoneId:'playground', flagIds:[], confidence:'verified', note:'Playground edge on the paper sheet.' },
+      { aliases:['sumac'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['sweetspire'], zoneId:'flowering-shrubs', flagIds:['yellow'], confidence:'field-flag based', note:'Flowering shrub beds · look for the yellow flag.' },
+      { aliases:['viburnum'], zoneId:'flowering-shrubs', flagIds:['purple'], confidence:'field-flag based', note:'Flowering shrub beds · look for the purple flag.' },
+      { aliases:['weigela'], zoneId:'flowering-shrubs', flagIds:['purple'], confidence:'field-flag based', note:'Flowering shrub beds · look for the purple flag.' },
+      { aliases:['willow shrub'], zoneId:'flowering-shrubs', flagIds:['purple'], confidence:'field-flag based', note:'Flowering shrub beds · look for the purple flag.' },
+      { aliases:['winterberry'], zoneId:'house-3', flagIds:[], confidence:'verified', note:'House 3 in the hoop houses.' },
+      { aliases:['wisteria'], zoneId:'house-1', flagIds:[], confidence:'verified', note:'House 1 in the hoop houses.' },
+      { aliases:['yew'], zoneId:'house-2', flagIds:[], confidence:'verified', note:'House 2 in the hoop houses.' },
+      { aliases:['yucca'], zoneId:'roses-grasses', flagIds:['red'], confidence:'field-flag based', note:'Roses & Grasses area · look for the red flag.' }
+    ];
+
 
     const CURATED = [
       { id:'hydrangeas', name:'Hydrangeas', zoneId:'house-5', quick:true, category:'Shrubs', traits:['Shade Friendly','Pollinator Friendly'], aliases:['hydrangea'], customer:'Go to House 5. Right-side hoop houses.', staff:'Primary hydrangea house.', landmark:'Near House 4 and House 6', confidence:'verified' },
@@ -334,7 +438,38 @@
     function normSku(v){ return String(v || '').trim().toUpperCase().replace(/[^A-Z0-9]/g,''); }
     function unique(arr){ return [...new Set(arr.filter(Boolean))]; }
     function getZone(id){ return ZONES.find(z => z.id === id); }
+    function getFlag(id){ return FLAG_LOOKUP[id]; }
     function getCurated(id){ return CURATED.find(i => i.id === id); }
+    function getFlagSummary(flagIds){
+      return unique((flagIds || []).map(id => getFlag(id)?.label).filter(Boolean)).join(' · ');
+    }
+    function renderFlagPills(flagIds){
+      return unique(flagIds || []).map(id => {
+        const flag = getFlag(id);
+        if(!flag) return '';
+        const stroke = flag.stroke || '#5f7397';
+        return `<span class="meta-pill" style="display:inline-flex;align-items:center;gap:8px;"><span style="display:inline-block;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:14px solid ${flag.color};filter:drop-shadow(0 0 0 ${stroke});"></span>${flag.label}</span>`;
+      }).join('');
+    }
+    function findPlantSync(target){
+      const text = [target?.name || target || '', target?.common || '', target?.category || '', target?.plant_group || '', target?.section || '']
+        .join(' ').toLowerCase();
+      const exactName = norm(target?.name || target || '');
+      let best = null;
+      let bestLen = 0;
+      for(const row of PLANT_SYNC){
+        for(const alias of row.aliases){
+          const a = norm(alias);
+          if(exactName === a || text.includes(a)){
+            if(a.length > bestLen){
+              best = row;
+              bestLen = a.length;
+            }
+          }
+        }
+      }
+      return best;
+    }
     function isTruthy(value){
       if (value === true) return true;
       if (value === false || value == null) return false;
@@ -388,6 +523,16 @@
       const common = norm(plant.common);
       const text = [name, group, category, common].join(' ');
 
+      const synced = findPlantSync(plant);
+      if(synced){
+        return {
+          zoneId: synced.zoneId,
+          confidence: synced.confidence,
+          note: synced.note,
+          flagIds: synced.flagIds || []
+        };
+      }
+
       const exact = [
         [['hydrangea'], 'house-5', 'verified', 'Hydrangea house'],
         [['japanese maple'], 'house-7', 'verified', 'Japanese maple house'],
@@ -409,20 +554,21 @@
         if (keys.some(k => text.includes(k))) return { zoneId, confidence, note };
       }
 
-      if(group.includes('perennials - sun')) return { zoneId:'sun-perennials', confidence:'grouped', note:'Mapped from plant group' };
-      if(group.includes('perennials - shade')) return { zoneId:'shade-perennials', confidence:'grouped', note:'Mapped from plant group' };
-      if(group.includes('ground covers') || group.includes('hardy vining') || group.includes('clematis')) return { zoneId:'house-1', confidence:'grouped', note:'Mapped from vine / groundcover group' };
-      if(group.includes('roses')) return { zoneId:'roses-grasses', confidence:'grouped', note:'Mapped from roses group' };
-      if(group.includes('peonies') || group.includes('native perennials')) return { zoneId:'sun-perennials', confidence:'approximate', note:'Mapped to perennial area' };
-      if(text.includes('grass') || text.includes('yucca')) return { zoneId:'roses-grasses', confidence:'grouped', note:'Mapped from perennial grasses / grasses area' };
-      if(text.includes('boxwood') || text.includes('euonymus') || text.includes('pyracantha') || text.includes('evergreen shrub')) return { zoneId:'evergreen-shrubs', confidence:'grouped', note:'Mapped from evergreen shrub grouping' };
-      if(text.includes('conifer')) return { zoneId:'zone-c', confidence:'grouped', note:'General conifer grouping' };
-      if(text.includes('shade tree') || text.includes('ornamental tree') || text.includes('flowering tree')) return { zoneId:'zone-d', confidence:'grouped', note:'General tree grouping' };
-      return { zoneId:'sun-perennials', confidence:'needs verification', note:'Defaulted to perennial area until verified' };
+      if(group.includes('perennials - sun')) return { zoneId:'sun-perennials', confidence:'grouped', note:'Mapped from plant group', flagIds:[] };
+      if(group.includes('perennials - shade')) return { zoneId:'shade-perennials', confidence:'grouped', note:'Mapped from plant group', flagIds:[] };
+      if(group.includes('ground covers') || group.includes('hardy vining') || group.includes('clematis')) return { zoneId:'house-1', confidence:'grouped', note:'Mapped from vine / groundcover group', flagIds:[] };
+      if(group.includes('roses')) return { zoneId:'roses-grasses', confidence:'grouped', note:'Mapped from roses group', flagIds:['red'] };
+      if(group.includes('peonies') || group.includes('native perennials')) return { zoneId:'sun-perennials', confidence:'approximate', note:'Mapped to perennial area', flagIds:[] };
+      if(text.includes('grass') || text.includes('yucca')) return { zoneId:'roses-grasses', confidence:'grouped', note:'Mapped from perennial grasses / grasses area', flagIds:['red'] };
+      if(text.includes('boxwood') || text.includes('euonymus') || text.includes('pyracantha') || text.includes('evergreen shrub')) return { zoneId:'evergreen-shrubs', confidence:'grouped', note:'Mapped from evergreen shrub grouping', flagIds:['green'] };
+      if(text.includes('conifer')) return { zoneId:'zone-c', confidence:'grouped', note:'General conifer grouping', flagIds:['green'] };
+      if(text.includes('shade tree') || text.includes('ornamental tree') || text.includes('flowering tree')) return { zoneId:'zone-d', confidence:'grouped', note:'General tree grouping', flagIds:['brown'] };
+      return { zoneId:'sun-perennials', confidence:'needs verification', note:'Defaulted to perennial area until verified', flagIds:[] };
     }
 
     function curatedEntry(item){
       const zone = getZone(item.zoneId);
+      const synced = findPlantSync({ name:item.name, category:item.category, common:(item.aliases || []).join(' ') }) || {};
       return {
         key:`curated:${item.id}`,
         source:'curated',
@@ -437,7 +583,10 @@
         customer:item.customer,
         staff:item.staff,
         traits:item.traits || [],
-        confidence:item.confidence || 'verified',
+        confidence:item.confidence || synced.confidence || 'verified',
+        flagIds:item.flagIds || synced.flagIds || [],
+        flagSummary:getFlagSummary(item.flagIds || synced.flagIds || []),
+        syncNote:synced.note || '',
         sku:'',
         price:'',
         plantGroup:'',
@@ -464,6 +613,8 @@
         staff:`${plant.name || 'This item'} was mapped to ${zone ? zone.name : mapping.zoneId} from SKU/inventory data.`,
         traits:inferTraits(plant),
         confidence:mapping.confidence,
+        flagIds:mapping.flagIds || [],
+        flagSummary:getFlagSummary(mapping.flagIds || []),
         sku:plant.sku || '',
         price:plant.price || '',
         plantGroup:getPlantGroup(plant),
@@ -534,7 +685,6 @@
 
     function zoneCenter(zone){ return { x: zone.x + zone.w/2, y: zone.y + zone.h/2 }; }
 
-    function getZone(id){ return ZONES.find(z => z.id === id); }
 
     function routePoints(zone){
       const c = zoneCenter(zone);
@@ -544,13 +694,15 @@
       return `568,668 568,338 392,338 392,${c.y} ${c.x},${c.y}`;
     }
 
-    function buildFlagMarker(flag, selectedZone){
-      const relevant = selectedZone && (flag.groups || []).includes(selectedZone.group);
-      const opacity = relevant ? 1 : .62;
-      const scale = relevant ? 1.02 : .9;
+    function buildFlagMarker(flag, selectedZone, selectedFlags){
+      const matched = (selectedFlags || []).includes(flag.id);
+      const relevant = matched || (selectedZone && (flag.groups || []).includes(selectedZone.group));
+      const opacity = matched ? 1 : relevant ? .78 : .42;
+      const scale = matched ? 1.14 : relevant ? .98 : .88;
       const stroke = flag.stroke || '#5f7397';
       return `
         <g opacity="${opacity}" transform="translate(${flag.x}, ${flag.y}) scale(${scale})">
+          ${matched ? `<circle cx="3" cy="-8" r="15" fill="none" stroke="#8ed54b" stroke-width="3" opacity=".65"></circle>` : ''}
           <line x1="0" y1="0" x2="0" y2="22" stroke="#6a7f9f" stroke-width="2.2" stroke-linecap="round"></line>
           <path d="M0 0 L0 -18 L18 -9 Z" fill="${flag.color}" stroke="${stroke}" stroke-width="1.6" stroke-linejoin="round"></path>
         </g>`;
@@ -577,7 +729,7 @@
         </g>`;
     }
 
-    function baseMapSvg(selectedId, viewBox){
+    function baseMapSvg(selectedId, viewBox, selectedFlags = []){
       const selected = getZone(selectedId);
       const subtleHoop = selected && selected.group !== 'hoop';
       const subtleField = selected && selected.group !== 'field';
@@ -593,7 +745,7 @@
         <polyline points="${routePoints(selected)}" fill="none" stroke="#ffb648" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" opacity=".95"></polyline>
         <polyline points="${routePoints(selected)}" fill="none" stroke="#fff" stroke-width="2.25" stroke-dasharray="8 7" stroke-linecap="round" opacity=".88"></polyline>` : '';
 
-      const flags = MAP_FLAGS.map(flag => buildFlagMarker(flag, selected)).join('');
+      const flags = MAP_FLAGS.map(flag => buildFlagMarker(flag, selected, selectedFlags)).join('');
 
       return `
       <svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Suburban nursery map">
@@ -676,20 +828,21 @@
     function renderMaps(){
       const entry = getSelectedEntry();
       const zone = getZone(entry.zoneId) || ZONES[0];
-      els.overviewMapWrap.innerHTML = baseMapSvg(zone.id, '0 0 1000 760');
+      const flagSummary = entry.flagSummary ? ` ${entry.flagSummary} is synced from the paper location sheet.` : '';
+      els.overviewMapWrap.innerHTML = baseMapSvg(zone.id, '0 0 1000 760', entry.flagIds || []);
       const detailBox = zone.zoom || {x:0,y:0,w:1000,h:760};
-      els.detailMapWrap.innerHTML = baseMapSvg(zone.id, `${detailBox.x} ${detailBox.y} ${detailBox.w} ${detailBox.h}`);
+      els.detailMapWrap.innerHTML = baseMapSvg(zone.id, `${detailBox.x} ${detailBox.y} ${detailBox.w} ${detailBox.h}`, entry.flagIds || []);
       els.overviewCaption.textContent = state.mode === 'customer'
-        ? `${zone.name} stays highlighted while the full map preserves the rest of the nursery.`
-        : `${zone.name} remains highlighted on the full map while the closer look lets staff verify the target section.`;
+        ? `${zone.name} stays highlighted while the full map preserves the rest of the nursery.${flagSummary}`
+        : `${zone.name} remains highlighted on the full map while the closer look lets staff verify the target section.${flagSummary}`;
       els.detailCaption.textContent = entry.source === 'inventory'
-        ? `This inventory result uses a ${entry.confidence} location match from SKU / group logic. Tighten the zone mapping as you verify live placements.`
-        : `${zone.name} is shown in a tighter crop while the overview above keeps the user's frame of reference.`;
+        ? `This inventory result uses a ${entry.confidence} location match from SKU / group logic.${entry.flagSummary ? ` Look for ${entry.flagSummary.toLowerCase()}.` : ''}`
+        : `${zone.name} is shown in a tighter crop while the overview above keeps the user's frame of reference.${entry.flagSummary ? ` Look for ${entry.flagSummary.toLowerCase()}.` : ''}`;
     }
 
     function confidenceClass(conf){
       if(conf === 'verified') return 'good';
-      if(conf === 'grouped' || conf === 'approximate') return 'warn';
+      if(conf === 'grouped' || conf === 'approximate' || conf === 'field-flag based') return 'warn';
       return 'bad';
     }
 
@@ -703,6 +856,7 @@
       if(entry.sku) extraMeta.push(`<span class="meta-pill">SKU ${entry.sku}</span>`);
       if(entry.price) extraMeta.push(`<span class="meta-pill">${entry.price}</span>`);
       if(entry.plantGroup) extraMeta.push(`<span class="meta-pill">${entry.plantGroup}</span>`);
+      if(entry.flagSummary) extraMeta.push(renderFlagPills(entry.flagIds || []));
       els.resultCard.innerHTML = `
         <div class="eyebrow">${entry.source === 'inventory' ? 'SKU / Inventory Result' : entry.category}</div>
         <h2>${entry.headline}</h2>
@@ -720,8 +874,8 @@
           ${entry.link ? `<a class="action-btn secondary" href="${entry.link}" target="_blank" rel="noopener noreferrer">Open product</a>` : ''}
         </div>
         <div class="status-line">${entry.source === 'inventory'
-          ? 'Inventory results are the bridge to SKU-level location. The placement shown here is a likely section until individually verified.'
-          : 'Curated results are the current wayfinding anchors and should feel stable for customer-facing use.'}</div>
+          ? `Inventory results are the bridge to SKU-level location. ${entry.flagSummary ? `This item is synced to ${entry.flagSummary.toLowerCase()} on the paper sheet.` : 'The placement shown here is a likely section until individually verified.'}`
+          : `${entry.flagSummary ? `Paper map sync says look for ${entry.flagSummary.toLowerCase()}.` : 'Curated results are the current wayfinding anchors and should feel stable for customer-facing use.'}`}</div>
       `;
       document.getElementById('showOnMapBtn').addEventListener('click', () => {
         state.view = 'find';
@@ -756,7 +910,7 @@
       els.searchResults.innerHTML = results.length ? results.map(entry => `
         <button class="search-result-btn ${entry.key === state.selectedKey ? 'active' : ''}" type="button" data-select="${entry.key}">
           <strong>${entry.headline}</strong>
-          <span>${entry.destination} ${entry.sku ? `· SKU ${entry.sku}` : ''} ${entry.landmark ? `· ${entry.landmark}` : ''}</span>
+          <span>${entry.destination} ${entry.flagSummary ? `· ${entry.flagSummary}` : ''} ${entry.sku ? `· SKU ${entry.sku}` : ''} ${entry.landmark ? `· ${entry.landmark}` : ''}</span>
         </button>`).join('') : `<div class="helper">No matches yet. Try a plant name, category, or SKU.</div>`;
       els.searchResults.querySelectorAll('[data-select]').forEach(btn => btn.addEventListener('click', () => selectKey(btn.dataset.select)));
     }
@@ -785,8 +939,10 @@
 
       els.zoneGrid.innerHTML = ZONES.map(zone => {
         const curatedHere = CURATED.filter(item => item.zoneId === zone.id).map(item => item.name);
+        const syncedHere = PLANT_SYNC.filter(item => item.zoneId === zone.id).flatMap(item => item.aliases.slice(0,1));
         const inventoryHere = state.plants.filter(p => inferZoneForPlant(p).zoneId === zone.id).slice(0, 8).map(p => p.name);
-        const aliases = unique([...curatedHere, ...inventoryHere]);
+        const aliases = unique([...curatedHere, ...syncedHere, ...inventoryHere]);
+        const zoneFlags = unique(PLANT_SYNC.filter(item => item.zoneId === zone.id).flatMap(item => item.flagIds || []));
         return `
           <article class="zone-card">
             <h4>${zone.name}</h4>
@@ -794,10 +950,11 @@
             <div class="tag-row">
               <span class="inventory-pill good">${zone.group}</span>
               <span class="meta-pill">${aliases.length} indexed names</span>
+              ${renderFlagPills(zoneFlags)}
             </div>
             <ul>
               ${zone.contents.slice(0,5).map(item => `<li>${item}</li>`).join('')}
-              ${aliases.slice(0,5).map(item => `<li>${item}</li>`).join('')}
+              ${aliases.slice(0,6).map(item => `<li>${item}</li>`).join('')}
             </ul>
           </article>`;
       }).join('');
