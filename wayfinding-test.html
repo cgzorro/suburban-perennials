@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Suburban Wayfinding — Test Index v4</title>
+  <title>Suburban Wayfinding — Test Index v5</title>
   <style>
     :root{
       --bg:#071325; --bg-elev:#0d1d36; --bg-soft:#132746; --panel:#10233f; --text:#eef4ff; --text-muted:#b7c4da;
@@ -23,7 +23,7 @@
         radial-gradient(circle at top right, rgba(89,156,93,.08), transparent 24%),
         var(--bg);
     }
-    .shell{width:min(1220px,calc(100% - 18px));margin:0 auto;padding:14px 0 64px}
+    .shell{width:min(1280px,calc(100% - 18px));margin:0 auto;padding:14px 0 64px}
     .hero,.panel,.result-card,.search-result-btn,.browse-btn,.zone-card,.staff-note,.map-card,.inventory-pill{background:var(--bg-elev);border:1px solid var(--border);box-shadow:var(--shadow)}
     .hero{padding:18px;border-radius:28px;margin-bottom:12px;display:flex;gap:16px;justify-content:space-between;align-items:flex-start}
     .hero h1{margin:0;font-size:clamp(1.65rem,5vw,2.8rem);line-height:1.02}
@@ -48,7 +48,7 @@
     .browse-btn{border-radius:22px;padding:14px;text-align:left;justify-content:flex-start;align-items:flex-start;flex-direction:column;min-height:110px;white-space:normal}
     .browse-btn strong{font-size:1rem;line-height:1.18}
     .browse-btn span{font-size:.9rem;color:var(--text-muted);font-weight:700;line-height:1.25}
-    .content-grid{display:grid;grid-template-columns:390px minmax(0,1fr);gap:14px;align-items:start}
+    .content-grid{display:grid;grid-template-columns:350px minmax(0,1fr);gap:14px;align-items:start}
     .result-card{padding:16px;border-radius:24px;position:sticky;top:12px}
     .eyebrow{font-size:.82rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)}
     .result-card h2{margin:6px 0 6px;font-size:1.55rem;line-height:1.05}
@@ -71,7 +71,7 @@
     .map-card h3{margin:0 0 6px;font-size:1.15rem}
     .map-card p{margin:0 0 10px;color:var(--text-muted);line-height:1.34}
     .map-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
-    .map-frame,.detail-frame{background:#ecf2fb;border-radius:24px;padding:10px;overflow:hidden}
+    .map-frame,.detail-frame{background:#ecf2fb;border-radius:24px;padding:6px;overflow:hidden}
     .map-frame svg,.detail-frame svg{display:block;width:100%;height:auto;border-radius:18px;box-shadow:0 6px 18px rgba(11,22,48,.12)}
     .detail-caption{font-size:.92rem;color:var(--text-muted);line-height:1.34;margin-top:10px}
     .search-results{display:grid;gap:10px;margin-top:12px}
@@ -118,7 +118,7 @@
   <div class="shell">
     <section class="hero">
       <div>
-        <h1>Suburban Wayfinding — Test Index v4</h1>
+        <h1>Suburban Wayfinding — Test Index v5</h1>
         <p>Testing model for <strong>SKU-level search + property location</strong>. Search should answer the question first, then keep the full nursery map visible so customers and staff never lose context.</p>
       </div>
       <div class="hero-actions">
@@ -159,8 +159,8 @@
         <section class="map-card">
           <div class="map-toolbar">
             <div>
-              <h3>Full nursery map</h3>
-              <p>Context stays visible. Search and selection highlight the destination instead of replacing the whole map.</p>
+              <h3>Digital nursery map</h3>
+              <p>The full Lenexa-style nursery map stays visible, then search highlights the exact destination so customers keep their frame of reference.</p>
             </div>
           </div>
           <div class="map-frame"><div id="overviewMapWrap"></div></div>
@@ -170,7 +170,7 @@
           <div class="map-toolbar">
             <div>
               <h3>Closer look</h3>
-              <p>The selected section is shown in a tighter crop, but the overview above keeps the customer oriented.</p>
+              <p>A tighter crop shows the target area in more detail, including route cue and field-flag context where it helps.</p>
             </div>
           </div>
           <div class="detail-frame"><div id="detailMapWrap"></div></div>
@@ -221,37 +221,53 @@
       exactSkuMode: false
     };
 
-    const YOU_ARE_HERE = { x: 606, y: 658, label: 'You are here · Perennials entry' };
+    const YOU_ARE_HERE = { x: 568, y: 668, label: 'You are here · Perennials entry' };
 
     const ZONES = [
-      { id:'zone-a', name:'Ball & Burlap A', short:'A', display:'Arborvitae', group:'field', x:120, y:55, w:110, h:60, zoom:{x:50,y:20,w:720,h:340}, contents:['Upright Arborvitae'] },
-      { id:'zone-b', name:'Ball & Burlap B', short:'B', display:'Juniper / Pine', group:'field', x:300, y:55, w:130, h:60, zoom:{x:50,y:20,w:720,h:340}, contents:['Juniper','Pine'] },
-      { id:'zone-c', name:'Ball & Burlap C', short:'C', display:'Conifers / Evergreens', group:'field', x:70, y:165, w:180, h:70, zoom:{x:40,y:30,w:760,h:350}, contents:['Spruce','Cedar','Cypress','Fir','Hemlock'] },
-      { id:'zone-d', name:'Ball & Burlap D', short:'D', display:'Deciduous Trees', group:'field', x:260, y:165, w:360, h:70, zoom:{x:40,y:30,w:760,h:350}, contents:['Maple','Oak','Linden','Ginkgo','Serviceberry','Willow'] },
+      { id:'zone-a', name:'Ball & Burlap A', short:'A', display:'Arborvitae', group:'field', x:118, y:78, w:104, h:58, zoom:{x:70,y:40,w:520,h:260}, contents:['Upright Arborvitae'] },
+      { id:'zone-b', name:'Ball & Burlap B', short:'B', display:'Juniper / Pine', group:'field', x:272, y:78, w:134, h:58, zoom:{x:120,y:40,w:560,h:260}, contents:['Juniper','Pine'] },
+      { id:'zone-c', name:'Ball & Burlap C', short:'C', display:'Conifers / Evergreens', group:'field', x:94, y:168, w:170, h:74, zoom:{x:58,y:48,w:650,h:310}, contents:['Spruce','Cedar','Cypress','Fir','Hemlock'] },
+      { id:'zone-d', name:'Ball & Burlap D', short:'D', display:'Deciduous Trees', group:'field', x:284, y:168, w:390, h:74, zoom:{x:150,y:48,w:660,h:310}, contents:['Maple','Oak','Linden','Ginkgo','Serviceberry','Willow'] },
 
-      { id:'container-trees', name:'Container Trees', short:'Container Trees', display:'Container Trees', group:'central', x:260, y:280, w:220, h:72, zoom:{x:200,y:230,w:650,h:330}, contents:['Container-grown trees'] },
-      { id:'center-bed', name:'Center Bed E', short:'E', display:'Center Bed', group:'central', x:500, y:270, w:72, h:92, zoom:{x:200,y:230,w:650,h:330}, contents:['Mixed bed'] },
-      { id:'flowering-shrubs', name:'Flowering Shrubs', short:'Flowering Shrubs', display:'Flowering Shrubs', group:'central', x:590, y:280, w:155, h:170, zoom:{x:200,y:230,w:650,h:330}, contents:['Abelia','Barberry','Spirea','Viburnum','Weigela'] },
-      { id:'playground', name:'Playground Edge', short:'Playground', display:'Playground Edge', group:'central', x:618, y:375, w:105, h:55, zoom:{x:200,y:230,w:650,h:330}, contents:['Landmark'] },
-      { id:'roses-grasses', name:'Roses & Grasses', short:'Roses & Grasses', display:'Roses / Grasses', group:'central', x:760, y:320, w:180, h:110, zoom:{x:500,y:235,w:430,h:290}, contents:['Roses','Ornamental grasses','Yucca'] },
-      { id:'evergreen-shrubs', name:'Evergreen Shrubs', short:'Evergreen Shrubs', display:'Evergreen Shrubs', group:'central', x:770, y:445, w:170, h:95, zoom:{x:520,y:310,w:420,h:320}, contents:['Boxwood','Holly','Laurel','Euonymus'] },
+      { id:'container-trees', name:'Container Trees', short:'Container Trees', display:'Front tree rows', group:'central', x:236, y:286, w:224, h:74, zoom:{x:180,y:230,w:620,h:330}, contents:['Container-grown trees'] },
+      { id:'center-bed', name:'Center Bed E', short:'E', display:'Center bed', group:'central', x:482, y:282, w:74, h:96, zoom:{x:240,y:236,w:560,h:320}, contents:['Mixed bed'] },
+      { id:'flowering-shrubs', name:'Flowering Shrubs', short:'Flowering Shrubs', display:'Open shrub beds', group:'central', x:578, y:286, w:148, h:186, zoom:{x:420,y:250,w:420,h:320}, contents:['Abelia','Barberry','Spirea','Viburnum','Weigela'] },
+      { id:'playground', name:'Playground Edge', short:'Playground', display:'Landmark', group:'central', x:607, y:386, w:92, h:58, zoom:{x:470,y:300,w:310,h:220}, contents:['Landmark'] },
+      { id:'roses-grasses', name:'Roses & Grasses', short:'Roses & Grasses', display:'Lower central beds', group:'central', x:650, y:486, w:184, h:78, zoom:{x:500,y:360,w:380,h:280}, contents:['Roses','Ornamental grasses','Yucca'] },
+      { id:'evergreen-shrubs', name:'Evergreen Shrubs', short:'Evergreen Shrubs', display:'Evergreen trees & shrubs', group:'central', x:384, y:395, w:184, h:58, zoom:{x:260,y:300,w:400,h:240}, contents:['Boxwood','Holly','Laurel','Euonymus'] },
 
-      { id:'shade-perennials', name:'Shade Perennials', short:'Shade Perennials', display:'Shade Perennials', group:'main', x:516, y:565, w:125, h:88, zoom:{x:440,y:510,w:300,h:220}, contents:['Shade perennial area'] },
-      { id:'sun-perennials', name:'Sun Perennials', short:'Sun Perennials', display:'Sun Perennials', group:'main', x:648, y:565, w:150, h:88, zoom:{x:520,y:510,w:330,h:220}, contents:['Sun perennial area'] },
-      { id:'tropicals', name:'Tropicals', short:'Tropicals', display:'Tropicals', group:'main', x:810, y:570, w:104, h:80, zoom:{x:720,y:510,w:230,h:220}, contents:['Tropicals'] },
-      { id:'annuals', name:'Annuals', short:'Annuals', display:'Annuals', group:'main', x:810, y:652, w:104, h:80, zoom:{x:720,y:585,w:230,h:220}, contents:['Annuals'] },
-      { id:'checkout', name:'Checkout', short:'Checkout', display:'Front Entry', group:'main', x:524, y:676, w:256, h:50, zoom:{x:470,y:610,w:380,h:170}, contents:['Checkout'] },
+      { id:'shade-perennials', name:'Shade Perennials', short:'Shade Perennials', display:'Main shade beds', group:'main', x:438, y:604, w:152, h:74, zoom:{x:360,y:540,w:360,h:210}, contents:['Shade perennial area'] },
+      { id:'sun-perennials', name:'Sun Perennials', short:'Sun Perennials', display:'Sun perennial beds', group:'main', x:598, y:568, w:182, h:60, zoom:{x:500,y:520,w:360,h:210}, contents:['Sun perennial area'] },
+      { id:'tropicals', name:'Tropicals', short:'Tropicals', display:'Front building', group:'main', x:278, y:602, w:136, h:74, zoom:{x:220,y:540,w:320,h:210}, contents:['Tropicals'] },
+      { id:'annuals', name:'Annuals', short:'Annuals', display:'Front building', group:'main', x:610, y:638, w:166, h:74, zoom:{x:500,y:580,w:340,h:190}, contents:['Annuals'] },
+      { id:'checkout', name:'Checkout', short:'Checkout', display:'Front entry / registers', group:'main', x:402, y:707, w:372, h:26, zoom:{x:320,y:620,w:540,h:140}, contents:['Checkout'] },
 
-      { id:'house-1', name:'House 1', short:'House 1', display:'Groundcovers / Vines', group:'hoop', x:818, y:64, w:110, h:54, zoom:{x:760,y:36,w:210,h:140}, contents:['Groundcovers','Vines','Liriope'] },
-      { id:'house-2', name:'House 2', short:'House 2', display:'Yews', group:'hoop', x:818, y:135, w:110, h:54, zoom:{x:760,y:100,w:210,h:150}, contents:['Yews'] },
-      { id:'house-3', name:'House 3', short:'House 3', display:'Shade Shrubs', group:'hoop', x:818, y:206, w:110, h:54, zoom:{x:760,y:170,w:210,h:150}, contents:['Holly','Laurel','Mahonia','Clethra'] },
-      { id:'house-4', name:'House 4', short:'House 4', display:'Azaleas / Rhodies', group:'hoop', x:818, y:277, w:110, h:54, zoom:{x:760,y:240,w:210,h:150}, contents:['Azaleas','Rhododendron'] },
-      { id:'house-5', name:'House 5', short:'House 5', display:'Hydrangeas', group:'hoop', x:818, y:348, w:110, h:54, zoom:{x:760,y:308,w:210,h:160}, contents:['Hydrangeas'] },
-      { id:'house-6', name:'House 6', short:'House 6', display:'Redbud / Magnolia', group:'hoop', x:818, y:419, w:110, h:54, zoom:{x:760,y:380,w:210,h:160}, contents:['Redbud','Magnolia'] },
-      { id:'house-7', name:'House 7', short:'House 7', display:'Japanese Maples', group:'hoop', x:818, y:490, w:110, h:54, zoom:{x:760,y:450,w:210,h:160}, contents:['Japanese Maples'] },
-      { id:'house-8', name:'House 8', short:'House 8', display:'Dogwoods', group:'hoop', x:818, y:561, w:110, h:54, zoom:{x:760,y:520,w:210,h:160}, contents:['Dogwoods'] },
+      { id:'house-1', name:'House 1', short:'House 1', display:'Groundcovers / Vines', group:'hoop', x:782, y:126, w:156, h:52, zoom:{x:520,y:108,w:430,h:420}, contents:['Groundcovers','Vines','Liriope'] },
+      { id:'house-2', name:'House 2', short:'House 2', display:'Yews', group:'hoop', x:782, y:186, w:156, h:52, zoom:{x:520,y:108,w:430,h:420}, contents:['Yews'] },
+      { id:'house-3', name:'House 3', short:'House 3', display:'Shade Shrubs', group:'hoop', x:782, y:246, w:156, h:52, zoom:{x:520,y:108,w:430,h:420}, contents:['Holly','Laurel','Mahonia','Clethra'] },
+      { id:'house-4', name:'House 4', short:'House 4', display:'Azaleas / Rhodies', group:'hoop', x:782, y:306, w:156, h:52, zoom:{x:520,y:108,w:430,h:420}, contents:['Azaleas','Rhododendron'] },
+      { id:'house-5', name:'House 5', short:'House 5', display:'Hydrangeas', group:'hoop', x:782, y:366, w:156, h:52, zoom:{x:520,y:160,w:430,h:450}, contents:['Hydrangeas'] },
+      { id:'house-6', name:'House 6', short:'House 6', display:'Redbud / Magnolia', group:'hoop', x:782, y:426, w:156, h:52, zoom:{x:520,y:160,w:430,h:450}, contents:['Redbud','Magnolia'] },
+      { id:'house-7', name:'House 7', short:'House 7', display:'Japanese Maples', group:'hoop', x:782, y:486, w:156, h:52, zoom:{x:520,y:160,w:430,h:450}, contents:['Japanese Maples'] },
+      { id:'house-8', name:'House 8', short:'House 8', display:'Dogwoods', group:'hoop', x:782, y:546, w:156, h:52, zoom:{x:520,y:160,w:430,h:450}, contents:['Dogwoods'] },
 
-      { id:'between-houses-123', name:'Between Houses 1–3', short:'Fruit Trees', display:'Fruit Trees', group:'hoop', x:685, y:135, w:112, h:68, zoom:{x:630,y:95,w:220,h:170}, contents:['Fruit trees'] }
+      { id:'between-houses-123', name:'Between Houses 1–3', short:'Fruit Trees', display:'Between houses 1–3', group:'hoop', x:690, y:548, w:84, h:54, zoom:{x:560,y:450,w:300,h:260}, contents:['Fruit trees'] }
+    ];
+
+    const MAP_FLAGS = [
+      { id:'magenta', x:170, y:432, color:'#d24c98', label:'Magenta flag', groups:['central'] },
+      { id:'black', x:404, y:292, color:'#243248', label:'Black flag', groups:['central','field'] },
+      { id:'brown', x:340, y:384, color:'#9b6b35', label:'Brown flag', groups:['central'] },
+      { id:'green', x:588, y:354, color:'#53b85f', label:'Green flag', groups:['central'] },
+      { id:'purple', x:700, y:288, color:'#9362e6', label:'Purple flag', groups:['central','hoop'] },
+      { id:'yellow', x:718, y:350, color:'#e4c03b', label:'Yellow flag', groups:['central','hoop'] },
+      { id:'white', x:414, y:433, color:'#ffffff', stroke:'#6f84a6', label:'White flag', groups:['central'] },
+      { id:'charcoal', x:538, y:433, color:'#697182', label:'Charcoal flag', groups:['central'] },
+      { id:'blue', x:490, y:527, color:'#5a8df4', label:'Blue flag', groups:['central','main'] },
+      { id:'pink', x:608, y:529, color:'#e15fb6', label:'Pink flag', groups:['central','main'] },
+      { id:'orange', x:755, y:521, color:'#f28b32', label:'Orange flag', groups:['central'] },
+      { id:'teal', x:658, y:620, color:'#29b6a2', label:'Teal flag', groups:['main'] },
+      { id:'red', x:778, y:586, color:'#de5a4b', label:'Red flag', groups:['main','hoop'] }
     ];
 
     const CURATED = [
@@ -517,28 +533,47 @@
     }
 
     function zoneCenter(zone){ return { x: zone.x + zone.w/2, y: zone.y + zone.h/2 }; }
+
+    function getZone(id){ return ZONES.find(z => z.id === id); }
+
     function routePoints(zone){
       const c = zoneCenter(zone);
-      if(zone.group === 'hoop') return `606,658 690,658 690,${c.y} ${c.x-10},${c.y}`;
-      if(zone.group === 'main') return `606,658 ${c.x},${c.y}`;
-      if(zone.group === 'central') return `606,658 606,${c.y+30} ${c.x},${c.y}`;
-      return `606,658 606,370 450,370 450,${c.y} ${c.x},${c.y}`;
+      if(zone.group === 'hoop') return `568,668 568,610 730,610 730,${c.y} ${c.x-12},${c.y}`;
+      if(zone.group === 'main') return `568,668 ${c.x},${c.y}`;
+      if(zone.group === 'central') return `568,668 568,560 ${c.x},${c.y}`;
+      return `568,668 568,338 392,338 392,${c.y} ${c.x},${c.y}`;
+    }
+
+    function buildFlagMarker(flag, selectedZone){
+      const relevant = selectedZone && (flag.groups || []).includes(selectedZone.group);
+      const opacity = relevant ? 1 : .62;
+      const scale = relevant ? 1.02 : .9;
+      const stroke = flag.stroke || '#5f7397';
+      return `
+        <g opacity="${opacity}" transform="translate(${flag.x}, ${flag.y}) scale(${scale})">
+          <line x1="0" y1="0" x2="0" y2="22" stroke="#6a7f9f" stroke-width="2.2" stroke-linecap="round"></line>
+          <path d="M0 0 L0 -18 L18 -9 Z" fill="${flag.color}" stroke="${stroke}" stroke-width="1.6" stroke-linejoin="round"></path>
+        </g>`;
     }
 
     function buildZoneShape(zone, selectedId, subdued = false){
       const isSelected = zone.id === selectedId;
-      const fill = isSelected ? '#426d49' : subdued ? '#d6dfec' : '#dfe7f3';
+      const fill = isSelected ? 'url(#selGrad)' : subdued ? 'rgba(213,223,236,.86)' : 'rgba(240,245,252,.95)';
       const stroke = isSelected ? '#8ed54b' : '#6077a0';
-      const sw = isSelected ? 4 : 2.4;
+      const sw = isSelected ? 4.2 : 2.5;
       const opacity = subdued && !isSelected ? .72 : 1;
-      const radius = zone.group === 'hoop' ? 22 : 16;
-      const label1 = zone.short;
-      const label2 = zone.display;
+      const radius = zone.group === 'hoop' ? 24 : 18;
+      const headline = zone.short;
+      const subline = zone.display;
+      const headSize = zone.group === 'hoop' ? 16 : headline.length > 18 ? 13.2 : zone.w > 180 ? 16.5 : 14.2;
+      const subSize = zone.group === 'hoop' ? 11.2 : zone.w > 180 ? 10.8 : 10.4;
+      const textFill = isSelected ? '#eef4ff' : '#1b2b45';
+      const subFill = isSelected ? 'rgba(238,244,255,.96)' : '#385072';
       return `
-        <g opacity="${opacity}">
+        <g opacity="${opacity}" ${isSelected ? 'filter="url(#zoneGlow)"' : ''}>
           <rect x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${radius}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"></rect>
-          <text x="${zone.x + zone.w/2}" y="${zone.y + (zone.group === 'hoop' ? 25 : 22)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${zone.group === 'hoop' ? 17 : 15}" font-weight="900" fill="${isSelected ? '#eef4ff' : '#17243a'}">${label1}</text>
-          <text x="${zone.x + zone.w/2}" y="${zone.y + (zone.group === 'hoop' ? 42 : 42)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" fill="${isSelected ? '#eef4ff' : '#20304c'}">${label2}</text>
+          <text x="${zone.x + zone.w/2}" y="${zone.y + (zone.group === 'hoop' ? 24 : 24)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${headSize}" font-weight="900" fill="${textFill}">${headline}</text>
+          <text x="${zone.x + zone.w/2}" y="${zone.y + (zone.group === 'hoop' ? 41 : 43)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${subSize}" font-weight="700" fill="${subFill}">${subline}</text>
         </g>`;
     }
 
@@ -555,49 +590,86 @@
       }).join('');
 
       const route = state.routeCue && selected ? `
-        <polyline points="${routePoints(selected)}" fill="none" stroke="#ffb648" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" opacity=".94"></polyline>
-        <polyline points="${routePoints(selected)}" fill="none" stroke="#fff" stroke-width="2.3" stroke-dasharray="8 7" stroke-linecap="round" opacity=".88"></polyline>` : '';
+        <polyline points="${routePoints(selected)}" fill="none" stroke="#ffb648" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" opacity=".95"></polyline>
+        <polyline points="${routePoints(selected)}" fill="none" stroke="#fff" stroke-width="2.25" stroke-dasharray="8 7" stroke-linecap="round" opacity=".88"></polyline>` : '';
+
+      const flags = MAP_FLAGS.map(flag => buildFlagMarker(flag, selected)).join('');
 
       return `
       <svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Suburban nursery map">
         <defs>
           <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#f3f7fd"></stop>
+            <stop offset="0%" stop-color="#f5f8fd"></stop>
             <stop offset="100%" stop-color="#e8eff9"></stop>
           </linearGradient>
+          <linearGradient id="selGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4e7a53"></stop>
+            <stop offset="100%" stop-color="#406646"></stop>
+          </linearGradient>
           <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#0b1630" flood-opacity=".12"/>
+            <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0b1630" flood-opacity=".12"/>
           </filter>
+          <filter id="zoneGlow" x="-40%" y="-40%" width="180%" height="180%">
+            <feDropShadow dx="0" dy="0" stdDeviation="9" flood-color="#8ed54b" flood-opacity=".34"/>
+          </filter>
+          <pattern id="rockStripes" patternUnits="userSpaceOnUse" width="28" height="28" patternTransform="rotate(28)">
+            <line x1="0" y1="0" x2="0" y2="28" stroke="#cad5e7" stroke-width="10"></line>
+          </pattern>
+          <pattern id="greenhouseRoof" patternUnits="userSpaceOnUse" width="18" height="18">
+            <rect width="18" height="18" fill="rgba(255,255,255,.32)"></rect>
+            <line x1="9" y1="0" x2="9" y2="18" stroke="rgba(130,148,176,.26)" stroke-width="2"></line>
+          </pattern>
         </defs>
         <rect x="0" y="0" width="1000" height="760" fill="url(#bgGrad)"></rect>
-        <rect x="24" y="24" width="952" height="712" rx="28" fill="none" stroke="#cfdaea" stroke-width="2"></rect>
+        <rect x="22" y="22" width="956" height="716" rx="30" fill="none" stroke="#cfdaea" stroke-width="2"></rect>
 
-        <path d="M36 72 H960 a28 28 0 0 1 28 28 V272 a34 34 0 0 1 -34 34 H38 a32 32 0 0 1 -32 -32 V104 a32 32 0 0 1 30 -32z"
-          fill="rgba(182,197,220,.16)" stroke="#c7d4e7" stroke-width="2"></path>
-        <text x="360" y="138" font-size="34" font-weight="900" fill="#233657" font-family="Inter, Arial, sans-serif">Ball &amp; Burlap Trees</text>
+        <rect x="58" y="70" width="690" height="212" rx="32" fill="rgba(186,199,219,.16)" stroke="#c7d4e7" stroke-width="2"></rect>
+        <text x="402" y="128" font-size="34" font-weight="900" fill="#223658" text-anchor="middle" font-family="Inter, Arial, sans-serif">Ball &amp; Burlap Trees</text>
+        <text x="402" y="152" font-size="14" font-weight="700" fill="#5f7397" text-anchor="middle" font-family="Inter, Arial, sans-serif">Upper field rows · broad tree categories</text>
 
-        <rect x="460" y="248" width="24" height="280" rx="12" fill="rgba(255,255,255,.45)"></rect>
-        <rect x="520" y="364" width="236" height="22" rx="11" fill="rgba(255,255,255,.45)"></rect>
-        <rect x="610" y="452" width="24" height="170" rx="12" fill="rgba(255,255,255,.42)"></rect>
+        <rect x="772" y="96" width="180" height="530" rx="28" fill="rgba(255,255,255,.20)" stroke="#c9d6e7" stroke-width="2"></rect>
+        <text x="862" y="128" text-anchor="middle" font-size="24" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Hoop Houses</text>
+        <text x="862" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#5f7397" font-family="Inter, Arial, sans-serif">Customer-right side</text>
 
-        <rect x="36" y="340" width="180" height="330" rx="22" fill="rgba(255,255,255,.22)" stroke="#cbd7e7"></rect>
-        <text x="58" y="380" font-size="24" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Left Yard / Ops</text>
-        <text x="58" y="414" font-size="15" font-weight="700" fill="#435a82" font-family="Inter, Arial, sans-serif">Bulk mulch · rock yard</text>
-        <text x="58" y="438" font-size="15" font-weight="700" fill="#435a82" font-family="Inter, Arial, sans-serif">Bagged goods · loading</text>
+        <rect x="36" y="352" width="118" height="258" rx="20" fill="rgba(255,255,255,.18)" stroke="#d4deec"></rect>
+        <text x="54" y="386" font-size="18" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Left Yard</text>
+        <text x="54" y="410" font-size="12.8" font-weight="700" fill="#5b7195" font-family="Inter, Arial, sans-serif">Bulk mulch</text>
+        <text x="54" y="432" font-size="12.8" font-weight="700" fill="#5b7195" font-family="Inter, Arial, sans-serif">Rock yard</text>
+        <text x="54" y="454" font-size="12.8" font-weight="700" fill="#5b7195" font-family="Inter, Arial, sans-serif">Bagged goods</text>
+        <text x="54" y="476" font-size="12.8" font-weight="700" fill="#5b7195" font-family="Inter, Arial, sans-serif">Loading</text>
+        <text x="54" y="498" font-size="12.8" font-weight="700" fill="#5b7195" font-family="Inter, Arial, sans-serif">Soils / sand / compost</text>
 
-        <rect x="752" y="32" width="196" height="608" rx="28" fill="rgba(255,255,255,.20)" stroke="#c9d6e7" stroke-width="2"></rect>
-        <text x="850" y="58" text-anchor="middle" font-size="20" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Hoop Houses</text>
+        <rect x="182" y="520" width="72" height="124" rx="14" fill="url(#rockStripes)" opacity=".72"></rect>
 
-        <text x="590" y="560" font-size="20" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Perennial / Front Nursery</text>
+        <rect x="210" y="334" width="182" height="96" rx="20" fill="rgba(255,255,255,.22)" stroke="#c7d4e7"></rect>
+        <text x="301" y="372" text-anchor="middle" font-size="17" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Tree Field</text>
+        <text x="301" y="396" text-anchor="middle" font-size="12" font-weight="700" fill="#5b7195" font-family="Inter, Arial, sans-serif">Look for flag color</text>
+
+        <rect x="436" y="432" width="184" height="108" rx="22" fill="rgba(255,255,255,.22)" stroke="#c7d4e7"></rect>
+        <text x="528" y="474" text-anchor="middle" font-size="17" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Shrub Field</text>
+        <text x="528" y="498" text-anchor="middle" font-size="12" font-weight="700" fill="#5b7195" font-family="Inter, Arial, sans-serif">Look for flag color</text>
+
+        <rect x="470" y="248" width="20" height="318" rx="10" fill="rgba(255,255,255,.45)"></rect>
+        <rect x="514" y="360" width="228" height="18" rx="9" fill="rgba(255,255,255,.42)"></rect>
+        <rect x="612" y="450" width="20" height="188" rx="10" fill="rgba(255,255,255,.40)"></rect>
+        <path d="M584 628 C610 594 660 572 726 572" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="18" stroke-linecap="round"></path>
+
+        <rect x="258" y="580" width="534" height="150" rx="24" fill="rgba(255,255,255,.18)" stroke="#d1dceb"></rect>
+        <rect x="286" y="576" width="128" height="90" rx="18" fill="url(#greenhouseRoof)" opacity=".48"></rect>
+        <rect x="422" y="576" width="164" height="104" rx="20" fill="rgba(255,255,255,.16)"></rect>
+        <rect x="598" y="574" width="184" height="144" rx="22" fill="rgba(255,255,255,.16)"></rect>
+        <text x="528" y="700" text-anchor="middle" font-size="18" font-weight="900" fill="#24365a" font-family="Inter, Arial, sans-serif">Front nursery / checkout</text>
+
+        <text x="246" y="286" font-size="14" font-weight="900" fill="#4e6388" font-family="Inter, Arial, sans-serif">Central nursery</text>
 
         ${zoneShapes}
+        ${flags}
         ${route}
 
-        <g filter="url(#softShadow)">
-          <circle cx="${YOU_ARE_HERE.x}" cy="${YOU_ARE_HERE.y}" r="14" fill="#e54d42" stroke="#ffffff" stroke-width="4"></circle>
-          <text x="${YOU_ARE_HERE.x + 24}" y="${YOU_ARE_HERE.y - 18}" font-size="14" font-weight="900" fill="#20304c" font-family="Inter, Arial, sans-serif">${YOU_ARE_HERE.label}</text>
-          <text x="${YOU_ARE_HERE.x + 24}" y="${YOU_ARE_HERE.y + 2}" font-size="12" font-weight="700" fill="#526b95" font-family="Inter, Arial, sans-serif">Leaving perennials / greeting point</text>
-        </g>
+        <circle cx="${YOU_ARE_HERE.x}" cy="${YOU_ARE_HERE.y}" r="12" fill="#e54d42" stroke="#8f231d" stroke-width="4"></circle>
+        <circle cx="${YOU_ARE_HERE.x}" cy="${YOU_ARE_HERE.y}" r="28" fill="none" stroke="#e54d42" stroke-width="4" opacity=".22"></circle>
+        <rect x="${YOU_ARE_HERE.x + 14}" y="${YOU_ARE_HERE.y - 18}" width="186" height="34" rx="17" fill="#ffffff" opacity=".95"></rect>
+        <text x="${YOU_ARE_HERE.x + 106}" y="${YOU_ARE_HERE.y + 4}" text-anchor="middle" font-size="15" font-weight="900" fill="#b83229" font-family="Inter, Arial, sans-serif">${YOU_ARE_HERE.label}</text>
       </svg>`;
     }
 
