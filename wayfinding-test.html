@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Suburban Wayfinding — Test Index v5</title>
+  <title>Find It at Suburban — Wayfinding</title>
   <style>
     :root{
       --bg:#071325; --bg-elev:#0d1d36; --bg-soft:#132746; --panel:#10233f; --text:#eef4ff; --text-muted:#b7c4da;
@@ -48,7 +48,7 @@
     .browse-btn{border-radius:22px;padding:14px;text-align:left;justify-content:flex-start;align-items:flex-start;flex-direction:column;min-height:110px;white-space:normal}
     .browse-btn strong{font-size:1rem;line-height:1.18}
     .browse-btn span{font-size:.9rem;color:var(--text-muted);font-weight:700;line-height:1.25}
-    .content-grid{display:grid;grid-template-columns:350px minmax(0,1fr);gap:14px;align-items:start}
+    .content-grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:14px;align-items:start}
     .result-card{padding:16px;border-radius:24px;position:sticky;top:12px}
     .eyebrow{font-size:.82rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)}
     .result-card h2{margin:6px 0 6px;font-size:1.55rem;line-height:1.05}
@@ -71,8 +71,8 @@
     .map-card h3{margin:0 0 6px;font-size:1.15rem}
     .map-card p{margin:0 0 10px;color:var(--text-muted);line-height:1.34}
     .map-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
-    .map-frame,.detail-frame{background:#ecf2fb;border-radius:24px;padding:6px;overflow:hidden}
-    .map-frame svg,.detail-frame svg{display:block;width:100%;height:auto;border-radius:18px;box-shadow:0 6px 18px rgba(11,22,48,.12)}
+    .map-frame,.detail-frame{background:linear-gradient(180deg,#f4f6f3,#eef3f7);border-radius:24px;padding:12px;overflow:hidden;border:1px solid rgba(93,113,145,.22)}
+    .map-frame svg,.detail-frame svg{display:block;width:100%;height:auto;border-radius:18px;box-shadow:0 12px 30px rgba(11,22,48,.14)}
     .detail-caption{font-size:.92rem;color:var(--text-muted);line-height:1.34;margin-top:10px}
     .search-results{display:grid;gap:10px;margin-top:12px}
     .search-result-btn{padding:14px;border-radius:18px;text-align:left;justify-content:flex-start;align-items:flex-start;flex-direction:column;white-space:normal}
@@ -118,8 +118,8 @@
   <div class="shell">
     <section class="hero">
       <div>
-        <h1>Suburban Wayfinding — Test Index v5</h1>
-        <p>Testing model for <strong>SKU-level search + property location</strong>. Search should answer the question first, then keep the full nursery map visible so customers and staff never lose context.</p>
+        <h1>Find It at Suburban</h1>
+        <p>Search a plant, category, or SKU and the map shows exactly where to go next. This version is designed to be clear enough for a customer kiosk and useful enough for staff on the floor.</p>
       </div>
       <div class="hero-actions">
         <button class="theme-btn" id="themeBtn" type="button">Theme: Dark</button>
@@ -160,7 +160,7 @@
           <div class="map-toolbar">
             <div>
               <h3>Digital nursery map</h3>
-              <p>The full Lenexa-style nursery map stays visible, then search highlights the exact destination so customers keep their frame of reference.</p>
+              <p>The full nursery map stays visible so customers keep their bearings while the selected destination lights up clearly.</p>
             </div>
           </div>
           <div class="map-frame"><div id="overviewMapWrap"></div></div>
@@ -170,7 +170,7 @@
           <div class="map-toolbar">
             <div>
               <h3>Closer look</h3>
-              <p>A tighter crop shows the target area in more detail, including route cue and field-flag context where it helps.</p>
+              <p>A closer look enlarges the selected part of the nursery so the next move feels obvious on a phone or kiosk.</p>
             </div>
           </div>
           <div class="detail-frame"><div id="detailMapWrap"></div></div>
@@ -696,36 +696,45 @@
 
     function buildFlagMarker(flag, selectedZone, selectedFlags){
       const matched = (selectedFlags || []).includes(flag.id);
-      const relevant = matched || (selectedZone && (flag.groups || []).includes(selectedZone.group));
-      const opacity = matched ? 1 : relevant ? .78 : .42;
-      const scale = matched ? 1.14 : relevant ? .98 : .88;
-      const stroke = flag.stroke || '#5f7397';
+      if(!matched) return '';
+      const stroke = flag.stroke || '#4e617f';
       return `
-        <g opacity="${opacity}" transform="translate(${flag.x}, ${flag.y}) scale(${scale})">
-          ${matched ? `<circle cx="3" cy="-8" r="15" fill="none" stroke="#8ed54b" stroke-width="3" opacity=".65"></circle>` : ''}
-          <line x1="0" y1="0" x2="0" y2="22" stroke="#6a7f9f" stroke-width="2.2" stroke-linecap="round"></line>
-          <path d="M0 0 L0 -18 L18 -9 Z" fill="${flag.color}" stroke="${stroke}" stroke-width="1.6" stroke-linejoin="round"></path>
+        <g opacity="1" transform="translate(${flag.x}, ${flag.y}) scale(1.08)">
+          <circle cx="3" cy="-10" r="18" fill="rgba(255,255,255,.76)" stroke="#8ed54b" stroke-width="3.5"></circle>
+          <line x1="0" y1="2" x2="0" y2="26" stroke="#7387a2" stroke-width="2.4" stroke-linecap="round"></line>
+          <path d="M0 0 L0 -20 L20 -10 Z" fill="${flag.color}" stroke="${stroke}" stroke-width="1.8" stroke-linejoin="round"></path>
+          <text x="30" y="-4" font-family="Inter, Arial, sans-serif" font-size="11.5" font-weight="900" fill="#263955">${flag.label.replace(' flag','')}</text>
         </g>`;
     }
 
     function buildZoneShape(zone, selectedId, subdued = false){
       const isSelected = zone.id === selectedId;
-      const fill = isSelected ? 'url(#selGrad)' : subdued ? 'rgba(213,223,236,.86)' : 'rgba(240,245,252,.95)';
-      const stroke = isSelected ? '#8ed54b' : '#6077a0';
-      const sw = isSelected ? 4.2 : 2.5;
-      const opacity = subdued && !isSelected ? .72 : 1;
+      const fillByGroup = {
+        field: '#e9f1e4',
+        central: '#fff7ea',
+        hoop: '#eef5ff',
+        main: '#f4efe8',
+        ops: '#eff2f6'
+      };
+      const baseFill = fillByGroup[zone.group] || '#f4f7fb';
+      const fill = isSelected ? 'url(#selGrad)' : subdued ? 'rgba(232,238,246,.84)' : baseFill;
+      const stroke = isSelected ? '#82cf4a' : '#5c7193';
+      const sw = isSelected ? 4.6 : 2.4;
+      const opacity = subdued && !isSelected ? .62 : 1;
       const radius = zone.group === 'hoop' ? 24 : 18;
       const headline = zone.short;
       const subline = zone.display;
-      const headSize = zone.group === 'hoop' ? 16 : headline.length > 18 ? 13.2 : zone.w > 180 ? 16.5 : 14.2;
-      const subSize = zone.group === 'hoop' ? 11.2 : zone.w > 180 ? 10.8 : 10.4;
-      const textFill = isSelected ? '#eef4ff' : '#1b2b45';
-      const subFill = isSelected ? 'rgba(238,244,255,.96)' : '#385072';
+      const headSize = zone.group === 'hoop' ? 18 : headline.length > 18 ? 13.8 : zone.w > 180 ? 18 : 14.5;
+      const subSize = zone.group === 'hoop' ? 12.2 : zone.w > 180 ? 11.4 : 10.8;
+      const textFill = isSelected ? '#f8fcff' : '#1d2c45';
+      const subFill = isSelected ? 'rgba(248,252,255,.96)' : '#3f5676';
+      const headY = zone.group === 'hoop' ? zone.y + 24 : zone.y + 24;
+      const subY = zone.group === 'hoop' ? zone.y + 42 : zone.y + 45;
       return `
-        <g opacity="${opacity}" ${isSelected ? 'filter="url(#zoneGlow)"' : ''}>
+        <g opacity="${opacity}" ${isSelected ? 'filter="url(#zoneGlow)"' : 'filter="url(#zoneShadow)"'}>
           <rect x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${radius}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"></rect>
-          <text x="${zone.x + zone.w/2}" y="${zone.y + (zone.group === 'hoop' ? 24 : 24)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${headSize}" font-weight="900" fill="${textFill}">${headline}</text>
-          <text x="${zone.x + zone.w/2}" y="${zone.y + (zone.group === 'hoop' ? 41 : 43)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${subSize}" font-weight="700" fill="${subFill}">${subline}</text>
+          <text x="${zone.x + zone.w/2}" y="${headY}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${headSize}" font-weight="900" fill="${textFill}">${headline}</text>
+          <text x="${zone.x + zone.w/2}" y="${subY}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${subSize}" font-weight="700" fill="${subFill}">${subline}</text>
         </g>`;
     }
 
