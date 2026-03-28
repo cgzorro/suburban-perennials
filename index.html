@@ -892,6 +892,14 @@
       gap: 16px;
     }
 
+    .kiosk-map-board {
+      min-height: 250px;
+    }
+
+    .kiosk-map-board svg {
+      min-height: 230px;
+    }
+
     .status-note {
       border: 1px solid var(--border);
       border-radius: 18px;
@@ -1516,6 +1524,15 @@
               <h2>Directions</h2>
               <p class="kiosk-lead">Select a result to show a short verbal direction you can repeat to a customer.</p>
             </section>
+            <section class="panel" id="kioskMapPanel">
+              <h2>Map view</h2>
+              <p class="kiosk-lead">Selected plants now show a simple map preview so customers can confirm where to go before they leave the kiosk.</p>
+              <div class="map-board kiosk-map-board" id="kioskMapBoard"></div>
+              <p class="map-caption" id="kioskMapCaption">Select a result to highlight its area on the nursery map.</p>
+              <div class="detail-actions">
+                <button type="button" class="location-btn primary" id="kioskOpenLargeMap" hidden>Open larger map</button>
+              </div>
+            </section>
             <section class="panel">
               <h2>Fast prompts</h2>
               <div class="detail-tag-row">
@@ -1869,7 +1886,10 @@
       kioskSearch: document.getElementById("kioskSearch"),
       kioskActions: document.getElementById("kioskActions"),
       kioskResults: document.getElementById("kioskResults"),
-      kioskDetailPanel: document.getElementById("kioskDetailPanel")
+      kioskDetailPanel: document.getElementById("kioskDetailPanel"),
+      kioskMapBoard: document.getElementById("kioskMapBoard"),
+      kioskMapCaption: document.getElementById("kioskMapCaption"),
+      kioskOpenLargeMap: document.getElementById("kioskOpenLargeMap")
     };
 
     function normalizeText(v) {
@@ -2830,7 +2850,12 @@
         if (picked === "Tree" || picked === "Shrub") return item.category === picked || item.category === `${picked}/Shrub`;
         return item.traits.includes(picked);
       })).slice(0, 24);
+
+      const selected = state.kioskResults.find(item => item.id === state.selectedKioskId) || null;
+      if (!selected) state.selectedKioskId = "";
+
       renderKioskResults();
+      renderKioskDetail(selected);
     }
 
     function renderKioskResults() {
@@ -2859,11 +2884,36 @@
       });
     }
 
-    function selectKioskItem(itemId) {
-      const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
-      if (!item) return;
-      state.selectedKioskId = item.id;
-      renderKioskResults();
+    function renderKioskMap(item = null) {
+      if (!els.kioskMapBoard || !els.kioskMapCaption) return;
+      const activeZoneIds = item?.zoneIds?.length ? item.zoneIds : [];
+      const markerItems = item ? [item] : [];
+      els.kioskMapBoard.innerHTML = buildMapSvg(activeZoneIds, markerItems, "0 0 1020 950");
+
+      if (item) {
+        const flagText = item.flagColor ? ` Look for the ${titleCase(item.flagColor)} flag.` : "";
+        els.kioskMapCaption.textContent = `${item.locationLabel} is highlighted on the nursery map so customers can keep the full layout in view.${flagText}`;
+      } else {
+        els.kioskMapCaption.textContent = "Select a result to highlight its area on the nursery map.";
+      }
+
+      if (els.kioskOpenLargeMap) {
+        els.kioskOpenLargeMap.hidden = !item;
+        els.kioskOpenLargeMap.disabled = !item;
+      }
+    }
+
+    function renderKioskDetail(item = null) {
+      if (!item) {
+        els.kioskDetailPanel.innerHTML = `
+          <h2>Directions</h2>
+          <p class="kiosk-lead">Select a result to show a short verbal direction you can repeat to a customer.</p>
+          <p class="zone-directions">The map preview will highlight the destination once a customer picks a plant.</p>
+        `;
+        renderKioskMap(null);
+        return;
+      }
+
       els.kioskDetailPanel.innerHTML = `
         <h2>${escapeHtml(item.name)}</h2>
         <p class="kiosk-lead"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
@@ -2878,6 +2928,15 @@
         </div>
       `;
       wireCopyButtons(els.kioskDetailPanel);
+      renderKioskMap(item);
+    }
+
+    function selectKioskItem(itemId) {
+      const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
+      if (!item) return;
+      state.selectedKioskId = item.id;
+      renderKioskResults();
+      renderKioskDetail(item);
     }
 
     async function loadPlants() {
@@ -2939,6 +2998,13 @@
       window.addEventListener("resize", syncMobileMapUi);
 
       els.kioskSearch.addEventListener("input", applyKioskFilters);
+      els.kioskOpenLargeMap?.addEventListener("click", () => {
+        const item = NURSERY_ITEMS.find(entry => entry.id === state.selectedKioskId);
+        if (!item) return;
+        showView("finder");
+        selectFinderItem(item.id);
+        els.finderView?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     }
 
     function initFinder() {
@@ -2948,6 +3014,7 @@
       renderFinderMaps([], []);
       applyFinderFilters();
       renderKioskActions();
+      renderKioskMap(null);
       applyKioskFilters();
     }
 
