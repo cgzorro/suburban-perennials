@@ -139,7 +139,8 @@
     .kiosk-btn,
     .finder-card,
     .map-link,
-    .location-btn {
+    .location-btn,
+    .finder-chip {
       border: 1px solid var(--border);
       color: var(--text);
       cursor: pointer;
@@ -692,7 +693,6 @@
       height: auto;
     }
 
-
     .map-pan-shell {
       border: 1px solid var(--border);
       border-radius: 24px;
@@ -915,6 +915,21 @@
       border: 0;
     }
 
+    .map-caption {
+      color: var(--text-muted);
+      font-size: .94rem;
+      line-height: 1.42;
+      margin: 12px 0 0;
+    }
+
+    .detail-map-board {
+      min-height: 280px;
+    }
+
+    .detail-map-board svg {
+      min-height: 260px;
+    }
+
     @media (max-width: 1200px) {
       .controls-grid {
         grid-template-columns: 1fr 1fr 1fr;
@@ -1006,6 +1021,9 @@
       .map-label { font-size: 17px; }
       .map-small,
       .map-static { font-size: 13px; }
+      .detail-map-board {
+        min-height: 220px;
+      }
     }
 
     @media (min-width: 901px) {
@@ -1031,248 +1049,244 @@
       }
     }
 
+    .flag-chip-note {
+      background: transparent;
+      border-style: dashed;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
 
-/* Map cleanup update */
-.flag-chip-note {
-  background: transparent;
-  border-style: dashed;
-  font-weight: 700;
-  color: var(--text-muted);
-}
+    .mini-flag.white {
+      filter: drop-shadow(0 0 0.8px rgba(0,0,0,0.55));
+    }
 
-.mini-flag.white {
-  filter: drop-shadow(0 0 0.8px rgba(0,0,0,0.55));
-}
+    .map-board {
+      padding: 16px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.42), rgba(255,255,255,0.16)),
+        var(--map-bg);
+    }
 
-.map-board {
-  padding: 16px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.42), rgba(255,255,255,0.16)),
-    var(--map-bg);
-}
+    .map-board svg {
+      border-radius: 18px;
+    }
 
-.map-board svg {
-  border-radius: 18px;
-}
+    .map-top-field {
+      fill: #e8edf4;
+      stroke: #bcc8d7;
+      stroke-width: 2;
+    }
 
-.map-top-field {
-  fill: #e8edf4;
-  stroke: #bcc8d7;
-  stroke-width: 2;
-}
+    .map-soft-block {
+      fill: #eef3f8;
+      stroke: #c5d0dd;
+      stroke-width: 1.8;
+    }
 
-.map-soft-block {
-  fill: #eef3f8;
-  stroke: #c5d0dd;
-  stroke-width: 1.8;
-}
+    .map-road {
+      fill: none;
+      stroke: #f8fbff;
+      stroke-width: 26;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: .95;
+    }
 
-.map-road {
-  fill: none;
-  stroke: #f8fbff;
-  stroke-width: 26;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: .95;
-}
+    .map-bench-strip {
+      fill: none;
+      stroke: #b7c2d1;
+      stroke-width: 8;
+      stroke-linecap: round;
+      opacity: .9;
+    }
 
-.map-bench-strip {
-  fill: none;
-  stroke: #b7c2d1;
-  stroke-width: 8;
-  stroke-linecap: round;
-  opacity: .9;
-}
+    .map-arrow-line {
+      stroke: var(--map-line);
+      stroke-width: 3;
+      stroke-dasharray: 9 8;
+      opacity: .75;
+    }
 
-.map-arrow-line {
-  stroke: var(--map-line);
-  stroke-width: 3;
-  stroke-dasharray: 9 8;
-  opacity: .75;
-}
+    .map-zone-shape {
+      fill: rgba(219, 228, 238, 0.82);
+      stroke: rgba(69, 90, 118, 0.88);
+      stroke-width: 2;
+    }
 
-.map-zone-shape {
-  fill: rgba(219, 228, 238, 0.82);
-  stroke: rgba(69, 90, 118, 0.88);
-  stroke-width: 2;
-}
+    .map-zone-shape.active {
+      fill: var(--map-zone-active);
+      stroke-width: 4;
+    }
 
-.map-zone-shape.active {
-  fill: var(--map-zone-active);
-  stroke-width: 4;
-}
+    .map-label {
+      font-size: 19px;
+      font-weight: 800;
+      text-anchor: middle;
+    }
 
-.map-label {
-  font-size: 19px;
-  font-weight: 800;
-  text-anchor: middle;
-}
+    .map-label.house {
+      font-size: 17px;
+    }
 
-.map-label.house {
-  font-size: 17px;
-}
+    .map-small {
+      font-size: 13px;
+      font-weight: 650;
+      text-anchor: middle;
+      opacity: .82;
+    }
 
-.map-small {
-  font-size: 13px;
-  font-weight: 650;
-  text-anchor: middle;
-  opacity: .82;
-}
+    .map-small.house {
+      font-size: 12px;
+    }
 
-.map-small.house {
-  font-size: 12px;
-}
+    .map-static {
+      font-size: 15px;
+      font-weight: 700;
+    }
 
-.map-static {
-  font-size: 15px;
-  font-weight: 700;
-}
+    .map-static.section {
+      font-size: 18px;
+      font-weight: 800;
+    }
 
-.map-static.section {
-  font-size: 18px;
-  font-weight: 800;
-}
+    .map-static.small {
+      font-size: 12px;
+      font-weight: 700;
+    }
 
-.map-static.small {
-  font-size: 12px;
-  font-weight: 700;
-}
+    .map-fixed-flag {
+      opacity: .64;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.14));
+    }
 
-.map-fixed-flag {
-  opacity: .64;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.14));
-}
+    .map-fixed-flag.active {
+      opacity: 1;
+      filter: drop-shadow(0 0 7px rgba(123, 208, 95, 0.52));
+    }
 
-.map-fixed-flag.active {
-  opacity: 1;
-  filter: drop-shadow(0 0 7px rgba(123, 208, 95, 0.52));
-}
+    .map-flag-stick {
+      stroke: #667384;
+      stroke-width: 1.5;
+    }
 
-.map-flag-stick {
-  stroke: #667384;
-  stroke-width: 1.5;
-}
+    .map-flag-base {
+      stroke: #263243;
+      stroke-width: 1.2;
+    }
 
-.map-flag-base {
-  stroke: #263243;
-  stroke-width: 1.2;
-}
+    .map-flag-base.white {
+      stroke: #516071;
+      stroke-width: 2.2;
+    }
 
-.map-flag-base.white {
-  stroke: #516071;
-  stroke-width: 2.2;
-}
+    html[data-theme="light"] .map-top-field {
+      fill: #edf3f9;
+      stroke: #bcc8d6;
+    }
 
-html[data-theme="light"] .map-top-field {
-  fill: #edf3f9;
-  stroke: #bcc8d6;
-}
+    html[data-theme="light"] .map-soft-block {
+      fill: #ffffff;
+      stroke: #ccd7e4;
+    }
 
-html[data-theme="light"] .map-soft-block {
-  fill: #ffffff;
-  stroke: #ccd7e4;
-}
+    html[data-theme="light"] .map-road {
+      stroke: #ffffff;
+    }
 
-html[data-theme="light"] .map-road {
-  stroke: #ffffff;
-}
+    html[data-theme="light"] .map-bench-strip {
+      stroke: #c3cddd;
+    }
 
-html[data-theme="light"] .map-bench-strip {
-  stroke: #c3cddd;
-}
+    @media (max-width: 900px) {
+      .flag-chip-note {
+        width: 100%;
+        border-radius: 16px;
+      }
 
-@media (max-width: 900px) {
-  .flag-chip-note {
-    width: 100%;
-    border-radius: 16px;
-  }
+      .map-label {
+        font-size: 16px;
+      }
 
-  .map-label {
-    font-size: 16px;
-  }
+      .map-label.house {
+        font-size: 14px;
+      }
 
-  .map-label.house {
-    font-size: 14px;
-  }
+      .map-small,
+      .map-small.house,
+      .map-static.small {
+        font-size: 11px;
+      }
 
-  .map-small,
-  .map-small.house,
-  .map-static.small {
-    font-size: 11px;
-  }
+      .map-static {
+        font-size: 13px;
+      }
 
-  .map-static {
-    font-size: 13px;
-  }
+      .map-static.section {
+        font-size: 15px;
+      }
+    }
 
-  .map-static.section {
-    font-size: 15px;
-  }
-}
-
-  
-.map-title-accent {
-  fill: var(--map-text);
-  font-family: Inter, Segoe UI, Arial, sans-serif;
-  font-size: 30px;
-  font-weight: 850;
-  text-anchor: middle;
-}
-.map-heading-note {
-  fill: var(--map-text);
-  font-family: Inter, Segoe UI, Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  text-anchor: middle;
-  opacity: .74;
-}
-.map-yard-label {
-  fill: var(--map-text);
-  font-family: Inter, Segoe UI, Arial, sans-serif;
-  font-size: 19px;
-  font-weight: 780;
-}
-.map-yard-item {
-  fill: var(--map-text);
-  font-family: Inter, Segoe UI, Arial, sans-serif;
-  font-size: 16px;
-  font-weight: 760;
-  opacity: .84;
-}
-.map-divider {
-  stroke: #c7d1dd;
-  stroke-width: 2;
-  opacity: .7;
-}
-.map-you-ring {
-  fill: rgba(215,74,74,.18);
-  stroke: rgba(215,74,74,.46);
-  stroke-width: 3;
-}
-.map-you-dot {
-  fill: #d74a4a;
-  stroke: #9a2f2f;
-  stroke-width: 2;
-}
-.map-you-text {
-  fill: #b53b3b;
-  font-family: Inter, Segoe UI, Arial, sans-serif;
-  font-size: 16px;
-  font-weight: 800;
-}
-.map-you-line {
-  stroke: #d74a4a;
-  stroke-width: 2;
-}
-
-</style>
+    .map-title-accent {
+      fill: var(--map-text);
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      font-size: 30px;
+      font-weight: 850;
+      text-anchor: middle;
+    }
+    .map-heading-note {
+      fill: var(--map-text);
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      text-anchor: middle;
+      opacity: .74;
+    }
+    .map-yard-label {
+      fill: var(--map-text);
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      font-size: 19px;
+      font-weight: 780;
+    }
+    .map-yard-item {
+      fill: var(--map-text);
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 760;
+      opacity: .84;
+    }
+    .map-divider {
+      stroke: #c7d1dd;
+      stroke-width: 2;
+      opacity: .7;
+    }
+    .map-you-ring {
+      fill: rgba(215,74,74,.18);
+      stroke: rgba(215,74,74,.46);
+      stroke-width: 3;
+    }
+    .map-you-dot {
+      fill: #d74a4a;
+      stroke: #9a2f2f;
+      stroke-width: 2;
+    }
+    .map-you-text {
+      fill: #b53b3b;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .map-you-line {
+      stroke: #d74a4a;
+      stroke-width: 2;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <section class="hero">
       <div class="hero-copy">
         <h1>Suburban Perennials</h1>
-        <p>Perennial browser, nursery finder, and customer kiosk in one app. The plant browser stays intact; the new tabs add whole-nursery wayfinding for trees, shrubs, hoop houses, and field-flag lookups.</p>
+        <p>Perennial browser, nursery finder, and customer kiosk in one app. The plant browser stays intact; the new Finder view now adds a full overview map plus a zoomed closer-look panel for trees, shrubs, hoop houses, and field-flag lookups.</p>
       </div>
       <div class="hero-actions">
         <div class="view-tabs" role="tablist" aria-label="App views">
@@ -1386,7 +1400,7 @@ html[data-theme="light"] .map-bench-strip {
     <section id="finderView" class="app-view" hidden>
       <section class="controls-wrap">
         <div class="status-note">
-          <strong>New:</strong> the Nursery Finder uses the tree/shrub sheets, hoop house references, brochure traits, and a clean digital schematic. Colored triangles on the map represent the physical field flags you mentioned.
+          <strong>New:</strong> the Nursery Finder uses the tree/shrub sheets, hoop house references, brochure traits, and a clean digital schematic. Colored triangles on the map represent the physical field flags you mentioned, and the closer-look map zooms to the selected section.
         </div>
 
         <div class="finder-toolbar">
@@ -1424,29 +1438,43 @@ html[data-theme="light"] .map-bench-strip {
 
         <div class="map-shell">
           <section class="panel">
-            <h2>Nursery map</h2>
+            <h2>Overview map</h2>
             <details class="legend-disclosure" id="legendDisclosure" open>
               <summary>Field flag legend</summary>
               <div class="flag-legend" id="flagLegend"></div>
               <p class="map-help">Flags are drawn only where they appear on the paper map example. Zone highlighting stays interactive for plant lookup.</p>
             </details>
+
             <div class="mobile-map-tools" id="mobileMapTools" aria-label="Mobile map jump controls">
               <button type="button" class="location-btn" data-map-focus="left">Left yard</button>
               <button type="button" class="location-btn" data-map-focus="center">Center</button>
               <button type="button" class="location-btn" data-map-focus="houses">Hoop houses</button>
               <button type="button" class="location-btn" data-map-focus="perennials">Perennials</button>
             </div>
+
             <div class="map-pan-shell" id="mapPanShell">
-              <div class="map-board" id="mapBoard"></div>
+              <div class="map-board" id="overviewMapBoard"></div>
             </div>
+
+            <p class="map-caption" id="overviewMapCaption">The full nursery stays visible while the selected destination stays highlighted.</p>
+
             <p class="map-help mobile-swipe-note">Swipe the map horizontally on mobile. Use the quick jump buttons if you want to move straight to hoop houses or perennials.</p>
+
             <div class="map-help-row quick-links">
               <button type="button" class="location-btn" data-zone-jump="house4">Azaleas / Rhododendron</button>
               <button type="button" class="location-btn" data-zone-jump="house5">Hydrangeas</button>
               <button type="button" class="location-btn" data-zone-jump="house7">Japanese Maples</button>
               <button type="button" class="location-btn" data-zone-jump="house8">Dogwoods</button>
             </div>
+
             <p class="map-help">You are here: customers typically enter this part of the nursery from the <strong>perennials / checkout</strong> side at the bottom of the map. Hoop houses are on the right. Ball &amp; Burlap trees are at the top. Bulk goods and rock yard are left.</p>
+          </section>
+
+          <section class="panel">
+            <h2>Closer look</h2>
+            <p class="panel-lead">The selected section zooms here so staff and customers can confirm the next move on a phone or kiosk.</p>
+            <div class="map-board detail-map-board" id="detailMapBoard"></div>
+            <p class="map-caption" id="detailMapCaption">Select a plant or tap a zone to zoom into that section.</p>
           </section>
 
           <section class="panel zone-details" id="locationDetails">
@@ -1508,21 +1536,21 @@ html[data-theme="light"] .map-bench-strip {
     const NURSERY_MAPS_LINK = "https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D";
 
     const FLAG_COLORS = {
-  black: "#1d2430",
-  brown: "#7b5131",
-  pink: "#d14f92",
-  purple: "#7f4fc8",
-  yellow: "#d8b13b",
-  green: "#3e9c5b",
-  blue: "#4b7fd7",
-  red: "#d74a4a",
-  orange: "#eb7a3a",
-  magenta: "#b93a83",
-  teal: "#2f9f87",
-  gray: "#7d8794",
-  charcoal: "#565f6c",
-  white: "#ffffff"
-};
+      black: "#1d2430",
+      brown: "#7b5131",
+      pink: "#d14f92",
+      purple: "#7f4fc8",
+      yellow: "#d8b13b",
+      green: "#3e9c5b",
+      blue: "#4b7fd7",
+      red: "#d74a4a",
+      orange: "#eb7a3a",
+      magenta: "#b93a83",
+      teal: "#2f9f87",
+      gray: "#7d8794",
+      charcoal: "#565f6c",
+      white: "#ffffff"
+    };
 
     const FINDER_TRAITS = [
       "shade",
@@ -1660,24 +1688,23 @@ html[data-theme="light"] .map-bench-strip {
       { id: "annuals", title: "Annuals", subtitle: "", shape: "rect", x: 718, y: 814, w: 140, h: 96, centerX: 788, centerY: 862 }
     ];
 
-const MAP_FLAG_MARKERS = [
-  { id: "flag-entry-magenta", color: "magenta", x: 180, y: 420, note: "Entry-side field flag shown on paper map" },
-  { id: "flag-top-black", color: "black", x: 414, y: 308, note: "Upper center flag shown on paper map" },
-  { id: "flag-container-brown", color: "brown", x: 415, y: 395, note: "Container tree row flag shown on paper map" },
-  { id: "flag-house8-purple", color: "purple", x: 730, y: 316, note: "Upper right hoop-house flag shown on paper map" },
-  { id: "flag-center-green", color: "green", x: 585, y: 405, note: "Center bed flag shown on paper map" },
-  { id: "flag-house6-yellow", color: "yellow", x: 726, y: 408, note: "Right-center flag shown on paper map" },
-  { id: "flag-evergreen-white", color: "white", x: 410, y: 494, note: "Evergreen strip flag shown on paper map" },
-  { id: "flag-evergreen-charcoal", color: "charcoal", x: 565, y: 494, note: "Evergreen strip dark flag shown on paper map" },
-  { id: "flag-lower-blue", color: "blue", x: 472, y: 598, note: "Lower left bed flag shown on paper map" },
-  { id: "flag-lower-pink", color: "pink", x: 592, y: 598, note: "Lower middle bed flag shown on paper map" },
-  { id: "flag-lower-orange", color: "orange", x: 732, y: 596, note: "Lower right bed flag shown on paper map" },
-  { id: "flag-lower-teal", color: "teal", x: 620, y: 704, note: "Curved lower bed flag shown on paper map" },
-  { id: "flag-roses-red", color: "red", x: 752, y: 682, note: "Roses and grasses flag shown on paper map" }
-];
+    const MAP_FLAG_MARKERS = [
+      { id: "flag-entry-magenta", color: "magenta", x: 180, y: 420, note: "Entry-side field flag shown on paper map" },
+      { id: "flag-top-black", color: "black", x: 414, y: 308, note: "Upper center flag shown on paper map" },
+      { id: "flag-container-brown", color: "brown", x: 415, y: 395, note: "Container tree row flag shown on paper map" },
+      { id: "flag-house8-purple", color: "purple", x: 730, y: 316, note: "Upper right hoop-house flag shown on paper map" },
+      { id: "flag-center-green", color: "green", x: 585, y: 405, note: "Center bed flag shown on paper map" },
+      { id: "flag-house6-yellow", color: "yellow", x: 726, y: 408, note: "Right-center flag shown on paper map" },
+      { id: "flag-evergreen-white", color: "white", x: 410, y: 494, note: "Evergreen strip flag shown on paper map" },
+      { id: "flag-evergreen-charcoal", color: "charcoal", x: 565, y: 494, note: "Evergreen strip dark flag shown on paper map" },
+      { id: "flag-lower-blue", color: "blue", x: 472, y: 598, note: "Lower left bed flag shown on paper map" },
+      { id: "flag-lower-pink", color: "pink", x: 592, y: 598, note: "Lower middle bed flag shown on paper map" },
+      { id: "flag-lower-orange", color: "orange", x: 732, y: 596, note: "Lower right bed flag shown on paper map" },
+      { id: "flag-lower-teal", color: "teal", x: 620, y: 704, note: "Curved lower bed flag shown on paper map" },
+      { id: "flag-roses-red", color: "red", x: 752, y: 682, note: "Roses and grasses flag shown on paper map" }
+    ];
 
     const NURSERY_BASE = [
-      // Trees
       { name: "Arborvitae Tree", category: "Tree", zoneIds: ["a"], locationLabel: "Ball & Burlap A", area: "Upright Arborvitae", flagColor: "black" },
       { name: "Aspen", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
       { name: "Bald Cypress", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
@@ -1712,8 +1739,6 @@ const MAP_FLAG_MARKERS = [
       { name: "Tulip Tree", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
       { name: "Whitebud", category: "Tree", zoneIds: ["house6"], locationLabel: "Hoop House 6", area: "Redbud & Magnolia", flagColor: "brown" },
       { name: "Willow", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
-
-      // Shrubs
       { name: "Abelia", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow orange flag", area: "Flowering Shrubs", flagColor: "orange" },
       { name: "Althea", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow orange flag", area: "Flowering Shrubs", flagColor: "orange" },
       { name: "Arborvitae Shrub", category: "Shrub", zoneIds: ["field-shrub"], locationLabel: "Shrub field — follow pink flag", area: "Evergreen Trees & Shrubs", flagColor: "pink" },
@@ -1831,7 +1856,10 @@ const MAP_FLAG_MARKERS = [
       finderResults: document.getElementById("finderResults"),
       finderClearBtn: document.getElementById("finderClearBtn"),
       flagLegend: document.getElementById("flagLegend"),
-      mapBoard: document.getElementById("mapBoard"),
+      overviewMapBoard: document.getElementById("overviewMapBoard"),
+      detailMapBoard: document.getElementById("detailMapBoard"),
+      overviewMapCaption: document.getElementById("overviewMapCaption"),
+      detailMapCaption: document.getElementById("detailMapCaption"),
       mapPanShell: document.getElementById("mapPanShell"),
       legendDisclosure: document.getElementById("legendDisclosure"),
       mobileMapTools: document.getElementById("mobileMapTools"),
@@ -2331,152 +2359,248 @@ const MAP_FLAG_MARKERS = [
     }
 
     function renderFlagLegend() {
-  const orderedColors = [];
-  MAP_FLAG_MARKERS.forEach(marker => {
-    if (!orderedColors.includes(marker.color)) orderedColors.push(marker.color);
-  });
+      const orderedColors = [];
+      MAP_FLAG_MARKERS.forEach(marker => {
+        if (!orderedColors.includes(marker.color)) orderedColors.push(marker.color);
+      });
 
-  els.flagLegend.innerHTML = `
-    <span class="flag-chip flag-chip-note">Approximate field-flag examples from the paper map.</span>
-    ${orderedColors.map(color => `
-      <span class="flag-chip">
-        <span class="mini-flag ${color === "white" ? "white" : ""}" style="--flag:${FLAG_COLORS[color] || color}"></span>
-        ${titleCase(color)} flag
-      </span>
-    `).join("")}
-  `;
-}
+      els.flagLegend.innerHTML = `
+        <span class="flag-chip flag-chip-note">Approximate field-flag examples from the paper map.</span>
+        ${orderedColors.map(color => `
+          <span class="flag-chip">
+            <span class="mini-flag ${color === "white" ? "white" : ""}" style="--flag:${FLAG_COLORS[color] || color}"></span>
+            ${titleCase(color)} flag
+          </span>
+        `).join("")}
+      `;
+    }
 
-function escapeHtml(value) {
+    function escapeHtml(value) {
       return String(value || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
+        .replace(/\"/g, "&quot;");
     }
 
-    function renderMap(activeZoneIds = [], markerItems = []) {
-  const active = new Set(activeZoneIds || []);
-  const selectedColors = new Set((markerItems || []).map(item => item.flagColor).filter(Boolean));
-
-  const staticText = `
-    <text class="map-title-accent" x="458" y="158">Ball &amp; Burlap Trees</text>
-    <text class="map-title-accent" x="917" y="308">Hoop Houses</text>
-    <text class="map-heading-note" x="917" y="330">shade tolerant</text>
-
-    <text class="map-yard-label" x="38" y="480">Employees Only</text>
-    <text class="map-yard-item" x="36" y="620">Bulk Mulch</text>
-    <text class="map-yard-item" x="34" y="670">Rock Yard</text>
-    <text class="map-yard-item" x="34" y="736">Bagged Goods &amp; Loading</text>
-    <text class="map-yard-item" x="34" y="826">Bulk Soils, Sand &amp; Compost</text>
-
-    <text class="map-static section" x="316" y="436">To East Bottoms</text>
-    <text class="map-static small subtle" x="410" y="912">Main building</text>
-    <text class="map-static small subtle" x="742" y="912">Main building</text>
-  `;
-
-  const zoneShapes = MAP_ZONES.map(zone => {
-    const rx = zone.shape === "pill" ? 22 : 16;
-    const subtitleY = zone.centerY + (zone.shape === "pill" ? 16 : 20);
-    const titleClass = zone.shape === "pill" ? "map-label house" : "map-label";
-    const subtitleClass = zone.shape === "pill" ? "map-small house" : "map-small";
-    const titleY = zone.subtitle ? zone.centerY - 4 : zone.centerY + 6;
-    return `
-      <g data-zone-group="${zone.id}">
-        <rect class="map-zone-shape${active.has(zone.id) ? " active" : ""}" data-zone="${zone.id}" x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${rx}" ry="${rx}"></rect>
-        <text class="${titleClass}" x="${zone.centerX}" y="${titleY}">${zone.title}</text>
-        ${zone.subtitle ? `<text class="${subtitleClass}" x="${zone.centerX}" y="${subtitleY}">${zone.subtitle}</text>` : ""}
-      </g>
-    `;
-  }).join("");
-
-  const exampleFlags = MAP_FLAG_MARKERS.map(marker => {
-    const color = FLAG_COLORS[marker.color] || marker.color || "#777";
-    const isActive = selectedColors.has(marker.color);
-    return `
-      <g class="map-fixed-flag${isActive ? " active" : ""}" aria-hidden="true" transform="translate(${marker.x} ${marker.y})">
-        <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="28"></line>
-        <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="0,0 -22,-12 -22,12" fill="${color}"></polygon>
-      </g>
-    `;
-  }).join("");
-
-  els.mapBoard.innerHTML = `
-    <svg viewBox="0 0 1020 950" role="img" aria-label="Digital nursery map based on the paper map">
-      <defs>
-        <pattern id="diagHatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="8" stroke="#c8d2dd" stroke-width="2"></line>
-        </pattern>
-      </defs>
-
-      <rect x="0" y="0" width="1020" height="950" fill="var(--map-bg)"></rect>
-
-      <path class="map-top-field" d="M60 68h186c34 0 50 16 58 40 10 28 24 38 50 38 27 0 39-10 49-38 10-26 28-40 58-40h454c54 0 82 34 82 82v166c0 56-34 84-82 84H396V184H258V328H82c-48 0-72-26-72-72V140c0-44 20-72 50-72Z"></path>
-
-      <rect class="map-soft-block" x="14" y="332" width="168" height="126" rx="18"></rect>
-      <rect x="10" y="328" width="176" height="134" rx="18" fill="url(#diagHatch)" opacity=".56"></rect>
-      <line class="map-divider" x1="214" y1="148" x2="214" y2="878"></line>
-
-      <path class="map-road" d="M342 352V528"></path>
-      <path class="map-road" d="M390 464H818"></path>
-      <path class="map-road" d="M728 368V776"></path>
-      <path class="map-road" d="M448 778C486 742 526 726 582 726C634 726 668 740 706 778"></path>
-
-      <rect class="map-soft-block" x="378" y="770" width="502" height="162" rx="6"></rect>
-      <rect class="map-soft-block" x="254" y="610" width="18" height="170" rx="9"></rect>
-      <rect class="map-soft-block" x="404" y="826" width="84" height="92" rx="10"></rect>
-      <rect class="map-soft-block" x="510" y="826" width="128" height="92" rx="10"></rect>
-
-      <path class="map-bench-strip" d="M170 708l54-86"></path>
-      <path class="map-bench-strip" d="M182 738l58-92"></path>
-      <path class="map-bench-strip" d="M194 768l60-94"></path>
-      <path class="map-bench-strip" d="M206 798l60-94"></path>
-
-      <line x1="342" y1="206" x2="342" y2="560" class="map-arrow-line"></line>
-      <polygon points="342,194 334,208 350,208" fill="var(--map-line)"></polygon>
-
-      ${zoneShapes}
-      ${exampleFlags}
-      ${staticText}
-
-      <g aria-label="You are here marker">
-        <line class="map-you-line" x1="700" y1="786" x2="654" y2="828"></line>
-        <circle class="map-you-ring" cx="700" cy="786" r="20"></circle>
-        <circle class="map-you-dot" cx="700" cy="786" r="10"></circle>
-        <text class="map-you-text" x="612" y="846">You are here</text>
-      </g>
-    </svg>
-  `;
-
-  els.mapBoard.querySelectorAll("[data-zone]").forEach(node => {
-    node.addEventListener("click", () => handleZoneClick(node.dataset.zone));
-  });
-}
-
-function syncMobileMapUi() {
-  if (window.innerWidth <= 900) {
-    if (els.legendDisclosure) els.legendDisclosure.open = false;
-  } else if (els.legendDisclosure) {
-    els.legendDisclosure.open = true;
-  }
-}
-
-function jumpMapFocus(target) {
-  if (!els.mapPanShell) return;
-  const shell = els.mapPanShell;
-  const maxLeft = Math.max(0, shell.scrollWidth - shell.clientWidth);
-  const points = {
-    left: 0,
-    center: Math.round(maxLeft * 0.42),
-    houses: Math.round(maxLeft * 0.88),
-    perennials: Math.round(maxLeft * 0.66)
-  };
-  shell.scrollTo({ left: points[target] ?? 0, behavior: "smooth" });
-}
-
-function zoneTitle(zoneId) {
+    function zoneTitle(zoneId) {
       const zone = MAP_ZONES.find(z => z.id === zoneId);
-      return zone ? `${zone.title} — ${zone.subtitle}` : zoneId;
+      if (!zone) return zoneId;
+      return zone.subtitle ? `${zone.title} — ${zone.subtitle}` : zone.title;
+    }
+
+    function clampZoomBox(box) {
+      const maxW = 1020;
+      const maxH = 950;
+      const x = Math.max(0, box.x);
+      const y = Math.max(0, box.y);
+      const w = Math.max(180, Math.min(box.w, maxW - x));
+      const h = Math.max(160, Math.min(box.h, maxH - y));
+      return { x, y, w, h };
+    }
+
+    function getZoneZoomBox(zoneId) {
+      const zone = MAP_ZONES.find(z => z.id === zoneId);
+      if (!zone) return { x: 300, y: 700, w: 620, h: 230 };
+
+      if (/^house\d$/.test(zoneId)) {
+        return clampZoomBox({
+          x: 770,
+          y: Math.max(280, zone.y - 84),
+          w: 240,
+          h: 210
+        });
+      }
+
+      if (zoneId === "between123") {
+        return clampZoomBox({ x: 730, y: 640, w: 230, h: 150 });
+      }
+
+      if (["sun-perennials", "shade-perennials", "annuals", "tropicals"].includes(zoneId)) {
+        return clampZoomBox({ x: 320, y: 730, w: 580, h: 220 });
+      }
+
+      if (["field-shrub", "field-tree", "roses", "playground"].includes(zoneId)) {
+        return clampZoomBox({
+          x: Math.max(180, zone.x - 120),
+          y: Math.max(300, zone.y - 120),
+          w: 420,
+          h: 300
+        });
+      }
+
+      if (["container", "e", "flowering"].includes(zoneId)) {
+        return clampZoomBox({
+          x: Math.max(180, zone.x - 120),
+          y: Math.max(220, zone.y - 100),
+          w: 470,
+          h: 310
+        });
+      }
+
+      if (["a", "b", "c", "d"].includes(zoneId)) {
+        return clampZoomBox({
+          x: Math.max(0, zone.x - 70),
+          y: 20,
+          w: Math.min(900, zone.w + 220),
+          h: 320
+        });
+      }
+
+      return clampZoomBox({
+        x: Math.max(0, zone.x - 120),
+        y: Math.max(0, zone.y - 100),
+        w: zone.w + 260,
+        h: zone.h + 220
+      });
+    }
+
+    function buildMapSvg(activeZoneIds = [], markerItems = [], viewBox = "0 0 1020 950") {
+      const active = new Set(activeZoneIds || []);
+      const selectedColors = new Set((markerItems || []).map(item => item.flagColor).filter(Boolean));
+
+      const staticText = `
+        <text class="map-title-accent" x="458" y="158">Ball &amp; Burlap Trees</text>
+        <text class="map-title-accent" x="917" y="308">Hoop Houses</text>
+        <text class="map-heading-note" x="917" y="330">shade tolerant</text>
+
+        <text class="map-yard-label" x="38" y="480">Employees Only</text>
+        <text class="map-yard-item" x="36" y="620">Bulk Mulch</text>
+        <text class="map-yard-item" x="34" y="670">Rock Yard</text>
+        <text class="map-yard-item" x="34" y="736">Bagged Goods &amp; Loading</text>
+        <text class="map-yard-item" x="34" y="826">Bulk Soils, Sand &amp; Compost</text>
+
+        <text class="map-static section" x="316" y="436">To East Bottoms</text>
+        <text class="map-static small subtle" x="410" y="912">Main building</text>
+        <text class="map-static small subtle" x="742" y="912">Main building</text>
+      `;
+
+      const zoneShapes = MAP_ZONES.map(zone => {
+        const rx = zone.shape === "pill" ? 22 : 16;
+        const subtitleY = zone.centerY + (zone.shape === "pill" ? 16 : 20);
+        const titleClass = zone.shape === "pill" ? "map-label house" : "map-label";
+        const subtitleClass = zone.shape === "pill" ? "map-small house" : "map-small";
+        const titleY = zone.subtitle ? zone.centerY - 4 : zone.centerY + 6;
+
+        return `
+          <g data-zone-group="${zone.id}">
+            <rect class="map-zone-shape${active.has(zone.id) ? " active" : ""}" data-zone="${zone.id}" x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${rx}" ry="${rx}"></rect>
+            <text class="${titleClass}" x="${zone.centerX}" y="${titleY}">${zone.title}</text>
+            ${zone.subtitle ? `<text class="${subtitleClass}" x="${zone.centerX}" y="${subtitleY}">${zone.subtitle}</text>` : ""}
+          </g>
+        `;
+      }).join("");
+
+      const exampleFlags = MAP_FLAG_MARKERS.map(marker => {
+        const color = FLAG_COLORS[marker.color] || marker.color || "#777";
+        const isActive = selectedColors.has(marker.color);
+        return `
+          <g class="map-fixed-flag${isActive ? " active" : ""}" aria-hidden="true" transform="translate(${marker.x} ${marker.y})">
+            <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="28"></line>
+            <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="0,0 -22,-12 -22,12" fill="${color}"></polygon>
+          </g>
+        `;
+      }).join("");
+
+      return `
+        <svg viewBox="${viewBox}" role="img" aria-label="Digital nursery map based on the paper map">
+          <defs>
+            <pattern id="diagHatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="8" stroke="#c8d2dd" stroke-width="2"></line>
+            </pattern>
+          </defs>
+
+          <rect x="0" y="0" width="1020" height="950" fill="var(--map-bg)"></rect>
+
+          <path class="map-top-field" d="M60 68h186c34 0 50 16 58 40 10 28 24 38 50 38 27 0 39-10 49-38 10-26 28-40 58-40h454c54 0 82 34 82 82v166c0 56-34 84-82 84H396V184H258V328H82c-48 0-72-26-72-72V140c0-44 20-72 50-72Z"></path>
+
+          <rect class="map-soft-block" x="14" y="332" width="168" height="126" rx="18"></rect>
+          <rect x="10" y="328" width="176" height="134" rx="18" fill="url(#diagHatch)" opacity=".56"></rect>
+          <line class="map-divider" x1="214" y1="148" x2="214" y2="878"></line>
+
+          <path class="map-road" d="M342 352V528"></path>
+          <path class="map-road" d="M390 464H818"></path>
+          <path class="map-road" d="M728 368V776"></path>
+          <path class="map-road" d="M448 778C486 742 526 726 582 726C634 726 668 740 706 778"></path>
+
+          <rect class="map-soft-block" x="378" y="770" width="502" height="162" rx="6"></rect>
+          <rect class="map-soft-block" x="254" y="610" width="18" height="170" rx="9"></rect>
+          <rect class="map-soft-block" x="404" y="826" width="84" height="92" rx="10"></rect>
+          <rect class="map-soft-block" x="510" y="826" width="128" height="92" rx="10"></rect>
+
+          <path class="map-bench-strip" d="M170 708l54-86"></path>
+          <path class="map-bench-strip" d="M182 738l58-92"></path>
+          <path class="map-bench-strip" d="M194 768l60-94"></path>
+          <path class="map-bench-strip" d="M206 798l60-94"></path>
+
+          <line x1="342" y1="206" x2="342" y2="560" class="map-arrow-line"></line>
+          <polygon points="342,194 334,208 350,208" fill="var(--map-line)"></polygon>
+
+          ${zoneShapes}
+          ${exampleFlags}
+          ${staticText}
+
+          <g aria-label="You are here marker">
+            <line class="map-you-line" x1="700" y1="786" x2="654" y2="828"></line>
+            <circle class="map-you-ring" cx="700" cy="786" r="20"></circle>
+            <circle class="map-you-dot" cx="700" cy="786" r="10"></circle>
+            <text class="map-you-text" x="612" y="846">You are here</text>
+          </g>
+        </svg>
+      `;
+    }
+
+    function wireMapClicks(scope) {
+      if (!scope) return;
+      scope.querySelectorAll("[data-zone]").forEach(node => {
+        node.addEventListener("click", () => handleZoneClick(node.dataset.zone));
+      });
+    }
+
+    function renderFinderMaps(activeZoneIds = [], markerItems = []) {
+      const active = Array.isArray(activeZoneIds) ? activeZoneIds.filter(Boolean) : [];
+      const primaryZoneId = active[0] || markerItems?.[0]?.zoneIds?.[0] || "";
+      const primaryZone = MAP_ZONES.find(z => z.id === primaryZoneId);
+      const detailBox = primaryZone ? getZoneZoomBox(primaryZone.id) : { x: 300, y: 700, w: 620, h: 230 };
+
+      els.overviewMapBoard.innerHTML = buildMapSvg(active, markerItems, "0 0 1020 950");
+      wireMapClicks(els.overviewMapBoard);
+
+      els.detailMapBoard.innerHTML = buildMapSvg(primaryZone ? [primaryZone.id] : active, markerItems, `${detailBox.x} ${detailBox.y} ${detailBox.w} ${detailBox.h}`);
+      wireMapClicks(els.detailMapBoard);
+
+      const flagSummary = uniqueValues((markerItems || []).map(item => item.flagColor).filter(Boolean))
+        .map(color => `${titleCase(color)} flag`)
+        .join(" • ");
+
+      els.overviewMapCaption.textContent = primaryZone
+        ? `${zoneTitle(primaryZone.id)} stays highlighted on the full map so the rest of the nursery remains visible.${flagSummary ? ` Matching cue: ${flagSummary}.` : ""}`
+        : "Use the full map to keep your bearings. Tap a result or tap any zone to highlight it.";
+
+      els.detailMapCaption.textContent = primaryZone
+        ? `Closer look: ${zoneTitle(primaryZone.id)}.${flagSummary ? ` Look for ${flagSummary.toLowerCase()}.` : ""}`
+        : "Closer look defaults to the perennials / checkout side until you choose a plant or zone.";
+    }
+
+    function syncMobileMapUi() {
+      if (window.innerWidth <= 900) {
+        if (els.legendDisclosure) els.legendDisclosure.open = false;
+      } else if (els.legendDisclosure) {
+        els.legendDisclosure.open = true;
+      }
+    }
+
+    function jumpMapFocus(target) {
+      if (!els.mapPanShell) return;
+      const shell = els.mapPanShell;
+      const maxLeft = Math.max(0, shell.scrollWidth - shell.clientWidth);
+      const points = {
+        left: 0,
+        center: Math.round(maxLeft * 0.42),
+        houses: Math.round(maxLeft * 0.88),
+        perennials: Math.round(maxLeft * 0.66)
+      };
+      shell.scrollTo({ left: points[target] ?? 0, behavior: "smooth" });
     }
 
     function directionFromZone(item) {
@@ -2621,7 +2745,7 @@ function zoneTitle(zoneId) {
       state.selectedFinderId = item.id;
       state.selectedZoneIds = item.zoneIds.slice();
       renderFinderResults();
-      renderMap(item.zoneIds, [item]);
+      renderFinderMaps(item.zoneIds, [item]);
       els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
       wireCopyButtons(els.locationDetails);
     }
@@ -2629,7 +2753,7 @@ function zoneTitle(zoneId) {
     function handleZoneClick(zoneId) {
       state.selectedZoneIds = [zoneId];
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
-      renderMap([zoneId], matches.slice(0, 6));
+      renderFinderMaps([zoneId], matches.slice(0, 6));
       const zoneName = zoneTitle(zoneId);
       if (!matches.length) {
         els.locationDetails.innerHTML = `
@@ -2657,7 +2781,7 @@ function zoneTitle(zoneId) {
       if (state.selectedFinderId) {
         selectFinderItem(state.selectedFinderId);
       } else {
-        renderMap(state.selectedZoneIds, []);
+        renderFinderMaps(state.selectedZoneIds, []);
       }
     }
 
@@ -2671,7 +2795,7 @@ function zoneTitle(zoneId) {
       state.selectedZoneIds = [];
       renderFinderChips();
       applyFinderFilters();
-      renderMap([], []);
+      renderFinderMaps([], []);
       els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel shows the location, any flag cue from the sheets, and a short direction line you can use with customers on the floor.</p>`;
     }
 
@@ -2821,7 +2945,7 @@ function zoneTitle(zoneId) {
       renderDefinitions();
       renderFlagLegend();
       renderFinderChips();
-      renderMap([], []);
+      renderFinderMaps([], []);
       applyFinderFilters();
       renderKioskActions();
       applyKioskFilters();
