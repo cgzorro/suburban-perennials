@@ -1335,6 +1335,48 @@
       .legend-disclosure .flag-legend,
       .legend-disclosure .map-help { margin-top: 0; }
     }
+
+    /* Dark-theme heading contrast fix */
+    .hero-copy h1,
+    .panel h2,
+    .zone-details h3,
+    .def-card h3,
+    .kiosk-demo-card h2,
+    .card-title,
+    .finder-card h3,
+    .kiosk-card h3,
+    .detail-title,
+    #kioskDetailPanel h2,
+    #kioskMapPanel h2,
+    #locationDetails h3 {
+      color: var(--text);
+    }
+
+    .panel h2,
+    .zone-details h3,
+    .def-card h3,
+    .kiosk-demo-card h2,
+    #kioskDetailPanel h2,
+    #kioskMapPanel h2,
+    #locationDetails h3 {
+      text-shadow: 0 1px 0 rgba(0,0,0,0.16);
+    }
+
+    html[data-theme="light"] .hero-copy h1,
+    html[data-theme="light"] .panel h2,
+    html[data-theme="light"] .zone-details h3,
+    html[data-theme="light"] .def-card h3,
+    html[data-theme="light"] .kiosk-demo-card h2,
+    html[data-theme="light"] .card-title,
+    html[data-theme="light"] .finder-card h3,
+    html[data-theme="light"] .kiosk-card h3,
+    html[data-theme="light"] .detail-title,
+    html[data-theme="light"] #kioskDetailPanel h2,
+    html[data-theme="light"] #kioskMapPanel h2,
+    html[data-theme="light"] #locationDetails h3 {
+      text-shadow: none;
+    }
+
   </style>
 
 </head>
