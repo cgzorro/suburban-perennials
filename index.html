@@ -1384,8 +1384,8 @@
   <div class="container">
     <section class="hero">
       <div class="hero-copy">
-        <h1>Suburban Perennials</h1>
-        <p>Plant browser, nursery finder, and customer kiosk in one polished workflow. The browser stays intact while Finder and Kiosk make the map, directions, and zone lookup feel faster, clearer, and more executive-ready.</p>
+        <h1 id="heroTitle">Suburban Perennials</h1>
+        <p id="heroSubtitle">Plant browser, nursery finder, and customer kiosk in one polished workflow. The browser stays intact while Finder and Kiosk make the map, directions, and zone lookup feel faster, clearer, and more executive-ready.</p>
       </div>
       <div class="hero-actions">
         <div class="view-tabs" role="tablist" aria-label="App views">
@@ -1950,6 +1950,8 @@
 
     const els = {
       html: document.documentElement,
+      heroTitle: document.getElementById("heroTitle"),
+      heroSubtitle: document.getElementById("heroSubtitle"),
       themeToggle: document.getElementById("themeToggle"),
       viewTabs: Array.from(document.querySelectorAll(".view-tab")),
       browserView: document.getElementById("browserView"),
@@ -2024,6 +2026,31 @@
       return String(text || "").replace(/\b\w/g, m => m.toUpperCase());
     }
 
+    const VIEW_COPY = {
+      browser: {
+        title: "Suburban Perennials",
+        subtitle: "Browse the perennial catalog with filters, images, SKU lookup, and scanner tools while keeping the current plant-browser workflow intact.",
+        pageTitle: "Suburban Perennials | Plant Browser"
+      },
+      finder: {
+        title: "Nursery Finder",
+        subtitle: "Use the overview map, closer-look panel, and zone cues to direct staff and customers to trees, shrubs, hoop houses, and destination areas faster.",
+        pageTitle: "Suburban Perennials | Nursery Finder"
+      },
+      kiosk: {
+        title: "Customer Kiosk",
+        subtitle: "A simpler self-serve mode with big search, quick actions, plain-English directions, and a map preview that starts from the checkout and perennials side.",
+        pageTitle: "Suburban Perennials | Customer Kiosk"
+      }
+    };
+
+    function updateHeroCopy(view) {
+      const copy = VIEW_COPY[view] || VIEW_COPY.browser;
+      els.heroTitle.textContent = copy.title;
+      els.heroSubtitle.textContent = copy.subtitle;
+      document.title = copy.pageTitle;
+    }
+
     function setTheme(theme) {
       state.theme = theme;
       els.html.setAttribute("data-theme", theme);
@@ -2043,6 +2070,7 @@
         node.hidden = !active;
       });
       els.viewTabs.forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
+      updateHeroCopy(view);
     }
 
     function setScanStatus(message, type = "") {
