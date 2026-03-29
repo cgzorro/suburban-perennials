@@ -382,6 +382,112 @@
       box-shadow: var(--shadow-soft);
     }
 
+    body[data-active-view="browser"] .hero {
+      padding: 18px 22px;
+      margin-bottom: 12px;
+    }
+
+    body[data-active-view="browser"] .hero-copy h1 {
+      font-size: clamp(1.9rem, 2.5vw, 2.45rem);
+    }
+
+    body[data-active-view="browser"] .hero-copy p {
+      max-width: 760px;
+      font-size: 0.95rem;
+      line-height: 1.28;
+      margin-top: 6px;
+    }
+
+    .browser-controls {
+      padding: 14px 16px;
+    }
+
+    .browser-refine-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+
+    .browser-refine-row .chips {
+      margin-top: 0;
+      flex: 1 1 auto;
+    }
+
+    .btn.compact {
+      min-height: 42px;
+      padding: 10px 14px;
+      font-size: 0.92rem;
+      border-radius: 14px;
+    }
+
+    .clear-inline {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    .browser-summary {
+      padding: 9px 12px;
+      border-radius: 18px;
+      margin-bottom: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
+    }
+
+    .browser-summary .pill {
+      padding: 7px 11px;
+      font-size: 0.88rem;
+    }
+
+    .utility-disclosure {
+      margin-top: 10px;
+      border: 1px solid var(--border-soft);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.02);
+      overflow: hidden;
+    }
+
+    .utility-disclosure summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      font-weight: 800;
+      color: var(--text);
+      user-select: none;
+    }
+
+    .utility-disclosure summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .utility-disclosure summary::after {
+      content: "Show";
+      color: var(--text-soft);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .utility-disclosure[open] summary::after {
+      content: "Hide";
+    }
+
+    .utility-summary-note {
+      margin-left: auto;
+      margin-right: 8px;
+      color: var(--text-soft);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .utility-inner {
+      padding: 0 14px 14px;
+    }
+
     .pill {
       border: 1px solid var(--border-soft);
       background: rgba(255,255,255,0.03);
@@ -1267,6 +1373,28 @@
         padding: 12px 14px;
       }
 
+      .browser-refine-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .browser-refine-row .chips {
+        width: 100%;
+      }
+
+      .clear-inline {
+        width: 100%;
+      }
+
+      .utility-disclosure summary {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .utility-summary-note {
+        margin: 2px 0 0;
+      }
+
       .chips,
       .finder-chip-row,
       .kiosk-actions,
@@ -1380,7 +1508,7 @@
   </style>
 
 </head>
-<body>
+<body data-active-view="browser">
   <div class="container">
     <section class="hero">
       <div class="hero-copy">
@@ -1397,8 +1525,9 @@
       </div>
     </section>
 
-    <section id="browserView" class="app-view">
-      <section class="controls-wrap">
+    
+<section id="browserView" class="app-view">
+      <section class="controls-wrap browser-controls">
         <div class="controls-grid">
           <div class="field">
             <label for="searchInput">Search catalog</label>
@@ -1448,51 +1577,59 @@
           </div>
         </div>
 
-        <div class="chips" id="traitChips"></div>
-
-        <div class="button-col">
-          <button id="clearFilters" class="btn" type="button">Clear filters</button>
+        <div class="browser-refine-row">
+          <div class="chips" id="traitChips"></div>
+          <button id="clearFilters" class="btn secondary compact clear-inline" type="button">Clear</button>
         </div>
 
-        <div class="scan-grid">
-          <div class="field">
-            <label for="scanSkuInput">SKU lookup</label>
-            <input
-              id="scanSkuInput"
-              type="text"
-              inputmode="text"
-              enterkeyhint="search"
-              autocomplete="off"
-              autocapitalize="off"
-              autocorrect="off"
-              spellcheck="false"
-              placeholder="Enter or scan SKU"
-            />
+        <section class="summary-bar browser-summary" id="summaryBar" aria-label="Catalog summary"></section>
+
+        <details class="utility-disclosure" id="browserUtilityTools">
+          <summary>
+            <span>SKU / Scanner tools</span>
+            <span class="utility-summary-note">Open for fast staff lookup</span>
+          </summary>
+          <div class="utility-inner">
+            <div class="scan-grid">
+              <div class="field">
+                <label for="scanSkuInput">SKU lookup</label>
+                <input
+                  id="scanSkuInput"
+                  type="text"
+                  inputmode="text"
+                  enterkeyhint="search"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  autocorrect="off"
+                  spellcheck="false"
+                  placeholder="Enter or scan SKU"
+                />
+              </div>
+
+              <div class="field">
+                <label for="findSkuBtn">Find</label>
+                <button id="findSkuBtn" class="btn primary" type="button" style="width:100%;">Find SKU</button>
+              </div>
+
+              <div class="field">
+                <label for="startScannerBtn">Scanner</label>
+                <button id="startScannerBtn" class="btn secondary" type="button" style="width:100%;">Start Scanner</button>
+              </div>
+            </div>
+
+            <div class="scanner-actions">
+              <button id="stopScannerBtn" class="btn" type="button">Stop Scanner</button>
+            </div>
+
+            <div id="scanStatus" class="scan-status"></div>
+
+            <div id="scannerShell" class="scanner-shell">
+              <div id="reader"></div>
+            </div>
           </div>
-
-          <div class="field">
-            <label for="findSkuBtn">Find</label>
-            <button id="findSkuBtn" class="btn primary" type="button" style="width:100%;">Find SKU</button>
-          </div>
-
-          <div class="field">
-            <label for="startScannerBtn">Scanner</label>
-            <button id="startScannerBtn" class="btn secondary" type="button" style="width:100%;">Start Scanner</button>
-          </div>
-        </div>
-
-        <div class="scanner-actions">
-          <button id="stopScannerBtn" class="btn" type="button">Stop Scanner</button>
-        </div>
-
-        <div id="scanStatus" class="scan-status"></div>
-
-        <div id="scannerShell" class="scanner-shell">
-          <div id="reader"></div>
-        </div>
+        </details>
       </section>
 
-      <section class="summary-bar" id="summaryBar"></section>
       <section id="results" class="results-grid"></section>
     </section>
 
@@ -2029,7 +2166,7 @@
     const VIEW_COPY = {
       browser: {
         title: "Suburban Perennials",
-        subtitle: "Browse the perennial catalog with filters, images, SKU lookup, and scanner tools while keeping the current plant-browser workflow intact.",
+        subtitle: "Browse the perennial catalog faster with filters, images, and quick tools—while keeping the current browser workflow intact.",
         pageTitle: "Suburban Perennials | Plant Browser"
       },
       finder: {
@@ -2070,6 +2207,7 @@
         node.hidden = !active;
       });
       els.viewTabs.forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
+      document.body.setAttribute("data-active-view", view);
       updateHeroCopy(view);
     }
 
