@@ -152,15 +152,17 @@
     .hero-actions {
       display: grid;
       gap: 12px;
-      justify-items: end;
+      justify-items: stretch;
+      width: min(100%, 430px);
       min-width: 320px;
     }
 
     .view-tabs {
-      display: inline-flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
-      justify-content: flex-end;
+      width: 100%;
+      justify-content: stretch;
       padding: 6px;
       border-radius: 999px;
       border: 1px solid var(--border-soft);
@@ -197,13 +199,19 @@
     .view-tab {
       background: transparent;
       border-radius: 999px;
-      padding: 11px 15px;
+      padding: 11px 10px;
       font-weight: 850;
-      white-space: nowrap;
       min-height: 46px;
+      min-width: 0;
+      width: 100%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      text-align: center;
+      line-height: 1.08;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .view-tab.active {
@@ -1343,12 +1351,17 @@
       }
 
       .view-tabs {
-        justify-content: flex-start;
         width: 100%;
         border-radius: 20px;
+        gap: 6px;
+        padding: 5px;
       }
 
-      .theme-toggle { width: 100%; justify-content: center; }
+      .theme-toggle {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+      }
 
       .controls-wrap,
       .panel {
@@ -1398,14 +1411,39 @@
       .chips,
       .finder-chip-row,
       .kiosk-actions,
-      .quick-links { gap: 8px; }
+      .quick-links,
+      .flag-legend,
+      .map-help-row {
+        gap: 8px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+      }
+
+      .chips::-webkit-scrollbar,
+      .finder-chip-row::-webkit-scrollbar,
+      .kiosk-actions::-webkit-scrollbar,
+      .quick-links::-webkit-scrollbar,
+      .flag-legend::-webkit-scrollbar,
+      .map-help-row::-webkit-scrollbar {
+        display: none;
+      }
 
       .chip,
       .finder-chip,
       .kiosk-btn,
+      .flag-chip,
+      .pill {
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+
       .view-tab {
-        padding: 9px 12px;
-        font-size: .84rem;
+        padding: 9px 6px;
+        font-size: .8rem;
       }
 
       .results-grid {
@@ -1446,6 +1484,33 @@
       .flag-chip-note { width: 100%; border-radius: 16px; }
       .demo-steps { grid-template-columns: 1fr; }
       .kiosk-side { gap: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .hero {
+        padding: 16px 14px;
+      }
+
+      .hero-copy h1 {
+        font-size: 1.72rem;
+      }
+
+      .view-tabs {
+        gap: 5px;
+        padding: 4px;
+      }
+
+      .view-tab {
+        min-height: 42px;
+        padding: 8px 4px;
+        font-size: .74rem;
+        letter-spacing: -0.01em;
+      }
+
+      .theme-toggle {
+        padding: 10px 12px;
+        font-size: .92rem;
+      }
     }
 
     @media (min-width: 901px) {
