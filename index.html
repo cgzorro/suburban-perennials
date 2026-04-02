@@ -152,17 +152,15 @@
     .hero-actions {
       display: grid;
       gap: 12px;
-      justify-items: stretch;
-      width: min(100%, 430px);
+      justify-items: end;
       min-width: 320px;
     }
 
     .view-tabs {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      display: inline-flex;
+      flex-wrap: wrap;
       gap: 8px;
-      width: 100%;
-      justify-content: stretch;
+      justify-content: flex-end;
       padding: 6px;
       border-radius: 999px;
       border: 1px solid var(--border-soft);
@@ -199,19 +197,13 @@
     .view-tab {
       background: transparent;
       border-radius: 999px;
-      padding: 11px 10px;
+      padding: 11px 15px;
       font-weight: 850;
+      white-space: nowrap;
       min-height: 46px;
-      min-width: 0;
-      width: 100%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      line-height: 1.08;
-      white-space: normal;
-      overflow-wrap: anywhere;
-      word-break: break-word;
     }
 
     .view-tab.active {
@@ -1351,17 +1343,12 @@
       }
 
       .view-tabs {
+        justify-content: flex-start;
         width: 100%;
         border-radius: 20px;
-        gap: 6px;
-        padding: 5px;
       }
 
-      .theme-toggle {
-        width: 100%;
-        justify-content: center;
-        text-align: center;
-      }
+      .theme-toggle { width: 100%; justify-content: center; }
 
       .controls-wrap,
       .panel {
@@ -1411,39 +1398,14 @@
       .chips,
       .finder-chip-row,
       .kiosk-actions,
-      .quick-links,
-      .flag-legend,
-      .map-help-row {
-        gap: 8px;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        padding-bottom: 2px;
-      }
-
-      .chips::-webkit-scrollbar,
-      .finder-chip-row::-webkit-scrollbar,
-      .kiosk-actions::-webkit-scrollbar,
-      .quick-links::-webkit-scrollbar,
-      .flag-legend::-webkit-scrollbar,
-      .map-help-row::-webkit-scrollbar {
-        display: none;
-      }
+      .quick-links { gap: 8px; }
 
       .chip,
       .finder-chip,
       .kiosk-btn,
-      .flag-chip,
-      .pill {
-        flex: 0 0 auto;
-        white-space: nowrap;
-      }
-
       .view-tab {
-        padding: 9px 6px;
-        font-size: .8rem;
+        padding: 9px 12px;
+        font-size: .84rem;
       }
 
       .results-grid {
@@ -1484,33 +1446,6 @@
       .flag-chip-note { width: 100%; border-radius: 16px; }
       .demo-steps { grid-template-columns: 1fr; }
       .kiosk-side { gap: 12px; }
-    }
-
-    @media (max-width: 520px) {
-      .hero {
-        padding: 16px 14px;
-      }
-
-      .hero-copy h1 {
-        font-size: 1.72rem;
-      }
-
-      .view-tabs {
-        gap: 5px;
-        padding: 4px;
-      }
-
-      .view-tab {
-        min-height: 42px;
-        padding: 8px 4px;
-        font-size: .74rem;
-        letter-spacing: -0.01em;
-      }
-
-      .theme-toggle {
-        padding: 10px 12px;
-        font-size: .92rem;
-      }
     }
 
     @media (min-width: 901px) {
@@ -1587,7 +1522,7 @@
     <section class="hero">
       <div class="hero-copy">
         <h1 id="heroTitle">Suburban Perennials</h1>
-        <p id="heroSubtitle">Plant browser, nursery finder, and customer kiosk in one polished workflow. The browser stays intact while Finder and Kiosk make the map, directions, and zone lookup feel faster, clearer, and more executive-ready.</p>
+        <p id="heroSubtitle">Plant browser, nursery finder, and customer kiosk in one polished workflow. Search plants, direct customers, and confirm locations faster with clear maps and simpler answers.</p>
       </div>
       <div class="hero-actions">
         <div class="view-tabs" role="tablist" aria-label="App views">
@@ -1661,7 +1596,7 @@
         <details class="utility-disclosure" id="browserUtilityTools">
           <summary>
             <span>SKU / Scanner tools</span>
-            <span class="utility-summary-note">Open for fast staff lookup</span>
+            <span class="utility-summary-note">Staff tools</span>
           </summary>
           <div class="utility-inner">
             <div class="scan-grid">
@@ -1710,7 +1645,7 @@
     <section id="finderView" class="app-view" hidden>
       <section class="controls-wrap">
         <div class="status-note">
-          <strong>Finder:</strong> search the nursery, highlight the destination, and confirm the exact section with the closer-look map and field-flag cues.
+          <strong>Finder:</strong> search the nursery, highlight the destination, and confirm the section fast.
         </div>
 
         <div class="finder-toolbar">
@@ -1732,7 +1667,7 @@
 
           <div class="finder-actions">
             <button id="finderClearBtn" class="btn" type="button">Clear</button>
-            <a class="map-link" href="https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&amp;g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Open property in Google Maps</a>
+            <a class="map-link" href="https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&amp;g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
           </div>
         </div>
 
@@ -1742,7 +1677,7 @@
       <div class="finder-layout">
         <section class="panel">
           <h2>Lookup results</h2>
-          <p class="panel-lead">Select one result to lock the destination, highlight the map, and surface the quickest verbal direction.</p>
+          <p class="panel-lead">Select a result to lock the destination and surface the quickest direction.</p>
           <div class="finder-results" id="finderResults"></div>
         </section>
 
@@ -1766,9 +1701,9 @@
               <div class="map-board" id="overviewMapBoard"></div>
             </div>
 
-            <p class="map-caption" id="overviewMapCaption">Full-property view with the active destination highlighted.</p>
+            <p class="map-caption" id="overviewMapCaption">Active destination highlighted on the full-property map.</p>
 
-            <p class="map-help mobile-swipe-note">On mobile, use the jump buttons to move quickly between the left yard, center field, hoop houses, and perennials.</p>
+            <p class="map-help mobile-swipe-note">On mobile, use the jump buttons to move between the main nursery areas.</p>
 
             <div class="map-help-row quick-links">
               <button type="button" class="location-btn" data-zone-jump="house4">Azaleas / Rhododendron</button>
@@ -1777,7 +1712,7 @@
               <button type="button" class="location-btn" data-zone-jump="house8">Dogwoods</button>
             </div>
 
-            <p class="map-help">You are here: customers typically enter this part of the nursery from the <strong>perennials / checkout</strong> side at the bottom of the map. Hoop houses are on the right. Ball &amp; Burlap trees are at the top. Bulk goods and rock yard are left.</p>
+            <p class="map-help">Customers usually start near <strong>perennials / checkout</strong> at the bottom of the map. Hoop houses are right, Ball &amp; Burlap is top, and bulk goods / rock yard are left.</p>
           </section>
 
           <section class="panel">
@@ -1789,7 +1724,7 @@
 
           <section class="panel zone-details" id="locationDetails">
             <h3>Select a plant or zone</h3>
-            <p class="finder-note">This panel becomes the answer card: where it is, what flag to look for, and what to say next.</p>
+            <p class="finder-note">This becomes the answer card: where it is, what flag to look for, and what to say.</p>
           </section>
 
           <section class="panel">
@@ -1814,7 +1749,7 @@
             </div>
           </div>
           <div class="status-note">
-            <strong>Customer mode:</strong> big search, fast buttons, short directions, and a map that reads instantly from the perennials / checkout side.
+            <strong>Customer mode:</strong> large search, fast buttons, short directions, and a clear starting point on the map.
           </div>
           <div class="kiosk-field">
             <label for="kioskSearch">Find a plant</label>
@@ -1833,28 +1768,28 @@
           <div class="kiosk-side">
             <section class="panel" id="kioskDetailPanel">
               <h2>Directions</h2>
-              <p class="kiosk-lead">Select a result to show a short verbal direction you can repeat to a customer.</p>
+              <p class="kiosk-lead">Select a result for a short direction you can repeat to a customer.</p>
             </section>
             <section class="panel" id="kioskMapPanel">
               <h2>Map view</h2>
-              <p class="kiosk-lead">A simple preview map helps customers confirm the destination before they walk away.</p>
+              <p class="kiosk-lead">A simple preview map helps customers confirm the destination at a glance.</p>
               <div class="you-are-here-note">
                 <span class="you-are-here-pill">●</span>
-                <div><strong>Start here:</strong> customers usually begin at <strong>perennials / checkout</strong> near the bottom of the map. The red marker stays visible so the route makes sense at a glance.</div>
+                <div><strong>Start here:</strong> most customers begin at <strong>perennials / checkout</strong> near the bottom of the map. The red marker stays visible for quick orientation.</div>
               </div>
               <div class="map-board kiosk-map-board" id="kioskMapBoard"></div>
               <p class="map-caption" id="kioskMapCaption">Select a result to highlight its area on the nursery map.</p>
               <div class="detail-actions">
-                <button type="button" class="location-btn primary" id="kioskOpenLargeMap" hidden>Open larger map</button>
+                <button type="button" class="location-btn primary" id="kioskOpenLargeMap" hidden>View larger map</button>
               </div>
             </section>
             <section class="panel">
-              <h2>Fast prompts</h2>
+              <h2>Sample prompts</h2>
               <div class="detail-tag-row">
-                <span class="note-badge">“Go to House 5 for hydrangeas.”</span>
+                <span class="note-badge">“Hydrangeas are in House 5.”</span>
                 <span class="note-badge">“Head right to the hoop houses.”</span>
-                <span class="note-badge">“Look for the purple flag in the field.”</span>
-                <span class="note-badge">“Ball &amp; Burlap is at the top of the yard.”</span>
+                <span class="note-badge">“Look for the purple field flag.”</span>
+                <span class="note-badge">“Ball &amp; Burlap is at the top.”</span>
               </div>
             </section>
           </div>
@@ -3068,7 +3003,7 @@
       const extraNote = item.notes ? `<p class="finder-note">${escapeHtml(item.notes)}</p>` : "";
       const zones = item.zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("");
       const link = mode === "finder"
-        ? `<a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open property in Google Maps</a>`
+        ? `<a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>`
         : "";
       return `
         <h3>${escapeHtml(item.name)}</h3>
@@ -3161,7 +3096,7 @@
       renderFinderChips();
       applyFinderFilters();
       renderFinderMaps([], []);
-      els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel becomes the answer card: where it is, what flag to look for, and what to say next.</p>`;
+      els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This becomes the answer card: where it is, what flag to look for, and what to say.</p>`;
     }
 
     function renderKioskActions() {
@@ -3252,7 +3187,7 @@
       if (!item) {
         els.kioskDetailPanel.innerHTML = `
           <h2>Directions</h2>
-          <p class="kiosk-lead">Select a result to show a short verbal direction you can repeat to a customer.</p>
+          <p class="kiosk-lead">Select a result for a short direction you can repeat to a customer.</p>
           <p class="zone-directions">The map preview keeps the full nursery in view and always shows the red starting marker at perennials / checkout.</p>
         `;
         renderKioskMap(null);
@@ -3268,7 +3203,7 @@
         <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
         <div class="detail-tag-row">${item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
         <div class="detail-actions">
-          <a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open Google Maps</a>
+          <a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
           <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy quick line</button>
         </div>
       `;
