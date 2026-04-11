@@ -1466,6 +1466,191 @@
       stroke: #d74a4a;
       stroke-width: 3;
     }
+  
+
+    /* Production polish overrides */
+    .view-tabs { gap: 12px; }
+    .view-tab {
+      min-height: 46px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .chips {
+      gap: 9px;
+      padding: 2px 2px 6px;
+      margin-top: 14px;
+    }
+
+    .scan-panel {
+      border-radius: 24px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .map-board {
+      background:
+        radial-gradient(circle at top right, rgba(111,200,109,0.08), transparent 24%),
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
+        var(--map-bg);
+      border: 1px solid rgba(166, 187, 203, 0.18);
+    }
+
+    .map-zone-shape {
+      fill: var(--map-zone);
+      stroke: rgba(178, 195, 209, 0.34);
+      stroke-width: 2.4;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.12));
+    }
+
+    .map-zone-shape:hover {
+      fill: #243548;
+    }
+
+    .map-zone-shape.active {
+      fill: var(--map-zone-active);
+      stroke: #d9f5d8;
+      stroke-width: 4;
+      filter: drop-shadow(0 8px 20px rgba(92, 168, 109, 0.28));
+    }
+
+    .map-label,
+    .map-small,
+    .map-static,
+    .map-title-accent,
+    .map-heading-note,
+    .map-yard-label,
+    .map-yard-item {
+      fill: var(--map-text);
+      paint-order: stroke;
+      stroke: rgba(6, 11, 18, 0.72);
+      stroke-width: 5px;
+      stroke-linejoin: round;
+      letter-spacing: 0.01em;
+    }
+
+    .map-small,
+    .map-heading-note,
+    .map-yard-item {
+      stroke-width: 4px;
+    }
+
+    .map-zone-group.active .map-label,
+    .map-zone-group.active .map-small {
+      fill: #102417;
+      stroke: rgba(243, 251, 247, 0.80);
+      stroke-width: 5px;
+    }
+
+    html[data-theme="light"] .map-zone-shape {
+      fill: rgba(236, 242, 248, 0.96);
+      stroke: rgba(102, 119, 140, 0.38);
+    }
+
+    html[data-theme="light"] .map-zone-shape:hover {
+      fill: #e4edf6;
+    }
+
+    html[data-theme="light"] .map-zone-shape.active {
+      fill: #cfe9ae;
+      stroke: #6aa24c;
+    }
+
+    html[data-theme="light"] .map-label,
+    html[data-theme="light"] .map-small,
+    html[data-theme="light"] .map-static,
+    html[data-theme="light"] .map-title-accent,
+    html[data-theme="light"] .map-heading-note,
+    html[data-theme="light"] .map-yard-label,
+    html[data-theme="light"] .map-yard-item {
+      stroke: rgba(255,255,255,0.86);
+      stroke-width: 6px;
+    }
+
+    html[data-theme="light"] .map-zone-group.active .map-label,
+    html[data-theme="light"] .map-zone-group.active .map-small {
+      fill: #173322;
+      stroke: rgba(255,255,255,0.90);
+    }
+
+    .kiosk-shell {
+      gap: 18px;
+    }
+
+    .kiosk-top {
+      gap: 16px;
+    }
+
+    .kiosk-demo-card {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(151,224,127,0.18), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015)),
+        var(--bg-elev);
+      border: 1px solid rgba(151, 224, 127, 0.28);
+      border-radius: 26px;
+      padding: 20px;
+    }
+
+    .kiosk-demo-card::before {
+      content: "SELF-SERVE LOOKUP";
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: var(--text);
+      background: rgba(123, 208, 95, 0.16);
+      border: 1px solid rgba(123, 208, 95, 0.28);
+    }
+
+    .kiosk-field input {
+      min-height: 64px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015)), var(--input-bg);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .kiosk-actions {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .kiosk-btn {
+      flex: 0 0 auto;
+      min-height: 54px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)), var(--chip-bg);
+    }
+
+    .kiosk-card {
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
+        var(--card-bg);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.12);
+    }
+
+    .kiosk-card.active {
+      box-shadow: 0 14px 34px rgba(79, 164, 80, 0.20);
+    }
+
+    .status-note {
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)), var(--bg-soft);
+    }
+
+    @media (max-width: 900px) {
+      .kiosk-grid { grid-template-columns: 1fr; }
+      .kiosk-side { grid-template-columns: 1fr; }
+    }
+
   </style>
 </head>
 <body>
@@ -1700,8 +1885,8 @@
       <section class="controls-wrap kiosk-shell">
         <div class="kiosk-top">
           <div class="kiosk-demo-card">
-            <h2>Customer Kiosk demo</h2>
-            <p>This view is built for quick self-service: a customer searches a plant, taps one result, and gets a plain-English direction plus a map highlight that starts from the perennials / checkout side.</p>
+            <h2>Customer Kiosk</h2>
+            <p>A cleaner front-of-house experience for customers: search fast, choose one result, and get a confident plain-English direction with a highlighted destination.</p>
             <div class="demo-steps">
               <div class="demo-step"><strong>1. Search</strong><span>Use the large search box or tap a quick button like Trees, Shade, or Pollinator.</span></div>
               <div class="demo-step"><strong>2. Select</strong><span>Tap one result card to lock in the destination and simplify the answer.</span></div>
@@ -1709,11 +1894,11 @@
             </div>
           </div>
           <div class="status-note">
-            <strong>Customer mode:</strong> big search, fast buttons, short directions. This keeps the current perennial browser separate while giving you a cleaner front-facing lookup tool.
+            <strong>Customer mode:</strong> larger search, simpler choices, calmer copy, and a cleaner map preview for a more premium self-serve feel.
           </div>
           <div class="kiosk-field">
             <label for="kioskSearch">Find a plant</label>
-            <input id="kioskSearch" type="search" placeholder="Search tree or shrub name" />
+            <input id="kioskSearch" type="search" placeholder="Search roses, conifers, hydrangeas, Japanese maples..." />
           </div>
           <div class="kiosk-actions" id="kioskActions"></div>
         </div>
@@ -1721,18 +1906,18 @@
         <div class="kiosk-grid">
           <section class="panel">
             <h2>Quick results</h2>
-            <p class="kiosk-lead">Results are simplified for customer use: where to go, what flag color to look for, and whether it likes shade, pollinators, or deer resistance.</p>
+            <p class="kiosk-lead">Concise customer cards: where to go, what flag to look for, and the most useful traits at a glance.</p>
             <div class="kiosk-results" id="kioskResults"></div>
           </section>
 
           <div class="kiosk-side">
             <section class="panel" id="kioskDetailPanel">
               <h2>Directions</h2>
-              <p class="kiosk-lead">Select a result to show a short verbal direction you can repeat to a customer.</p>
+              <p class="kiosk-lead">Select a result to show a short polished direction you can repeat to a customer.</p>
             </section>
             <section class="panel" id="kioskMapPanel">
               <h2>Map view</h2>
-              <p class="kiosk-lead">Selected plants now show a simple map preview so customers can confirm where to go before they leave the kiosk.</p>
+              <p class="kiosk-lead">Selected plants show a cleaner preview map with a stronger highlighted destination before the customer walks away.</p>
               <div class="you-are-here-note">
                 <span class="you-are-here-pill">●</span>
                 <div><strong>Start here:</strong> customers usually begin at <strong>perennials / checkout</strong> near the bottom of the map. The red marker stays visible so the route makes sense at a glance.</div>
@@ -2220,18 +2405,49 @@
     }
 
     function isRosePlant(plant) {
-      const directFields = [
+      const exactFields = [plant.section, plant.category, plant.plant_group, plant.common, plant.genus]
+        .map(normalizeSpaces)
+        .filter(Boolean)
+        .map(value => value.toLowerCase());
+      const series = normalizeSpaces(plant.series).toLowerCase();
+      const sku = normalizeSku(plant.sku || "");
+
+      if (exactFields.some(value => value === "roses" || value === "rose")) return true;
+      if (exactFields.includes("rosa") || normalizeText(plant.genus) === "rosa") return true;
+      if (series.includes("knock out rose") || series.includes("drift rose") || series.includes("proven winner rose")) return true;
+      if (sku.startsWith("ROSE")) return true;
+      return false;
+    }
+
+    function isConiferPlant(plant) {
+      const haystack = [
+        plant.name,
+        plant.common,
+        plant.genus,
+        plant.series,
         plant.section,
         plant.category,
         plant.plant_group,
-        plant.series,
-        plant.common,
-        plant.genus
-      ].map(normalizeSpaces).filter(Boolean).map(value => value.toLowerCase());
+        plant.source_subdepartment,
+        plant.tree_class,
+        plant.category_path,
+        Array.isArray(plant.breadcrumbs) ? plant.breadcrumbs.join(" > ") : "",
+        plant.notes,
+        plant.description
+      ].map(normalizeSpaces).filter(Boolean).join(" | ").toLowerCase();
 
-      if (directFields.some(value => value === "roses" || value === "rose")) return true;
-      if (directFields.some(value => value.includes("drift rose") || value.includes("knock out rose"))) return true;
-      return normalizeText(plant.genus) === "rosa" || normalizeText(plant.common) === "rose";
+      return (
+        haystack.includes("conifer") ||
+        haystack.includes("arborvitae") ||
+        haystack.includes("cedar") ||
+        haystack.includes("cypress") ||
+        haystack.includes("fir") ||
+        haystack.includes("hemlock") ||
+        haystack.includes("juniper") ||
+        haystack.includes("pine") ||
+        haystack.includes("spruce") ||
+        /(^|\W)yews?(\W|$)/.test(haystack)
+      );
     }
 
     function deriveTreeGroup(joined, rawGroup) {
@@ -2273,18 +2489,7 @@
 
       if (isRosePlant(plant)) return "Roses";
 
-      if (
-        joined.includes("conifer") ||
-        joined.includes("arborvitae") ||
-        joined.includes("cedar") ||
-        joined.includes("cypress") ||
-        joined.includes("fir") ||
-        joined.includes("hemlock") ||
-        joined.includes("juniper") ||
-        joined.includes("pine") ||
-        joined.includes("spruce") ||
-        /(^|\W)yews?(\W|$)/.test(joined)
-      ) {
+      if (isConiferPlant(plant)) {
         return "Conifers";
       }
 
@@ -2960,10 +3165,10 @@
         const titleY = zone.subtitle ? zone.centerY - 4 : zone.centerY + 6;
 
         return `
-          <g data-zone-group="${zone.id}">
+          <g class="map-zone-group${active.has(zone.id) ? " active" : ""}" data-zone-group="${zone.id}" data-active="${active.has(zone.id) ? "true" : "false"}">
             <rect class="map-zone-shape${active.has(zone.id) ? " active" : ""}" data-zone="${zone.id}" x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${rx}" ry="${rx}"></rect>
-            <text class="${titleClass}" x="${zone.centerX}" y="${titleY}">${zone.title}</text>
-            ${zone.subtitle ? `<text class="${subtitleClass}" x="${zone.centerX}" y="${subtitleY}">${zone.subtitle}</text>` : ""}
+            <text class="${titleClass}${active.has(zone.id) ? " active" : ""}" x="${zone.centerX}" y="${titleY}">${zone.title}</text>
+            ${zone.subtitle ? `<text class="${subtitleClass}${active.has(zone.id) ? " active" : ""}" x="${zone.centerX}" y="${subtitleY}">${zone.subtitle}</text>` : ""}
           </g>
         `;
       }).join("");
@@ -3053,11 +3258,11 @@
 
       els.overviewMapCaption.textContent = primaryZone
         ? `${zoneTitle(primaryZone.id)} stays highlighted on the full map so the rest of the nursery remains visible.${flagSummary ? ` Matching cue: ${flagSummary}.` : ""}`
-        : "Use the full map to keep your bearings. Tap a result or tap any zone to highlight it.";
+        : "The full nursery stays visible while each section uses darker blocks and reverse type for faster reading. Tap a result or any zone to highlight it.";
 
       els.detailMapCaption.textContent = primaryZone
         ? `Closer look: ${zoneTitle(primaryZone.id)}.${flagSummary ? ` Look for ${flagSummary.toLowerCase()}.` : ""}`
-        : "Closer look defaults to the perennials / checkout side until you choose a plant or zone.";
+        : "Closer look starts near perennials / checkout until you choose a plant or map section.";
     }
 
     function syncMobileMapUi() {
@@ -3279,13 +3484,13 @@
 
     function renderKioskActions() {
       const actions = [
-        { label: "All", value: "" },
+        { label: "All Plants", value: "" },
         { label: "Trees", value: "Tree" },
         { label: "Shrubs", value: "Shrub" },
         { label: "Shade", value: "shade" },
-        { label: "Deer Resistant", value: "deer-resistant" },
-        { label: "Pollinator", value: "pollinator-friendly" },
-        { label: "Wet Areas", value: "wet-tolerant" }
+        { label: "Conifers", value: "conifers" },
+        { label: "Roses", value: "roses" },
+        { label: "Pollinator", value: "pollinator-friendly" }
       ];
       els.kioskActions.innerHTML = actions.map(action => `
         <button type="button" class="kiosk-btn${state.kioskTrait === action.value ? " active" : ""}" data-kiosk-value="${action.value}">${action.label}</button>
@@ -3306,6 +3511,8 @@
         if (query && !item.searchBlob.includes(query)) return false;
         if (!picked) return true;
         if (picked === "Tree" || picked === "Shrub") return item.category === picked || item.category === `${picked}/Shrub`;
+        if (picked === "conifers") return /(conifer|arborvitae|cedar|cypress|fir|hemlock|juniper|pine|spruce|yew)s?/i.test(item.name + ' ' + item.searchBlob);
+        if (picked === "roses") return /rosa/i.test(item.searchBlob) || /rose/i.test(item.name) || /rose/i.test(item.area);
         return item.traits.includes(picked);
       })).slice(0, 24);
 
@@ -3365,7 +3572,7 @@
       if (!item) {
         els.kioskDetailPanel.innerHTML = `
           <h2>Directions</h2>
-          <p class="kiosk-lead">Select a result to show a short verbal direction you can repeat to a customer.</p>
+          <p class="kiosk-lead">Select a result to show a short polished direction you can repeat to a customer.</p>
           <p class="zone-directions">The map preview keeps the full nursery in view and always shows the red starting marker at perennials / checkout.</p>
         `;
         renderKioskMap(null);
