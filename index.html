@@ -122,16 +122,24 @@
     .hero-actions {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: stretch;
       gap: 12px;
-      min-width: 270px;
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
     }
 
     .view-tabs {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 10px;
-      justify-content: flex-end;
+      justify-content: flex-start;
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
     }
 
     .theme-toggle,
@@ -164,6 +172,7 @@
       padding: 11px 14px;
       font-weight: 800;
       white-space: nowrap;
+      flex: 0 0 auto;
     }
 
     .view-tab.active {
@@ -775,6 +784,12 @@
       background: var(--map-bg);
     }
 
+    .map-board,
+    .map-pan-shell,
+    .detail-map-board {
+      background: var(--map-bg) !important;
+    }
+
     .mobile-map-tools {
       display: none;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1125,7 +1140,10 @@
         width: 100%;
         align-items: stretch;
       }
-      .view-tabs { justify-content: flex-start; }
+      .view-tabs {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+      }
       .controls-wrap,
       .panel {
         padding: 14px;
@@ -1233,32 +1251,32 @@
     }
 
     .map-top-field {
-      fill: #e8edf4;
-      stroke: #bcc8d7;
+      fill: #16263d;
+      stroke: #2c4568;
       stroke-width: 2;
     }
 
     .map-soft-block {
-      fill: #eef3f8;
-      stroke: #c5d0dd;
+      fill: #1b2d46;
+      stroke: #355173;
       stroke-width: 1.8;
     }
 
     .map-road {
       fill: none;
-      stroke: #f8fbff;
+      stroke: #3c5474;
       stroke-width: 26;
       stroke-linecap: round;
       stroke-linejoin: round;
-      opacity: .95;
+      opacity: .92;
     }
 
     .map-bench-strip {
       fill: none;
-      stroke: #b7c2d1;
+      stroke: #48627f;
       stroke-width: 8;
       stroke-linecap: round;
-      opacity: .9;
+      opacity: .88;
     }
 
     .map-arrow-line {
@@ -2256,6 +2274,21 @@
       if (isRosePlant(plant)) return "Roses";
 
       if (
+        joined.includes("conifer") ||
+        joined.includes("arborvitae") ||
+        joined.includes("cedar") ||
+        joined.includes("cypress") ||
+        joined.includes("fir") ||
+        joined.includes("hemlock") ||
+        joined.includes("juniper") ||
+        joined.includes("pine") ||
+        joined.includes("spruce") ||
+        /(^|\W)yews?(\W|$)/.test(joined)
+      ) {
+        return "Conifers";
+      }
+
+      if (
         sourceType === "tree" ||
         normalizeText(plant.category) === "tree" ||
         joined.includes("trees >") ||
@@ -2351,6 +2384,7 @@
         "Hardy Vining Plants",
         "Native Perennials",
         "Perennial Grasses",
+        "Conifers",
         "Flowering Trees",
         "Ornamental Trees",
         "Shade Trees",
