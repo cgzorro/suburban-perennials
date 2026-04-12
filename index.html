@@ -1683,7 +1683,24 @@
       text-shadow: none;
     }
 
-  </style>
+  
+    /* Locked-down kiosk heading contrast + result summary */
+    html[data-theme="dark"] .panel h2,
+    html[data-theme="dark"] .kiosk-panel h2,
+    html[data-theme="dark"] #kioskDetailPanel h2,
+    html[data-theme="dark"] #kioskMapPanel h2,
+    html[data-theme="dark"] .kiosk-card h3 {
+      color: var(--text) !important;
+    }
+
+    .kiosk-result-summary {
+      margin: 0 0 10px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+
+</style>
 </head>
 <body>
   <div class="container">
@@ -2267,6 +2284,8 @@
       kioskQuery: "",
       kioskTrait: "",
       kioskResults: [],
+      kioskCatalogItems: [],
+      kioskMatchCount: 0,
       selectedKioskId: ""
     };
 
@@ -3109,7 +3128,91 @@
 
     const NURSERY_ITEMS = buildNurseryData();
 
-    function renderDefinitions() {
+    function kioskTraitsFromPlant(plant) {
+      const traits = inferTraits(plant) || {};
+      const list = [];
+      if (traits.sun) list.push("sun");
+      if (traits.shade) list.push("shade");
+      if (traits.pollinator) list.push("pollinator-friendly");
+      if (traits.drought) list.push("drought-tolerant");
+      if (traits["deer resistant"]) list.push("deer-resistant");
+      return list;
+    }
+
+    function kioskZoneMetaForPlant(plant) {
+      const group = getPlantGroup(plant);
+      const exposure = getExposure(plant);
+      const category = normalizeText(plant.category);
+
+      if (group === "Roses") {
+        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right rose section", flagColor: "red", topCategory: "Shrub" };
+      }
+      if (group === "Conifers") {
+        return { zoneIds: ["b", "c"], locationLabel: "Ball & Burlap B / C", area: "Conifers & evergreens", flagColor: "blue", topCategory: "Tree" };
+      }
+      if (group === "Shade Trees") {
+        return { zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Shade Trees", flagColor: "brown", topCategory: "Tree" };
+      }
+      if (group === "Flowering Trees") {
+        return { zoneIds: ["d", "house6", "house8"], locationLabel: "Ball & Burlap D / Houses 6 & 8", area: "Flowering trees", flagColor: "magenta", topCategory: "Tree" };
+      }
+      if (group === "Ornamental Trees") {
+        return { zoneIds: ["house6", "house7", "house8"], locationLabel: "Hoop Houses 6–8", area: "Ornamental trees", flagColor: "purple", topCategory: "Tree" };
+      }
+      if (group === "Fruit Trees") {
+        return { zoneIds: ["between123", "house1", "house2", "house3"], locationLabel: "Between Houses 1–3", area: "Fruit trees", flagColor: "yellow", topCategory: "Tree" };
+      }
+      if (group === "Perennials - Shade" || exposure === "Shade") {
+        return { zoneIds: ["shade-perennials"], locationLabel: "Shade Perennials", area: "Shade perennial yard", flagColor: "teal", topCategory: "Plant" };
+      }
+      if (group === "Perennials - Sun" || group === "Peonies" || exposure === "Sun") {
+        return { zoneIds: ["sun-perennials"], locationLabel: "Sun Perennials", area: "Sun perennial yard", flagColor: "orange", topCategory: "Plant" };
+      }
+      if (group === "Ground Covers" || group === "Hardy Vining Plants" || group === "Grapes & Berries" || group === "Clematis") {
+        return { zoneIds: ["house1"], locationLabel: "Hoop House 1", area: "Groundcovers / vines / berries", flagColor: "yellow", topCategory: "Plant" };
+      }
+      if (category === "tree/shrub") {
+        return { zoneIds: ["field-shrub"], locationLabel: "Shrub Field", area: "Tree / shrub forms", flagColor: "green", topCategory: "Shrub" };
+      }
+      return { zoneIds: ["field-shrub"], locationLabel: "Shrub Field", area: "General nursery stock", flagColor: "green", topCategory: "Plant" };
+    }
+
+    function buildKioskCatalogItems(plants) {
+      const seen = new Set();
+      return (Array.isArray(plants) ? plants : []).map((plant, index) => {
+        const meta = kioskZoneMetaForPlant(plant);
+        const group = getPlantGroup(plant);
+        const exposure = getExposure(plant);
+        const traits = kioskTraitsFromPlant(plant);
+        const id = `k-${normalizeSpaces(plant.sku || plant.name || index).replace(/[^a-zA-Z0-9_-]/g, "-")}-${index}`;
+        const item = {
+          id,
+          name: normalizeSpaces(plant.name || plant.common || plant.sku || `Plant ${index + 1}`),
+          category: meta.topCategory,
+          browserGroup: group,
+          zoneIds: meta.zoneIds,
+          locationLabel: meta.locationLabel,
+          area: meta.area,
+          flagColor: meta.flagColor,
+          traits,
+          notes: normalizeSpaces(plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || ""),
+          searchBlob: [
+            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, group, exposure, meta.locationLabel, meta.area, traits.join(" ")
+          ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase()
+        };
+        const dedupeKey = `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`;
+        if (seen.has(dedupeKey)) return null;
+        seen.add(dedupeKey);
+        return item;
+      }).filter(Boolean);
+    }
+
+    function getKioskItems() {
+      if (Array.isArray(state.kioskCatalogItems) && state.kioskCatalogItems.length) return state.kioskCatalogItems;
+      return NURSERY_ITEMS;
+    }
+
+function renderDefinitions() {
       els.definitionsGrid.innerHTML = DEFINITIONS.map(def => `
         <article class="def-card">
           <h3>${def.title}</h3>
@@ -3607,15 +3710,21 @@
     function applyKioskFilters() {
       const query = normalizeText(els.kioskSearch.value);
       const picked = state.kioskTrait;
-
-      state.kioskResults = sortFinderItems(NURSERY_ITEMS.filter(item => {
+      const sourceItems = getKioskItems();
+      const filtered = sortFinderItems(sourceItems.filter(item => {
         if (query && !item.searchBlob.includes(query)) return false;
         if (!picked) return true;
-        if (picked === "Tree" || picked === "Shrub") return item.category === picked || item.category === `${picked}/Shrub`;
-        if (picked === "conifers") return isConiferNurseryItem(item);
-        if (picked === "roses") return isRoseNurseryItem(item);
+        if (picked === "Tree") return item.category === "Tree";
+        if (picked === "Shrub") return item.category === "Shrub";
+        if (picked === "conifers") return item.browserGroup === "Conifers" || isConiferNurseryItem(item);
+        if (picked === "roses") return item.browserGroup === "Roses" || isRoseNurseryItem(item);
+        if (picked === "shade") return item.traits.includes("shade");
+        if (picked === "pollinator-friendly") return item.traits.includes("pollinator-friendly");
         return item.traits.includes(picked);
-      })).slice(0, 24);
+      }));
+
+      state.kioskMatchCount = filtered.length;
+      state.kioskResults = filtered.slice(0, 120);
 
       const selected = state.kioskResults.find(item => item.id === state.selectedKioskId) || null;
       if (!selected) state.selectedKioskId = "";
@@ -3625,11 +3734,17 @@
     }
 
     function renderKioskResults() {
+      const total = state.kioskMatchCount || 0;
       if (!state.kioskResults.length) {
         els.kioskResults.innerHTML = `<div class="empty">No matches in kiosk mode. Try another search or clear a quick filter.</div>`;
         return;
       }
-      els.kioskResults.innerHTML = state.kioskResults.map(item => {
+
+      const summary = total > state.kioskResults.length
+        ? `<p class="kiosk-result-summary">Showing first ${state.kioskResults.length} of ${total} matches.</p>`
+        : `<p class="kiosk-result-summary">${total} match${total === 1 ? "" : "es"}.</p>`;
+
+      els.kioskResults.innerHTML = summary + state.kioskResults.map(item => {
         const active = state.selectedKioskId === item.id;
         const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
         return `
@@ -3641,7 +3756,7 @@
               </div>
               <span class="mini-flag" style="--flag:${flagColor}"></span>
             </div>
-            <div class="details-text">${escapeHtml(item.traits.slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area)}</div>
+            <div class="details-text">${escapeHtml(item.traits.slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area || item.browserGroup || item.category)}</div>
           </button>
         `;
       }).join("");
@@ -3698,7 +3813,7 @@
     }
 
     function selectKioskItem(itemId) {
-      const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
+      const item = getKioskItems().find(entry => entry.id === itemId);
       if (!item) return;
       state.selectedKioskId = item.id;
       renderKioskResults();
@@ -3717,12 +3832,16 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         state.plants = normalizePlantsData(Array.isArray(data) ? data : []);
+        state.kioskCatalogItems = buildKioskCatalogItems(state.plants);
         populateFilters(state.plants);
         renderTraitChips();
         applyFilters();
+        applyKioskFilters();
       } catch (err) {
         els.summaryBar.innerHTML = `<span class="pill">Failed to load plants</span>`;
         els.results.innerHTML = `<div class="empty">Could not load <code>plants.json</code>. ${err.message}</div>`;
+        state.kioskCatalogItems = [];
+        applyKioskFilters();
       }
     }
 
@@ -3775,10 +3894,17 @@
 
       els.kioskSearch.addEventListener("input", () => { renderKioskActions(); applyKioskFilters(); });
       els.kioskOpenLargeMap?.addEventListener("click", () => {
-        const item = NURSERY_ITEMS.find(entry => entry.id === state.selectedKioskId);
+        const item = getKioskItems().find(entry => entry.id === state.selectedKioskId);
         if (!item) return;
         showView("finder");
-        selectFinderItem(item.id);
+        const mappedFinder = NURSERY_ITEMS.find(entry => normalizeText(entry.name) === normalizeText(item.name)) || null;
+        if (mappedFinder) {
+          selectFinderItem(mappedFinder.id);
+        } else {
+          renderFinderMaps(item.zoneIds || [], [item]);
+          els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
+          wireCopyButtons(els.locationDetails);
+        }
         els.finderView?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
