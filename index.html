@@ -1651,6 +1651,38 @@
       .kiosk-side { grid-template-columns: 1fr; }
     }
 
+  
+    /* Kiosk and panel heading contrast */
+    html[data-theme="dark"] .hero-copy h1,
+    html[data-theme="dark"] .panel h2,
+    html[data-theme="dark"] .zone-details h3,
+    html[data-theme="dark"] .def-card h3,
+    html[data-theme="dark"] .kiosk-demo-card h2,
+    html[data-theme="dark"] .card-title,
+    html[data-theme="dark"] .finder-card h3,
+    html[data-theme="dark"] .kiosk-card h3,
+    html[data-theme="dark"] #kioskDetailPanel h2,
+    html[data-theme="dark"] #kioskMapPanel h2,
+    html[data-theme="dark"] #locationDetails h3 {
+      color: var(--text) !important;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.14);
+    }
+
+    html[data-theme="light"] .hero-copy h1,
+    html[data-theme="light"] .panel h2,
+    html[data-theme="light"] .zone-details h3,
+    html[data-theme="light"] .def-card h3,
+    html[data-theme="light"] .kiosk-demo-card h2,
+    html[data-theme="light"] .card-title,
+    html[data-theme="light"] .finder-card h3,
+    html[data-theme="light"] .kiosk-card h3,
+    html[data-theme="light"] #kioskDetailPanel h2,
+    html[data-theme="light"] #kioskMapPanel h2,
+    html[data-theme="light"] #locationDetails h3 {
+      color: var(--text) !important;
+      text-shadow: none;
+    }
+
   </style>
 </head>
 <body>
@@ -2297,6 +2329,52 @@
 
     function normalizeSku(v) {
       return String(v || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+    }
+    function isRoseNurseryItem(item) {
+      const exactName = normalizeText(item?.name || "");
+      const exactCategory = normalizeText(item?.category || "");
+      const joined = [
+        item?.name,
+        item?.category,
+        item?.locationLabel,
+        item?.area,
+        ...(Array.isArray(item?.aliases) ? item.aliases : [])
+      ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase();
+
+      if (exactName === "roses" || exactName === "rose") return true;
+      if (exactCategory === "roses" || exactCategory === "rose") return true;
+      if (joined.includes("roses & grasses area") && exactName !== "grasses") return true;
+      if (/(^|\b)(drift rose|knock out rose|hybrid tea rose|floribunda rose|grandiflora rose|climbing rose|shrub rose|rose bush)(\b|$)/i.test(joined)) return true;
+      return false;
+    }
+
+    function isConiferNurseryItem(item) {
+      const joined = [
+        item?.name,
+        item?.category,
+        item?.locationLabel,
+        item?.area,
+        ...(Array.isArray(item?.aliases) ? item.aliases : [])
+      ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase();
+
+      return (
+        joined.includes("conifer") ||
+        joined.includes("arborvitae") ||
+        joined.includes("cedar") ||
+        joined.includes("cypress") ||
+        joined.includes("fir") ||
+        joined.includes("hemlock") ||
+        joined.includes("juniper") ||
+        joined.includes("pine") ||
+        joined.includes("spruce") ||
+        /(^|\W)yews?(\W|$)/.test(joined)
+      );
+    }
+
+    function withSatelliteView(url) {
+      if (!url) return url;
+      if (/[?&]t=k\b/i.test(url)) return url;
+      return url + (url.includes("?") ? "&t=k" : "?t=k");
     }
 
     function isTruthy(value) {
@@ -3492,12 +3570,34 @@
         { label: "Roses", value: "roses" },
         { label: "Pollinator", value: "pollinator-friendly" }
       ];
+      const hasQuery = !!normalizeText(els.kioskSearch?.value || "");
+      const hasActiveFilter = !!state.kioskTrait;
+
+      if (hasQuery || hasActiveFilter) {
+        actions.push({ label: "Clear Search", value: "__clear__" });
+      }
+
       els.kioskActions.innerHTML = actions.map(action => `
-        <button type="button" class="kiosk-btn${state.kioskTrait === action.value ? " active" : ""}" data-kiosk-value="${action.value}">${action.label}</button>
+        <button
+          type="button"
+          class="kiosk-btn${state.kioskTrait === action.value || (action.value === "__clear__" && (hasQuery || hasActiveFilter)) ? " active" : ""}"
+          data-kiosk-value="${action.value}"
+        >${action.label}</button>
       `).join("");
+
       els.kioskActions.querySelectorAll("[data-kiosk-value]").forEach(btn => {
         btn.addEventListener("click", () => {
-          state.kioskTrait = btn.dataset.kioskValue;
+          const value = btn.dataset.kioskValue;
+          if (value === "__clear__") {
+            els.kioskSearch.value = "";
+            state.kioskTrait = "";
+            state.selectedKioskId = "";
+            renderKioskActions();
+            applyKioskFilters();
+            return;
+          }
+
+          state.kioskTrait = value;
           renderKioskActions();
           applyKioskFilters();
         });
@@ -3507,12 +3607,13 @@
     function applyKioskFilters() {
       const query = normalizeText(els.kioskSearch.value);
       const picked = state.kioskTrait;
+
       state.kioskResults = sortFinderItems(NURSERY_ITEMS.filter(item => {
         if (query && !item.searchBlob.includes(query)) return false;
         if (!picked) return true;
         if (picked === "Tree" || picked === "Shrub") return item.category === picked || item.category === `${picked}/Shrub`;
-        if (picked === "conifers") return /(conifer|arborvitae|cedar|cypress|fir|hemlock|juniper|pine|spruce|yew)s?/i.test(item.name + ' ' + item.searchBlob);
-        if (picked === "roses") return /rosa/i.test(item.searchBlob) || /rose/i.test(item.name) || /rose/i.test(item.area);
+        if (picked === "conifers") return isConiferNurseryItem(item);
+        if (picked === "roses") return isRoseNurseryItem(item);
         return item.traits.includes(picked);
       })).slice(0, 24);
 
@@ -3588,7 +3689,7 @@
         <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
         <div class="detail-tag-row">${item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
         <div class="detail-actions">
-          <a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open Google Maps</a>
+          <a class="map-link" href="${withSatelliteView(NURSERY_MAPS_LINK)}" target="_blank" rel="noopener noreferrer">Open Satellite Map</a>
           <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy quick line</button>
         </div>
       `;
@@ -3602,6 +3703,11 @@
       state.selectedKioskId = item.id;
       renderKioskResults();
       renderKioskDetail(item);
+
+      const detailTarget = els.kioskDetailPanel || els.kioskMapPanel || els.kioskMapBoard;
+      if (detailTarget && typeof detailTarget.scrollIntoView === "function") {
+        detailTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
 
 
@@ -3667,7 +3773,7 @@
 
       window.addEventListener("resize", syncMobileMapUi);
 
-      els.kioskSearch.addEventListener("input", applyKioskFilters);
+      els.kioskSearch.addEventListener("input", () => { renderKioskActions(); applyKioskFilters(); });
       els.kioskOpenLargeMap?.addEventListener("click", () => {
         const item = NURSERY_ITEMS.find(entry => entry.id === state.selectedKioskId);
         if (!item) return;
