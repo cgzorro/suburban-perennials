@@ -1683,25 +1683,7 @@
       text-shadow: none;
     }
 
-  
-    .kiosk-results-meta {
-      grid-column: 1 / -1;
-      margin: 0 0 10px;
-      color: var(--text-muted);
-      font-size: 0.92rem;
-      letter-spacing: 0.01em;
-    }
-
-    html[data-theme="dark"] .kiosk-card h3,
-    html[data-theme="dark"] #kioskDetailPanel h2,
-    html[data-theme="dark"] #kioskMapPanel h2,
-    html[data-theme="dark"] .panel h2,
-    html[data-theme="dark"] .kiosk-results h3 {
-      color: var(--text) !important;
-    }
-
-
-</style>
+  </style>
 </head>
 <body>
   <div class="container">
@@ -3127,160 +3109,6 @@
 
     const NURSERY_ITEMS = buildNurseryData();
 
-    const KIOSK_RESULT_RENDER_LIMIT = 120;
-
-    function normalizeLookupKey(value) {
-      return normalizeText(String(value || "").replace(/&/g, "and")).trim();
-    }
-
-    function getKioskItems() {
-      return Array.isArray(state.kioskCatalog) && state.kioskCatalog.length ? state.kioskCatalog : NURSERY_ITEMS;
-    }
-
-    function deriveKioskCategory(plant) {
-      const group = getPlantGroup(plant);
-      const sourceCategory = normalizeLookupKey(plant.category);
-
-      if (
-        sourceCategory === "tree" ||
-        ["Shade Trees", "Flowering Trees", "Ornamental Trees", "Fruit Trees", "Evergreen Trees", "Trees"].includes(group)
-      ) {
-        return "Tree";
-      }
-
-      if (sourceCategory === "tree/shrub") return "Tree/Shrub";
-      if (group === "Conifers") return "Tree";
-      if (group === "Roses") return "Other";
-      return "Other";
-    }
-
-    function matchManualItemForPlant(plant) {
-      const plantTerms = uniqueValues([
-        plant.name,
-        plant.common,
-        plant.genus,
-        plant.series
-      ].map(normalizeLookupKey).filter(Boolean));
-
-      const longPlantTerms = plantTerms.filter(term => term.length >= 5);
-      const nameKey = normalizeLookupKey(plant.name);
-
-      for (const item of NURSERY_ITEMS) {
-        const itemTerms = uniqueValues([item.name, ...(item.aliases || [])].map(normalizeLookupKey).filter(Boolean));
-        if (itemTerms.some(term => plantTerms.includes(term))) {
-          return item;
-        }
-      }
-
-      for (const item of NURSERY_ITEMS) {
-        const itemTerms = uniqueValues([item.name, ...(item.aliases || [])].map(normalizeLookupKey).filter(Boolean));
-        if (itemTerms.some(term => term.length >= 5 && (nameKey.includes(term) || longPlantTerms.some(pt => term.includes(pt))))) {
-          return item;
-        }
-      }
-
-      return null;
-    }
-
-    function fallbackLocationForPlant(plant) {
-      const group = getPlantGroup(plant);
-      const exposure = getExposure(plant);
-      const sourceCategory = normalizeLookupKey(plant.category);
-      const nameKey = normalizeLookupKey(plant.name);
-
-      if (group === "Roses") {
-        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses area", area: "Lower right", flagColor: "red" };
-      }
-
-      if (group === "Perennial Grasses") {
-        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses area", area: "Lower right", flagColor: "red" };
-      }
-
-      if (group === "Perennials - Shade" || exposure === "Shade") {
-        return { zoneIds: ["shade-perennials"], locationLabel: "Shade Perennials", area: "Perennial benches", flagColor: "purple" };
-      }
-
-      if (group === "Perennials - Sun" || group === "Peonies" || group === "Native Perennials") {
-        return { zoneIds: ["sun-perennials"], locationLabel: "Sun Perennials", area: "Perennial benches", flagColor: "yellow" };
-      }
-
-      if (["Clematis", "Ground Covers", "Hardy Vining Plants", "Grapes & Berries"].includes(group)) {
-        return { zoneIds: ["house1"], locationLabel: "Hoop House 1", area: "Groundcovers, vines, berries", flagColor: "yellow" };
-      }
-
-      if (group === "Fruit Trees") {
-        return { zoneIds: ["between123", "house1", "house2", "house3"], locationLabel: "Between Houses 1, 2, and 3", area: "Hoop Houses", flagColor: "yellow" };
-      }
-
-      if (group === "Conifers") {
-        if (sourceCategory === "tree" || nameKey.includes("pine") || nameKey.includes("spruce") || nameKey.includes("fir")) {
-          return { zoneIds: ["c"], locationLabel: "Ball & Burlap C", area: "Evergreens", flagColor: "green" };
-        }
-        return { zoneIds: ["field-shrub"], locationLabel: "Shrub field — evergreen section", area: "Evergreen trees & shrubs", flagColor: "green" };
-      }
-
-      if (["Shade Trees", "Flowering Trees", "Ornamental Trees", "Evergreen Trees", "Trees"].includes(group) || sourceCategory === "tree") {
-        return { zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: group || "Tree stock", flagColor: "brown" };
-      }
-
-      if (sourceCategory === "tree/shrub") {
-        return { zoneIds: ["field-shrub"], locationLabel: "Shrub field", area: "Mixed shrub stock", flagColor: "yellow" };
-      }
-
-      return { zoneIds: ["field-shrub"], locationLabel: "Shrub field", area: "General field stock", flagColor: "yellow" };
-    }
-
-    function buildKioskCatalog(plants) {
-      const productItems = (Array.isArray(plants) ? plants : []).map((plant, index) => {
-        const manual = matchManualItemForPlant(plant);
-        const location = manual || fallbackLocationForPlant(plant);
-        const traitMap = inferTraits(plant);
-        const traitList = Object.keys(traitMap).filter(key => traitMap[key]);
-        const group = getPlantGroup(plant);
-        const exposure = getExposure(plant);
-
-        return {
-          id: `kp${index + 1}`,
-          name: plant.name || plant.common || `Plant ${index + 1}`,
-          sku: plant.sku || "",
-          category: deriveKioskCategory(plant),
-          browserGroup: group,
-          zoneIds: (location.zoneIds || []).slice(),
-          locationLabel: location.locationLabel || location.area || group,
-          area: location.area || group,
-          flagColor: location.flagColor || "yellow",
-          notes: plant.size ? `Size: ${plant.size}` : "",
-          traits: uniqueValues([
-            ...traitList,
-            exposure === "Sun" ? "sun" : "",
-            exposure === "Shade" ? "shade" : "",
-            group === "Conifers" ? "conifers" : "",
-            group === "Roses" ? "roses" : ""
-          ].filter(Boolean)),
-          searchBlob: [
-            plant.name,
-            plant.common,
-            plant.genus,
-            plant.series,
-            plant.sku,
-            group,
-            exposure,
-            plant.color,
-            location.locationLabel,
-            location.area
-          ].filter(Boolean).join(" ").toLowerCase()
-        };
-      });
-
-      const seenNames = new Set(productItems.map(item => normalizeLookupKey(item.name)));
-      const manualExtras = NURSERY_ITEMS
-        .filter(item => !seenNames.has(normalizeLookupKey(item.name)))
-        .map((item, index) => ({ ...item, id: item.id || `km${index + 1}` }));
-
-      return sortFinderItems([...productItems, ...manualExtras]);
-    }
-
-
     function renderDefinitions() {
       els.definitionsGrid.innerHTML = DEFINITIONS.map(def => `
         <article class="def-card">
@@ -3779,40 +3607,15 @@
     function applyKioskFilters() {
       const query = normalizeText(els.kioskSearch.value);
       const picked = state.kioskTrait;
-      const kioskItems = getKioskItems();
 
-      state.kioskResults = sortFinderItems(kioskItems.filter(item => {
-        const normalizedGroup = item.browserGroup || item.plant_group || item.category || "";
-
+      state.kioskResults = sortFinderItems(NURSERY_ITEMS.filter(item => {
         if (query && !item.searchBlob.includes(query)) return false;
         if (!picked) return true;
-
-        if (picked === "Tree") {
-          return item.category === "Tree" || item.category === "Tree/Shrub";
-        }
-
-        if (picked === "Shrub") {
-          return item.category === "Shrub" || item.category === "Tree/Shrub";
-        }
-
-        if (picked === "conifers") {
-          return normalizedGroup === "Conifers";
-        }
-
-        if (picked === "roses") {
-          return normalizedGroup === "Roses";
-        }
-
-        if (picked === "shade") {
-          return item.traits.includes("shade");
-        }
-
-        if (picked === "pollinator-friendly") {
-          return item.traits.includes("pollinator-friendly") || item.traits.includes("pollinator");
-        }
-
+        if (picked === "Tree" || picked === "Shrub") return item.category === picked || item.category === `${picked}/Shrub`;
+        if (picked === "conifers") return isConiferNurseryItem(item);
+        if (picked === "roses") return isRoseNurseryItem(item);
         return item.traits.includes(picked);
-      }));
+      })).slice(0, 24);
 
       const selected = state.kioskResults.find(item => item.id === state.selectedKioskId) || null;
       if (!selected) state.selectedKioskId = "";
@@ -3826,13 +3629,7 @@
         els.kioskResults.innerHTML = `<div class="empty">No matches in kiosk mode. Try another search or clear a quick filter.</div>`;
         return;
       }
-
-      const visibleItems = state.kioskResults.slice(0, KIOSK_RESULT_RENDER_LIMIT);
-      const summary = state.kioskResults.length > KIOSK_RESULT_RENDER_LIMIT
-        ? `Showing first ${visibleItems.length} of ${state.kioskResults.length} matches. Type a plant name or SKU to narrow it down.`
-        : `${state.kioskResults.length} match${state.kioskResults.length === 1 ? "" : "es"} in kiosk mode.`;
-
-      els.kioskResults.innerHTML = `<div class="kiosk-results-meta">${escapeHtml(summary)}</div>` + visibleItems.map(item => {
+      els.kioskResults.innerHTML = state.kioskResults.map(item => {
         const active = state.selectedKioskId === item.id;
         const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
         return `
@@ -3848,7 +3645,6 @@
           </button>
         `;
       }).join("");
-
       els.kioskResults.querySelectorAll("[data-kiosk-id]").forEach(btn => {
         btn.addEventListener("click", () => selectKioskItem(btn.dataset.kioskId));
       });
@@ -3902,7 +3698,7 @@
     }
 
     function selectKioskItem(itemId) {
-      const item = getKioskItems().find(entry => entry.id === itemId);
+      const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
       if (!item) return;
       state.selectedKioskId = item.id;
       renderKioskResults();
@@ -3915,18 +3711,15 @@
     }
 
 
-    async async function loadPlants() {
+    async function loadPlants() {
       try {
         const res = await fetch("./plants.json", { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         state.plants = normalizePlantsData(Array.isArray(data) ? data : []);
-        state.kioskCatalog = buildKioskCatalog(state.plants);
         populateFilters(state.plants);
         renderTraitChips();
         applyFilters();
-        renderKioskActions();
-        applyKioskFilters();
       } catch (err) {
         els.summaryBar.innerHTML = `<span class="pill">Failed to load plants</span>`;
         els.results.innerHTML = `<div class="empty">Could not load <code>plants.json</code>. ${err.message}</div>`;
@@ -3982,23 +3775,10 @@
 
       els.kioskSearch.addEventListener("input", () => { renderKioskActions(); applyKioskFilters(); });
       els.kioskOpenLargeMap?.addEventListener("click", () => {
-        const item = getKioskItems().find(entry => entry.id === state.selectedKioskId);
+        const item = NURSERY_ITEMS.find(entry => entry.id === state.selectedKioskId);
         if (!item) return;
-
-        const finderMatch = NURSERY_ITEMS.find(entry => entry.name === item.name || entry.locationLabel === item.locationLabel);
         showView("finder");
-
-        if (finderMatch) {
-          selectFinderItem(finderMatch.id);
-        } else {
-          state.selectedFinderId = "";
-          state.selectedZoneIds = (item.zoneIds || []).slice();
-          renderFinderResults();
-          renderFinderMaps(item.zoneIds || [], [item]);
-          els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
-          wireCopyButtons(els.locationDetails);
-        }
-
+        selectFinderItem(item.id);
         els.finderView?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
