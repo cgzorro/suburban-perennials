@@ -4,102 +4,302 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Nursery Ordering Platform Demo v3</title>
+<title>Perennial Ordering Platform — Executive Demo</title>
+
 <style>
 :root{
-  --bg:#f5f1ea; --bg2:#ece5da; --card:#fff; --ink:#1f2621; --muted:#667063; --line:#ddd5c9;
-  --green:#2e5b3d; --green2:#edf5ef; --amber:#94611e; --amber2:#fcf5e7; --red:#923b35; --red2:#fbefee; --blue:#244d73; --blue2:#edf4fb;
-  --shadow:0 10px 28px rgba(31,37,31,.08); --radius:18px; --field:#fff; --fieldLine:#d4dacf; --chip:#f7faf8; --chipBorder:#d5e1d9;
+  --bg:#fbf8f2;
+  --bg2:#f3ede3;
+  --bg3:#ece4d7;
+  --card:#fffffff0;
+  --card-solid:#ffffff;
+  --ink:#1f1b16;
+  --muted:#6f6558;
+  --line:#e2d8c8;
+  --line-strong:#d0c2ad;
+  --green:#cd6d1f;
+  --green-2:#ea8b35;
+  --green-soft:#fff1e4;
+  --amber:#b87622;
+  --amber-soft:#fff4e5;
+  --red:#b44c3c;
+  --red-soft:#fdf0ed;
+  --blue:#68798a;
+  --blue-soft:#eef2f6;
+  --field:#fffdf9;
+  --fieldLine:#ddd2c2;
+  --chip:#fffaf3;
+  --chipBorder:#eadcc9;
+  --shadow:0 14px 36px rgba(31,27,22,.08);
+  --shadow-strong:0 22px 46px rgba(31,27,22,.14);
+  --radius:22px;
+  --radius-sm:14px;
 }
 body[data-theme="dark"]{
-  --bg:#0f1513; --bg2:#18221e; --card:#17201d; --ink:#edf4ef; --muted:#a9b7ae; --line:#2b3631;
-  --green:#7fc794; --green2:rgba(127,199,148,.14); --amber:#f2c57a; --amber2:rgba(242,197,122,.14);
-  --red:#f29a92; --red2:rgba(242,154,146,.14); --blue:#8ebae4; --blue2:rgba(142,186,228,.14);
-  --shadow:0 18px 36px rgba(0,0,0,.34); --field:#121a17; --fieldLine:#324139; --chip:#1a2821; --chipBorder:#31453b;
+  --bg:#071325;
+  --bg2:#0d1d36;
+  --bg3:#132746;
+  --card:rgba(16,35,63,.94);
+  --card-solid:#10233f;
+  --ink:#eef4ff;
+  --muted:#b7c4da;
+  --line:#29456f;
+  --line-strong:#3a5d8d;
+  --green:#f08f34;
+  --green-2:#ffab57;
+  --green-soft:rgba(240,143,52,.14);
+  --amber:#f2c27d;
+  --amber-soft:rgba(242,194,125,.14);
+  --red:#ef9b84;
+  --red-soft:rgba(239,155,132,.14);
+  --blue:#a9bdd9;
+  --blue-soft:rgba(169,189,217,.14);
+  --field:#0b1930;
+  --fieldLine:#29456f;
+  --chip:#132746;
+  --chipBorder:#355681;
+  --shadow:0 20px 44px rgba(0,0,0,.34);
+  --shadow-strong:0 28px 60px rgba(0,0,0,.48);
+  --glow:0 0 0 1px rgba(255,255,255,.03), 0 14px 34px rgba(0,0,0,.28);
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);}
-.wrap{max-width:1600px;margin:0 auto;padding:20px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px}
-.hero-main{padding:24px}
-.hero h1{margin:0 0 10px;font-size:34px;line-height:1.04}
-.subtle{color:var(--muted);line-height:1.5}
-.badges{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 12px}
-.badge{padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid var(--chipBorder);background:var(--chip);color:var(--green)}
-.hero-note{line-height:1.58;font-size:14px}
-.meta{padding:20px;display:grid;gap:12px}
-.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.field{display:grid;gap:5px}
-label{font-size:11px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(240,143,52,.10), transparent 22%),
+    radial-gradient(circle at top right, rgba(240,143,52,.06), transparent 18%),
+    linear-gradient(180deg,var(--bg) 0%,var(--bg2) 52%,var(--bg3) 100%);
+}
+.wrap{max-width:1640px;margin:0 auto;padding:22px}
+.card{
+  background:var(--card);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.hero{display:grid;grid-template-columns:1.45fr .95fr;gap:18px;margin-bottom:18px;align-items:stretch}
+.hero-main{
+  padding:28px;
+  background:
+    linear-gradient(140deg, color-mix(in srgb, var(--card-solid) 84%, transparent) 0%, color-mix(in srgb, var(--green-soft) 22%, var(--card-solid) 78%) 100%);
+  position:relative;
+  overflow:hidden;
+}
+.hero-main::after{
+  content:"";
+  position:absolute;
+  inset:auto -70px -70px auto;
+  width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle, color-mix(in srgb, var(--green) 24%, transparent), transparent 68%);
+  pointer-events:none;
+}
+.hero h1{margin:0 0 12px;font-size:38px;line-height:1.02;letter-spacing:-.03em}
+.subtle{color:var(--muted);line-height:1.6;font-size:15px;max-width:74ch}
+.badges{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0 14px}
+.badge{
+  padding:8px 11px;border-radius:999px;font-size:12px;font-weight:900;
+  border:1px solid var(--chipBorder);background:var(--chip);color:var(--green);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
+}
+.hero-note{
+  line-height:1.65;font-size:14px;
+  padding:16px 18px;border-radius:18px;
+  background:color-mix(in srgb, var(--card-solid) 72%, var(--green-soft) 28%);
+  border:1px solid color-mix(in srgb, var(--line) 84%, var(--green) 16%);
+  position:relative;z-index:1;
+}
+.meta{
+  padding:22px;
+  display:grid;
+  gap:14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--card-solid) 92%, transparent), color-mix(in srgb, var(--card-solid) 82%, transparent));
+}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:grid;gap:6px}
+label{
+  font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--muted);text-transform:uppercase
+}
 input[type=text],input[type=number],input[type=week],select,textarea{
-  width:100%;border:1px solid var(--fieldLine);border-radius:12px;background:var(--field);color:var(--ink);padding:10px 11px;font:inherit
+  width:100%;
+  border:1px solid var(--fieldLine);
+  border-radius:14px;
+  background:var(--field);
+  color:var(--ink);
+  padding:11px 12px;
+  font:inherit;
+  transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
 }
-textarea{min-height:84px;resize:vertical}
-.toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+textarea{min-height:92px;resize:vertical}
+input[type=text]:hover,input[type=number]:hover,input[type=week]:hover,select:hover,textarea:hover{border-color:var(--line-strong)}
+.toolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 button{
-  border:0;border-radius:12px;padding:12px 14px;font:inherit;font-weight:800;cursor:pointer;
-  transition:transform .12s ease,filter .18s ease,background-color .2s ease,color .2s ease,border-color .2s ease;
+  border:1px solid transparent;
+  border-radius:14px;
+  padding:12px 14px;
+  font:inherit;font-weight:900;cursor:pointer;
+  transition:transform .12s ease,filter .18s ease,background-color .2s ease,color .2s ease,border-color .2s ease,box-shadow .18s ease;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
 }
-button:hover{filter:brightness(.98)} button:active{transform:translateY(1px)}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-.btn-primary{background:var(--green);color:#fff}
-.btn-secondary{background:color-mix(in srgb, var(--card) 65%, var(--line) 35%);color:var(--ink);border:1px solid var(--line)}
-.btn-danger{background:#5c2a24;color:#fff}
+button:hover{filter:brightness(.99)}
+button:active{transform:translateY(1px)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:none;
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--blue) 28%, transparent);
+  border-color:var(--blue);
+}
+.btn-primary{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--green-2) 84%, white 16%), var(--green));
+  color:#fff;
+  box-shadow:0 8px 20px color-mix(in srgb, var(--green) 24%, transparent), inset 0 1px 0 rgba(255,255,255,.15);
+}
+.btn-secondary{
+  background:color-mix(in srgb, var(--card-solid) 76%, var(--line) 24%);
+  color:var(--ink);
+  border-color:var(--line);
+}
+.btn-danger{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--red) 88%, white 12%), color-mix(in srgb, var(--red) 72%, #4e231f 28%));
+  color:#fff;
+}
 .theme-toggle{display:flex;align-items:center;justify-content:center;gap:8px}
-.summary{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 0 16px}
-.metric{padding:16px}
-.metric .k{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.metric .v{font-size:28px;font-weight:900;margin-top:4px}
-.metric .s{font-size:12px;color:var(--muted);margin-top:4px}
-.nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.nav button{background:var(--card);border:1px solid var(--line);color:var(--ink)}
-.nav button.active{background:var(--green);color:#fff;border-color:var(--green)}
-.panel{display:none;padding:18px;overflow:hidden}
+.summary{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 0 18px}
+.metric{
+  padding:18px 18px 16px;
+  position:relative;
+  overflow:hidden;
+}
+.metric::before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+  background:linear-gradient(180deg, var(--green), color-mix(in srgb, var(--blue) 40%, var(--green) 60%));
+  opacity:.9;
+}
+.metric .k{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.metric .v{font-size:30px;font-weight:950;margin-top:6px;letter-spacing:-.03em}
+.metric .s{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45}
+.nav{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;
+  position:sticky;top:0;z-index:6;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:color-mix(in srgb, var(--card-solid) 82%, transparent);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  box-shadow:var(--shadow);
+}
+.nav button{
+  background:transparent;border:1px solid var(--line);color:var(--ink);
+  padding:10px 12px;border-radius:12px;font-size:13px
+}
+.nav button.active{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--green-2) 84%, white 16%), var(--green));
+  color:#fff;border-color:var(--green)
+}
+.panel{display:none;padding:20px;overflow:hidden}
 .panel.active{display:block}
 .panel-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}
-.panel-head h2{margin:0;font-size:24px}
-.panel-note{color:var(--muted);font-size:14px;max-width:980px;line-height:1.45}
-.filters{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:10px;margin-bottom:12px}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px}
-table{width:100%;border-collapse:collapse;min-width:1140px}
-th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:14px}
-th{position:sticky;top:0;background:color-mix(in srgb, var(--card) 80%, var(--line) 20%);z-index:1;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
-tr:hover td{background:color-mix(in srgb, var(--card) 90%, var(--line) 10%)}
-.small{font-size:12px;color:var(--muted)}
-.chip{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}
-.high,.ok{background:var(--green2);color:var(--green)}
-.medium,.warn{background:var(--amber2);color:var(--amber)}
-.low,.bad{background:var(--red2);color:var(--red)}
-.pending{background:var(--blue2);color:var(--blue)}
-.mutedbox{padding:14px 16px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);background:color-mix(in srgb, var(--card) 92%, var(--line) 8%)}
+.panel-head h2{margin:0;font-size:26px;letter-spacing:-.02em}
+.panel-note{color:var(--muted);font-size:14px;max-width:980px;line-height:1.52}
+.filters{
+  display:grid;grid-template-columns:2fr repeat(4,1fr);gap:10px;margin-bottom:14px;
+  padding:14px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb, var(--card-solid) 90%, transparent)
+}
+.table-wrap{
+  overflow:auto;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb, var(--card-solid) 96%, transparent)
+}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:1140px}
+th,td{padding:12px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:14px}
+th{
+  position:sticky;top:0;background:color-mix(in srgb, var(--card-solid) 86%, var(--line) 14%);z-index:1;
+  font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)
+}
+tbody tr:nth-child(even) td{background:color-mix(in srgb, var(--card-solid) 96%, var(--line) 4%)}
+tr:hover td{background:color-mix(in srgb, var(--green-soft) 24%, var(--card-solid) 76%)}
+.small{font-size:12px;color:var(--muted);line-height:1.45}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 9px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:.01em
+}
+.high,.ok{background:var(--green-soft);color:var(--green)}
+.medium,.warn{background:var(--amber-soft);color:var(--amber)}
+.low,.bad{background:var(--red-soft);color:var(--red)}
+.pending{background:var(--blue-soft);color:var(--blue)}
+.mutedbox{
+  padding:16px 18px;border:1px dashed var(--line);border-radius:18px;color:var(--muted);
+  background:color-mix(in srgb, var(--card-solid) 90%, var(--line) 10%)
+}
 .stack{display:grid;gap:16px}
-.grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+.grid-2{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
 .schema-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.schema-card{padding:16px}
-.schema-card h3{margin:0 0 8px}
-.schema-card pre{white-space:pre-wrap;margin:0;font-size:12px;line-height:1.45;color:var(--ink)}
+.schema-card{padding:18px}
+.schema-card h3{margin:0 0 10px;letter-spacing:-.01em}
+.schema-card pre{
+  white-space:pre-wrap;margin:0;font-size:12px;line-height:1.5;color:var(--ink);
+  padding:14px;border-radius:16px;background:color-mix(in srgb, var(--card-solid) 78%, var(--line) 22%);
+  border:1px solid var(--line)
+}
 .legend-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-.legend-card{padding:14px}
-.inline-input{width:82px !important;padding:8px 9px !important}
-.alloc-grid{display:grid;grid-template-columns:repeat(3,84px);gap:6px}
-.alloc-labels{display:grid;grid-template-columns:repeat(3,84px);gap:6px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.footer{text-align:center;color:var(--muted);font-size:12px;padding:16px 0 8px}
-@media (max-width:1180px){.hero,.summary,.grid-2,.filters,.schema-grid,.legend-grid{grid-template-columns:1fr}}
+.legend-card{padding:16px}
+.inline-input{width:90px !important;padding:8px 9px !important}
+.alloc-grid{display:grid;grid-template-columns:repeat(3,88px);gap:6px}
+.alloc-labels{display:grid;grid-template-columns:repeat(3,88px);gap:6px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.qr-box{display:grid;gap:12px}
+.qr-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.btn-small{padding:9px 11px;font-size:12px}
+.qr-grid{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:center}
+.qr-preview{
+  width:132px;height:132px;border-radius:18px;border:1px solid var(--line);
+  background:repeating-linear-gradient(45deg, color-mix(in srgb, var(--card-solid) 88%, var(--line) 12%), color-mix(in srgb, var(--card-solid) 88%, var(--line) 12%) 10px, color-mix(in srgb, var(--card-solid) 96%, transparent) 10px, color-mix(in srgb, var(--card-solid) 96%, transparent) 20px);
+  display:grid;place-items:center;overflow:hidden
+}
+.qr-preview img{display:block;width:100%;height:100%;object-fit:cover}
+.qr-url{
+  font-size:12px;line-height:1.45;color:var(--muted);
+  padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:color-mix(in srgb, var(--card-solid) 95%, var(--line) 5%);
+  word-break:break-all
+}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:18px 0 10px;letter-spacing:.08em;text-transform:uppercase}
+@media (max-width:1180px){
+  .hero,.summary,.grid-2,.filters,.schema-grid,.legend-grid{grid-template-columns:1fr}
+  .toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 @media (max-width:720px){
-  .wrap{padding:14px}.hero-main,.meta,.metric,.panel,.legend-card,.schema-card{padding:16px}.hero h1{font-size:28px}
-  .meta-grid,.toolbar{grid-template-columns:1fr}.nav{display:grid;grid-template-columns:1fr 1fr}.summary{grid-template-columns:1fr 1fr}
-  table{min-width:880px}
+  .wrap{padding:14px}
+  .hero-main,.meta,.metric,.panel,.legend-card,.schema-card{padding:16px}
+  .hero h1{font-size:30px}
+  .meta-grid,.toolbar{grid-template-columns:1fr}
+  .nav{display:grid;grid-template-columns:1fr 1fr;position:static}
+  .summary{grid-template-columns:1fr 1fr}
+  table{min-width:900px}
+  .qr-grid{grid-template-columns:1fr}
 }
 @media (max-width:520px){.summary,.nav{grid-template-columns:1fr}}
+@media print{
+  body{background:#fff;color:#000}
+  .wrap{max-width:none;padding:0}
+  .nav,.toolbar,.filters,.footer,#themeToggle,#exportQrBtn,#refreshQrBtn{display:none !important}
+  .card,.table-wrap,.schema-card pre,.mutedbox{box-shadow:none;background:#fff !important;border:1px solid #c9c9c9}
+  .panel{display:block !important;page-break-inside:avoid}
+  .hero{grid-template-columns:1fr}
+}
 </style>
+
 </head>
 <body>
 <div class="wrap">
   <section class="hero">
     <div class="card hero-main">
-      <h1>Nursery ordering platform demo v3</h1>
-      <div class="subtle">An executive-ready ordering prototype built on top of your current demo flow, but expanded to reflect common wholesale nursery workflows: availability intake, SKU crosswalk, multi-location allocation, manager review, vendor packet, and receiving exceptions.</div>
+      <h1>Perennial Ordering Platform</h1>
+      <div class="subtle">An executive-ready perennial ordering prototype built on top of your current demo flow, expanded to reflect common wholesale grower workflows: availability intake, SKU crosswalk, multi-location allocation, manager review, vendor packet, QR-ready intake, and receiving exceptions.</div>
       <div class="badges">
         <span class="badge">Availability → Crosswalk → Allocation → Receiving</span>
         <span class="badge">3 retail locations</span>
@@ -109,7 +309,7 @@ tr:hover td{background:color-mix(in srgb, var(--card) 90%, var(--line) 10%)}
         <span class="badge">Foxfield Studio</span>
       </div>
       <div class="hero-note">
-        This version is designed to show Roman and Matt what the <strong>next layer</strong> could look like without replacing the current system of record. It keeps the practical sheet-driven workflow buyers already understand, then wraps it in a cleaner operating model: normalized status, location splits, vendor packet output, and a future-facing schema that can grow into real farm SKU crosswalks.
+        This version is designed to show Roman and Matt what the <strong>next layer</strong> could look like without replacing the current system of record. It keeps the practical sheet-driven perennial workflow buyers already understand, then wraps it in a cleaner operating model: normalized status, location splits, vendor packet output, QR-ready intake, and a future-facing schema that can grow into real farm SKU crosswalks.
       </div>
     </div>
     <aside class="card meta">
@@ -118,7 +318,7 @@ tr:hover td{background:color-mix(in srgb, var(--card) 90%, var(--line) 10%)}
         <div class="field"><label>Requested ship week</label><input id="shipWeek" type="week" value="2026-W16" /></div>
         <div class="field"><label>Organization</label><input id="orgName" type="text" value="Suburban Lawn & Garden" /></div>
         <div class="field"><label>Vendor</label><input id="vendorName" type="text" value="Suburban Farm" /></div>
-        <div class="field"><label>Buyer</label><input id="buyerName" type="text" value="Bill C." /></div>
+        <div class="field"><label>Buyer</label><input id="buyerName" type="text" value="Chris Fox" /></div>
         <div class="field"><label>Draft status</label>
           <select id="draftStatus">
             <option>Intake in progress</option>
@@ -139,6 +339,7 @@ tr:hover td{background:color-mix(in srgb, var(--card) 90%, var(--line) 10%)}
         <button class="btn-primary" id="saveBtn" type="button">Save browser draft</button>
         <button class="btn-secondary" id="exportJsonBtn" type="button">Export JSON</button>
         <button class="btn-secondary" id="exportCsvBtn" type="button">Export approved CSV</button>
+        <button class="btn-secondary" id="exportQrBtn" type="button">Export QR</button>
         <button class="btn-secondary" id="printPacketBtn" type="button">Print packet</button>
         <button class="btn-danger" id="resetBtn" type="button">Reset seed data</button>
       </div>
@@ -270,6 +471,19 @@ tr:hover td{background:color-mix(in srgb, var(--card) 90%, var(--line) 10%)}
       </div>
       <div class="stack">
         <div class="mutedbox" id="packetSummary"></div>
+        <div class="mutedbox qr-box" id="qrPanel">
+          <div class="qr-head">
+            <strong>QR share + export</strong>
+            <button class="btn-secondary btn-small" id="refreshQrBtn" type="button">Refresh QR</button>
+          </div>
+          <div class="qr-grid">
+            <div class="qr-preview"><img id="qrPreview" alt="QR code preview" /></div>
+            <div class="stack" style="gap:10px">
+              <span class="small">Use this for a phone-friendly handoff. The QR points to the current live page when available, or falls back to a compact order summary.</span>
+              <div class="qr-url" id="qrValueLabel"></div>
+            </div>
+          </div>
+        </div>
         <div class="mutedbox">
           <strong>Status normalization</strong><br>
           <span class="small">A = Available · L = Limited · S = To Size / No Color · T = Tight Buds · C = Color Showing · B = Blooming</span>
@@ -373,7 +587,7 @@ tr:hover td{background:color-mix(in srgb, var(--card) 90%, var(--line) 10%)}
     </div>
   </section>
 
-  <div class="footer">C.G. FOX • Foxfield Studio • Ordering platform demo v3 • Executive-ready prototype</div>
+  <div class="footer">C.G. FOX • Foxfield Studio • Perennial Ordering Platform • Executive-ready prototype</div>
 </div>
 
 <script>
@@ -394,6 +608,7 @@ const STATUS_MAP = {
   B:'Blooming'
 };
 const EXCEPTION_TYPES = ['', 'Short ship', 'Substitution', 'Damaged', 'Wrong size', 'Wrong color', 'Partial fill'];
+const QR_ENDPOINT = 'https://api.qrserver.com/v1/create-qr-code/?size=720x720&margin=18&data=';
 const CONDITION_TYPES = ['Pending', 'Good', 'Monitor', 'Issue'];
 
 const DEFAULT_ROWS = [
@@ -523,7 +738,7 @@ function resetState(){
   els.shipWeek.value = '2026-W16';
   els.orgName.value = 'Suburban Lawn & Garden';
   els.vendorName.value = 'Suburban Farm';
-  els.buyerName.value = 'Bill C.';
+  els.buyerName.value = 'Chris Fox';
   els.draftStatus.value = 'Manager review ready';
   els.draftNotes.value = 'Executive demo build: strongest page-1 intake rows carried forward from the current Suburban Farm draft, expanded with market-standard schema fields, location allocation, and receiving exceptions.';
   saveState();
@@ -538,7 +753,7 @@ function loadState(){
     els.shipWeek.value = meta.shipWeek || '2026-W16';
     els.orgName.value = meta.orgName || 'Suburban Lawn & Garden';
     els.vendorName.value = meta.vendorName || 'Suburban Farm';
-    els.buyerName.value = meta.buyerName || 'Bill C.';
+    els.buyerName.value = meta.buyerName || 'Chris Fox';
     els.draftStatus.value = meta.draftStatus || 'Manager review ready';
     els.draftNotes.value = meta.draftNotes || '';
   } else {
@@ -780,6 +995,7 @@ function renderPacket(){
     Allocated units: ${allocatedUnits}<br>
     Rows still needing mapping polish: ${unmapped}</span>
   `;
+  renderQr();
 }
 function renderReceiving(){
   const data = rows.filter(r=>Number(r.approved_qty || 0) > 0);
@@ -839,6 +1055,47 @@ function renderMetrics(){
   els.metricAllocated.textContent = allocatedUnits;
   els.metricExceptions.textContent = exceptions;
 }
+
+function buildQrValue(){
+  const approved = rows.filter(r=>Number(r.approved_qty || 0) > 0 && r.manager_decision !== 'Hold');
+  const approvedUnits = approved.reduce((sum,r)=>sum + Number(r.approved_qty || 0),0);
+  const liveHref = typeof location !== 'undefined' && location.href && !location.href.startsWith('file:') ? location.href : '';
+  if (liveHref) return liveHref;
+  return JSON.stringify({
+    type:'Perennial Ordering Platform executive demo',
+    order_id: els.orderId.value,
+    vendor: els.vendorName.value,
+    ship_week: els.shipWeek.value,
+    approved_lines: approved.length,
+    approved_units: approvedUnits
+  });
+}
+function qrImageUrl(){
+  return QR_ENDPOINT + encodeURIComponent(buildQrValue());
+}
+function renderQr(){
+  if(!els.qrPreview || !els.qrValueLabel) return;
+  const value = buildQrValue();
+  els.qrPreview.src = qrImageUrl();
+  els.qrValueLabel.textContent = value;
+}
+async function exportQr(){
+  const url = qrImageUrl();
+  const fileName = `${els.orderId.value || 'order'}-qr.png`;
+  try{
+    const res = await fetch(url, {mode:'cors'});
+    const blob = await res.blob();
+    downloadFile(fileName, blob, blob.type || 'image/png');
+  }catch(err){
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.download = fileName;
+    a.click();
+  }
+}
+
 function exportJson(){
   const payload = {
     order_id: els.orderId.value,
@@ -869,7 +1126,7 @@ function csvEscape(value){
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 function downloadFile(name, content, type){
-  const blob = new Blob([content], {type});
+  const blob = content instanceof Blob ? content : new Blob([content], {type});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = name; a.click();
@@ -904,8 +1161,8 @@ function renderAll(){
 function initEls(){
   [
     'orderId','shipWeek','orgName','vendorName','buyerName','draftStatus','draftNotes','themeToggle','saveBtn','exportJsonBtn',
-    'exportCsvBtn','printPacketBtn','resetBtn','availabilitySearch','availabilityGroup','availabilityStatus','availabilityConfidence',
-    'availabilityView','availabilityBody','crosswalkBody','allocationBody','reviewBody','packetBody','packetSummary','receivingBody',
+    'exportCsvBtn','exportQrBtn','printPacketBtn','resetBtn','refreshQrBtn','availabilitySearch','availabilityGroup','availabilityStatus','availabilityConfidence',
+    'availabilityView','availabilityBody','crosswalkBody','allocationBody','reviewBody','packetBody','packetSummary','qrPreview','qrValueLabel','receivingBody',
     'metricLines','metricUnits','metricApproved','metricMapped','metricAllocated','metricExceptions'
   ].forEach(id=>els[id]=document.getElementById(id));
 }
@@ -922,6 +1179,8 @@ function initEvents(){
   els.saveBtn.addEventListener('click', ()=>{ saveState(); alert('Draft saved in this browser.'); });
   els.exportJsonBtn.addEventListener('click', exportJson);
   els.exportCsvBtn.addEventListener('click', exportCsv);
+  els.exportQrBtn.addEventListener('click', exportQr);
+  els.refreshQrBtn.addEventListener('click', renderQr);
   els.printPacketBtn.addEventListener('click', ()=>window.print());
   els.resetBtn.addEventListener('click', ()=>{
     if (confirm('Reset this demo back to the seeded v3 state?')) resetState();
