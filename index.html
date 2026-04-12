@@ -1700,6 +1700,83 @@
     }
 
 
+    /* Footer ownership */
+    .site-footer {
+      margin-top: 18px;
+      padding: 18px 16px 28px;
+      border-top: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)), var(--bg-elev);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .site-footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      text-align: center;
+    }
+
+    .site-footer-logo {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      padding: 4px;
+      flex: 0 0 auto;
+    }
+
+    .site-footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.2;
+    }
+
+    .site-footer-title {
+      font-size: .95rem;
+      font-weight: 850;
+      color: var(--text);
+    }
+
+    .site-footer-sub {
+      font-size: .84rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .site-footer-note {
+      width: 100%;
+      margin-top: 8px;
+      font-size: .8rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 900px) {
+      .site-footer {
+        padding: 16px 14px 22px;
+        border-radius: 18px;
+      }
+
+      .site-footer-logo {
+        width: 38px;
+        height: 38px;
+      }
+
+      .site-footer-title {
+        font-size: .9rem;
+      }
+
+      .site-footer-sub,
+      .site-footer-note {
+        font-size: .78rem;
+      }
+    }
+
+
 </style>
 </head>
 <body>
@@ -1991,6 +2068,23 @@
       </section>
     </section>
   </div>
+
+    <footer class="site-footer" aria-label="Ownership footer">
+      <div class="site-footer-inner">
+        <img
+          src="./assets/foxfield-studio-mark.png"
+          alt="C.G. Fox / Foxfield Studio"
+          class="site-footer-logo"
+          onerror="this.style.display='none';"
+        />
+        <div class="site-footer-copy">
+          <div class="site-footer-title">Designed and developed by C.G. Fox</div>
+          <div class="site-footer-sub">Foxfield Studio</div>
+        </div>
+        <div class="site-footer-note">For your logo, place the file at <code>./assets/foxfield-studio-mark.png</code>.</div>
+      </div>
+    </footer>
+
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script>
@@ -3828,7 +3922,9 @@ function renderDefinitions() {
 
     async function loadPlants() {
       try {
-        const res = await fetch("./plants.json", { cache: "no-store" });
+        const dataUrl = new URL("./plants.json", window.location.href);
+        dataUrl.searchParams.set("v", Date.now().toString());
+        const res = await fetch(dataUrl.href, { cache: "reload" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         state.plants = normalizePlantsData(Array.isArray(data) ? data : []);
@@ -3837,6 +3933,7 @@ function renderDefinitions() {
         renderTraitChips();
         applyFilters();
         applyKioskFilters();
+        console.log("Loaded plants from:", dataUrl.href);
       } catch (err) {
         els.summaryBar.innerHTML = `<span class="pill">Failed to load plants</span>`;
         els.results.innerHTML = `<div class="empty">Could not load <code>plants.json</code>. ${err.message}</div>`;
