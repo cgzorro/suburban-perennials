@@ -1,1197 +1,2660 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Perennial Ordering Platform — Executive Demo</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suburban Perennials</title>
+  <meta name="theme-color" content="#071325" />
+  <style>
+    :root{
+      --bg:#071325;
+      --bg-elev:#0d1d36;
+      --bg-soft:#132746;
+      --panel:#10233f;
+      --text:#eef4ff;
+      --text-muted:#b7c4da;
+      --border:#29456f;
+      --accent:#7bd05f;
+      --accent-2:#88d87b;
+      --chip-bg:#17325a;
+      --chip-text:#eef4ff;
+      --shadow:0 14px 34px rgba(0,0,0,.28);
+      --input-bg:#132746;
+      --card-bg:#0d1d36;
+      --success:#67c35f;
+      --warning:#efc45e;
+      --danger:#f08b8b;
+      --map-bg:#0d1d34;
+      --map-line:#7c93b3;
+      --map-text:#e8f1ff;
+      --map-zone:#173155;
+      --map-zone-active:#6ea845;
+      --map-divider:rgba(214,228,248,.18);
+      --red:#de665e;
+      --orange:#e59a42;
+      --teal:#4fb3c8;
+      --white-flag:#ffffff;
+      --radius-xl:28px;
+      --radius-lg:22px;
+      --radius-md:18px;
+      --radius-sm:14px;
+    }
 
-<style>
-:root{
-  --bg:#fbf8f2;
-  --bg2:#f3ede3;
-  --bg3:#ece4d7;
-  --card:#fffffff0;
-  --card-solid:#ffffff;
-  --ink:#1f1b16;
-  --muted:#6f6558;
-  --line:#e2d8c8;
-  --line-strong:#d0c2ad;
-  --green:#cd6d1f;
-  --green-2:#ea8b35;
-  --green-soft:#fff1e4;
-  --amber:#b87622;
-  --amber-soft:#fff4e5;
-  --red:#b44c3c;
-  --red-soft:#fdf0ed;
-  --blue:#68798a;
-  --blue-soft:#eef2f6;
-  --field:#fffdf9;
-  --fieldLine:#ddd2c2;
-  --chip:#fffaf3;
-  --chipBorder:#eadcc9;
-  --shadow:0 14px 36px rgba(31,27,22,.08);
-  --shadow-strong:0 22px 46px rgba(31,27,22,.14);
-  --radius:22px;
-  --radius-sm:14px;
-}
-body[data-theme="dark"]{
-  --bg:#071325;
-  --bg2:#0d1d36;
-  --bg3:#132746;
-  --card:rgba(16,35,63,.94);
-  --card-solid:#10233f;
-  --ink:#eef4ff;
-  --muted:#b7c4da;
-  --line:#29456f;
-  --line-strong:#3a5d8d;
-  --green:#f08f34;
-  --green-2:#ffab57;
-  --green-soft:rgba(240,143,52,.14);
-  --amber:#f2c27d;
-  --amber-soft:rgba(242,194,125,.14);
-  --red:#ef9b84;
-  --red-soft:rgba(239,155,132,.14);
-  --blue:#a9bdd9;
-  --blue-soft:rgba(169,189,217,.14);
-  --field:#0b1930;
-  --fieldLine:#29456f;
-  --chip:#132746;
-  --chipBorder:#355681;
-  --shadow:0 20px 44px rgba(0,0,0,.34);
-  --shadow-strong:0 28px 60px rgba(0,0,0,.48);
-  --glow:0 0 0 1px rgba(255,255,255,.03), 0 14px 34px rgba(0,0,0,.28);
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;
-  font-family:Inter,Segoe UI,Arial,sans-serif;
-  color:var(--ink);
-  background:
-    radial-gradient(circle at top left, rgba(240,143,52,.10), transparent 22%),
-    radial-gradient(circle at top right, rgba(240,143,52,.06), transparent 18%),
-    linear-gradient(180deg,var(--bg) 0%,var(--bg2) 52%,var(--bg3) 100%);
-}
-.wrap{max-width:1640px;margin:0 auto;padding:22px}
-.card{
-  background:var(--card);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-}
-.hero{display:grid;grid-template-columns:1.45fr .95fr;gap:18px;margin-bottom:18px;align-items:stretch}
-.hero-main{
-  padding:28px;
-  background:
-    linear-gradient(140deg, color-mix(in srgb, var(--card-solid) 84%, transparent) 0%, color-mix(in srgb, var(--green-soft) 22%, var(--card-solid) 78%) 100%);
-  position:relative;
-  overflow:hidden;
-}
-.hero-main::after{
-  content:"";
-  position:absolute;
-  inset:auto -70px -70px auto;
-  width:220px;height:220px;border-radius:50%;
-  background:radial-gradient(circle, color-mix(in srgb, var(--green) 24%, transparent), transparent 68%);
-  pointer-events:none;
-}
-.hero h1{margin:0 0 12px;font-size:38px;line-height:1.02;letter-spacing:-.03em}
-.subtle{color:var(--muted);line-height:1.6;font-size:15px;max-width:74ch}
-.badges{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0 14px}
-.badge{
-  padding:8px 11px;border-radius:999px;font-size:12px;font-weight:900;
-  border:1px solid var(--chipBorder);background:var(--chip);color:var(--green);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
-}
-.hero-note{
-  line-height:1.65;font-size:14px;
-  padding:16px 18px;border-radius:18px;
-  background:color-mix(in srgb, var(--card-solid) 72%, var(--green-soft) 28%);
-  border:1px solid color-mix(in srgb, var(--line) 84%, var(--green) 16%);
-  position:relative;z-index:1;
-}
-.meta{
-  padding:22px;
-  display:grid;
-  gap:14px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--card-solid) 92%, transparent), color-mix(in srgb, var(--card-solid) 82%, transparent));
-}
-.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.field{display:grid;gap:6px}
-label{
-  font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--muted);text-transform:uppercase
-}
-input[type=text],input[type=number],input[type=week],select,textarea{
-  width:100%;
-  border:1px solid var(--fieldLine);
-  border-radius:14px;
-  background:var(--field);
-  color:var(--ink);
-  padding:11px 12px;
-  font:inherit;
-  transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
-}
-textarea{min-height:92px;resize:vertical}
-input[type=text]:hover,input[type=number]:hover,input[type=week]:hover,select:hover,textarea:hover{border-color:var(--line-strong)}
-.toolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-button{
-  border:1px solid transparent;
-  border-radius:14px;
-  padding:12px 14px;
-  font:inherit;font-weight:900;cursor:pointer;
-  transition:transform .12s ease,filter .18s ease,background-color .2s ease,color .2s ease,border-color .2s ease,box-shadow .18s ease;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-}
-button:hover{filter:brightness(.99)}
-button:active{transform:translateY(1px)}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
-  outline:none;
-  box-shadow:0 0 0 3px color-mix(in srgb, var(--blue) 28%, transparent);
-  border-color:var(--blue);
-}
-.btn-primary{
-  background:linear-gradient(180deg, color-mix(in srgb, var(--green-2) 84%, white 16%), var(--green));
-  color:#fff;
-  box-shadow:0 8px 20px color-mix(in srgb, var(--green) 24%, transparent), inset 0 1px 0 rgba(255,255,255,.15);
-}
-.btn-secondary{
-  background:color-mix(in srgb, var(--card-solid) 76%, var(--line) 24%);
-  color:var(--ink);
-  border-color:var(--line);
-}
-.btn-danger{
-  background:linear-gradient(180deg, color-mix(in srgb, var(--red) 88%, white 12%), color-mix(in srgb, var(--red) 72%, #4e231f 28%));
-  color:#fff;
-}
-.theme-toggle{display:flex;align-items:center;justify-content:center;gap:8px}
-.summary{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 0 18px}
-.metric{
-  padding:18px 18px 16px;
-  position:relative;
-  overflow:hidden;
-}
-.metric::before{
-  content:"";
-  position:absolute;
-  inset:0 auto 0 0;
-  width:4px;
-  background:linear-gradient(180deg, var(--green), color-mix(in srgb, var(--blue) 40%, var(--green) 60%));
-  opacity:.9;
-}
-.metric .k{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.metric .v{font-size:30px;font-weight:950;margin-top:6px;letter-spacing:-.03em}
-.metric .s{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45}
-.nav{
-  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;
-  position:sticky;top:0;z-index:6;
-  padding:10px;
-  border:1px solid var(--line);
-  border-radius:18px;
-  background:color-mix(in srgb, var(--card-solid) 82%, transparent);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  box-shadow:var(--shadow);
-}
-.nav button{
-  background:transparent;border:1px solid var(--line);color:var(--ink);
-  padding:10px 12px;border-radius:12px;font-size:13px
-}
-.nav button.active{
-  background:linear-gradient(180deg, color-mix(in srgb, var(--green-2) 84%, white 16%), var(--green));
-  color:#fff;border-color:var(--green)
-}
-.panel{display:none;padding:20px;overflow:hidden}
-.panel.active{display:block}
-.panel-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}
-.panel-head h2{margin:0;font-size:26px;letter-spacing:-.02em}
-.panel-note{color:var(--muted);font-size:14px;max-width:980px;line-height:1.52}
-.filters{
-  display:grid;grid-template-columns:2fr repeat(4,1fr);gap:10px;margin-bottom:14px;
-  padding:14px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb, var(--card-solid) 90%, transparent)
-}
-.table-wrap{
-  overflow:auto;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb, var(--card-solid) 96%, transparent)
-}
-table{width:100%;border-collapse:separate;border-spacing:0;min-width:1140px}
-th,td{padding:12px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:14px}
-th{
-  position:sticky;top:0;background:color-mix(in srgb, var(--card-solid) 86%, var(--line) 14%);z-index:1;
-  font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)
-}
-tbody tr:nth-child(even) td{background:color-mix(in srgb, var(--card-solid) 96%, var(--line) 4%)}
-tr:hover td{background:color-mix(in srgb, var(--green-soft) 24%, var(--card-solid) 76%)}
-.small{font-size:12px;color:var(--muted);line-height:1.45}
-.chip{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 9px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:.01em
-}
-.high,.ok{background:var(--green-soft);color:var(--green)}
-.medium,.warn{background:var(--amber-soft);color:var(--amber)}
-.low,.bad{background:var(--red-soft);color:var(--red)}
-.pending{background:var(--blue-soft);color:var(--blue)}
-.mutedbox{
-  padding:16px 18px;border:1px dashed var(--line);border-radius:18px;color:var(--muted);
-  background:color-mix(in srgb, var(--card-solid) 90%, var(--line) 10%)
-}
-.stack{display:grid;gap:16px}
-.grid-2{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
-.schema-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.schema-card{padding:18px}
-.schema-card h3{margin:0 0 10px;letter-spacing:-.01em}
-.schema-card pre{
-  white-space:pre-wrap;margin:0;font-size:12px;line-height:1.5;color:var(--ink);
-  padding:14px;border-radius:16px;background:color-mix(in srgb, var(--card-solid) 78%, var(--line) 22%);
-  border:1px solid var(--line)
-}
-.legend-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-.legend-card{padding:16px}
-.inline-input{width:90px !important;padding:8px 9px !important}
-.alloc-grid{display:grid;grid-template-columns:repeat(3,88px);gap:6px}
-.alloc-labels{display:grid;grid-template-columns:repeat(3,88px);gap:6px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.qr-box{display:grid;gap:12px}
-.qr-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.btn-small{padding:9px 11px;font-size:12px}
-.qr-grid{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:center}
-.qr-preview{
-  width:132px;height:132px;border-radius:18px;border:1px solid var(--line);
-  background:repeating-linear-gradient(45deg, color-mix(in srgb, var(--card-solid) 88%, var(--line) 12%), color-mix(in srgb, var(--card-solid) 88%, var(--line) 12%) 10px, color-mix(in srgb, var(--card-solid) 96%, transparent) 10px, color-mix(in srgb, var(--card-solid) 96%, transparent) 20px);
-  display:grid;place-items:center;overflow:hidden
-}
-.qr-preview img{display:block;width:100%;height:100%;object-fit:cover}
-.qr-url{
-  font-size:12px;line-height:1.45;color:var(--muted);
-  padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:color-mix(in srgb, var(--card-solid) 95%, var(--line) 5%);
-  word-break:break-all
-}
-.footer{text-align:center;color:var(--muted);font-size:12px;padding:18px 0 10px;letter-spacing:.08em;text-transform:uppercase}
-@media (max-width:1180px){
-  .hero,.summary,.grid-2,.filters,.schema-grid,.legend-grid{grid-template-columns:1fr}
-  .toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media (max-width:720px){
-  .wrap{padding:14px}
-  .hero-main,.meta,.metric,.panel,.legend-card,.schema-card{padding:16px}
-  .hero h1{font-size:30px}
-  .meta-grid,.toolbar{grid-template-columns:1fr}
-  .nav{display:grid;grid-template-columns:1fr 1fr;position:static}
-  .summary{grid-template-columns:1fr 1fr}
-  table{min-width:900px}
-  .qr-grid{grid-template-columns:1fr}
-}
-@media (max-width:520px){.summary,.nav{grid-template-columns:1fr}}
-@media print{
-  body{background:#fff;color:#000}
-  .wrap{max-width:none;padding:0}
-  .nav,.toolbar,.filters,.footer,#themeToggle,#exportQrBtn,#refreshQrBtn{display:none !important}
-  .card,.table-wrap,.schema-card pre,.mutedbox{box-shadow:none;background:#fff !important;border:1px solid #c9c9c9}
-  .panel{display:block !important;page-break-inside:avoid}
-  .hero{grid-template-columns:1fr}
-}
-</style>
+    html[data-theme="light"]{
+      --bg:#eef4fb;
+      --bg-elev:#ffffff;
+      --bg-soft:#e7eef8;
+      --panel:#dde7f5;
+      --text:#182435;
+      --text-muted:#526274;
+      --border:#c5d3e8;
+      --accent:#58b641;
+      --accent-2:#65c24d;
+      --chip-bg:#d8e5f7;
+      --chip-text:#182435;
+      --shadow:0 10px 24px rgba(0,0,0,.08);
+      --input-bg:#ffffff;
+      --card-bg:#ffffff;
+      --success:#53b44c;
+      --warning:#a77400;
+      --danger:#c94b4b;
+      --map-bg:#f8fbff;
+      --map-line:#526274;
+      --map-text:#182435;
+      --map-zone:#ecf2f8;
+      --map-zone-active:#cfe9ae;
+      --map-divider:rgba(82,98,116,.18);
+      --red:#d05047;
+      --orange:#c88328;
+      --teal:#2f92ab;
+      --white-flag:#f4f7fb;
+    }
 
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      padding:0;
+      min-height:100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Inter,Segoe UI,Arial,sans-serif;
+    }
+
+    body{
+      background:
+        radial-gradient(circle at top left, rgba(89,156,93,.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(89,156,93,.08), transparent 24%),
+        var(--bg);
+      text-rendering:optimizeLegibility;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    button,input,select,textarea{font:inherit}
+    a{color:inherit}
+
+    .container{
+      width:min(1480px, calc(100% - 28px));
+      margin:0 auto;
+      padding:16px 0 28px;
+    }
+
+    .hero{
+      position:relative;
+      display:grid;
+      grid-template-columns:minmax(0,1.4fr) minmax(340px,1fr);
+      gap:18px;
+      background:var(--bg-elev);
+      border:1px solid var(--border);
+      border-radius:var(--radius-xl);
+      box-shadow:var(--shadow);
+      padding:20px 22px;
+      margin-bottom:14px;
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at top right, rgba(123,208,95,.08), transparent 22%),
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+      opacity:.95;
+    }
+
+    .hero > *{position:relative;z-index:1}
+
+    .hero-copy h1{
+      margin:0;
+      font-size:clamp(2.05rem, 3vw, 3rem);
+      line-height:1.02;
+      letter-spacing:-.03em;
+      text-wrap:balance;
+    }
+
+    .hero-copy p{
+      margin:8px 0 0;
+      color:var(--text-muted);
+      max-width:760px;
+      line-height:1.28;
+      font-size:.97rem;
+      text-wrap:pretty;
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-direction:column;
+      align-items:stretch;
+      gap:10px;
+      min-width:0;
+      width:100%;
+    }
+
+    .view-tabs{
+      display:flex;
+      gap:9px;
+      width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      padding-bottom:2px;
+      scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+    }
+    .view-tabs::-webkit-scrollbar,.chips::-webkit-scrollbar{display:none}
+
+    .theme-toggle,
+    .view-tab,
+    .btn,
+    .chip,
+    .kiosk-btn,
+    .finder-card,
+    .map-link,
+    .location-btn,
+    .finder-chip{
+      border:1px solid var(--border);
+      color:var(--text);
+      cursor:pointer;
+      transition:background .18s ease,border-color .18s ease,color .18s ease,opacity .18s ease,transform .18s ease, box-shadow .18s ease;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .theme-toggle{
+      background:var(--bg-elev);
+      border-radius:999px;
+      padding:12px 18px;
+      font-weight:800;
+      white-space:nowrap;
+      min-height:48px;
+      justify-content:center;
+      display:inline-flex;
+      align-items:center;
+    }
+
+    .view-tab{
+      background:var(--bg-soft);
+      border-radius:999px;
+      padding:11px 16px;
+      font-weight:800;
+      white-space:nowrap;
+      flex:0 0 auto;
+      min-height:48px;
+    }
+
+    .view-tab.active{
+      background:var(--accent);
+      border-color:var(--accent);
+      color:#fff;
+    }
+
+    .view-tab:hover,.btn:hover,.chip:hover,.finder-chip:hover,.kiosk-btn:hover,.location-btn:hover,.map-link:hover,.finder-card:hover{
+      transform:translateY(-1px);
+    }
+
+    .app-view[hidden]{display:none !important}
+
+    .controls-wrap{
+      background:linear-gradient(180deg, rgba(70,102,144,.42), rgba(35,58,95,.42));
+      border:1px solid var(--border);
+      border-radius:var(--radius-xl);
+      box-shadow:var(--shadow);
+      padding:16px;
+      margin-bottom:14px;
+      backdrop-filter:blur(2px);
+    }
+
+    .controls-grid{
+      display:grid;
+      grid-template-columns:2fr 1.1fr 1.2fr 1.1fr 1.1fr 0.9fr;
+      gap:12px;
+      align-items:end;
+    }
+
+    .scan-panel{
+      margin-top:12px;
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)), var(--bg-elev);
+    }
+
+    .scan-panel-toggle{
+      width:100%;
+      background:transparent;
+      border:0;
+      border-radius:var(--radius-lg);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 16px;
+      cursor:pointer;
+      text-align:left;
+      font:inherit;
+    }
+
+    .scan-panel-toggle strong{
+      display:block;
+      font-size:.98rem;
+      font-weight:850;
+    }
+
+    .scan-panel-toggle span{
+      display:block;
+      margin-top:2px;
+      color:var(--text-muted);
+      font-size:.9rem;
+      font-weight:650;
+    }
+
+    .scan-panel-toggle .chevron{
+      color:var(--text-muted);
+      font-size:1rem;
+      font-weight:900;
+      transition:transform .18s ease;
+    }
+
+    .scan-panel[data-open="true"] .scan-panel-toggle .chevron{transform:rotate(180deg)}
+
+    .scan-panel-content{
+      padding:0 16px 16px;
+    }
+    .scan-panel-content[hidden]{display:none !important}
+
+    .scan-grid{
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr;
+      gap:12px;
+      align-items:end;
+      margin-top:4px;
+    }
+
+    .field label,.finder-field label,.kiosk-field label{
+      display:block;
+      font-size:.92rem;
+      font-weight:800;
+      color:var(--text);
+      margin:0 0 8px;
+    }
+
+    .field input,.field select,.finder-field input,.finder-field select,.kiosk-field input{
+      width:100%;
+      border:1px solid var(--border);
+      background:var(--input-bg);
+      color:var(--text);
+      border-radius:18px;
+      padding:13px 15px;
+      font-size:1rem;
+      outline:none;
+    }
+
+    .field input::placeholder,.finder-field input::placeholder,.kiosk-field input::placeholder{
+      color:var(--text-muted);
+      opacity:.92;
+    }
+
+    .button-col,.finder-actions{
+      display:flex;
+      gap:10px;
+      align-items:end;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .btn,.map-link,.location-btn{
+      background:var(--bg-elev);
+      border-radius:16px;
+      padding:13px 18px;
+      font-weight:800;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      white-space:nowrap;
+    }
+
+    .btn.primary,.map-link.primary,.location-btn.primary{
+      background:var(--accent);
+      border-color:var(--accent);
+      color:#fff;
+    }
+
+    .btn.secondary{
+      background:var(--bg-elev);
+      border-color:var(--border);
+      color:var(--text);
+    }
+
+    .btn.active,.kiosk-btn.active,.finder-chip.active,.location-btn.active{
+      background:var(--success);
+      border-color:var(--success);
+      color:#fff;
+    }
+
+    .btn.clear-active{
+      background:var(--accent);
+      border-color:var(--accent);
+      color:#fff;
+    }
+
+    .chips,.finder-chip-row,.kiosk-actions,.quick-links,.map-help-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .chips{
+      margin-top:12px;
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      overflow-y:hidden;
+      padding-bottom:2px;
+      scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+    }
+    .chips .chip{flex:0 0 auto}
+
+    .chip,.finder-chip,.kiosk-btn{
+      background:var(--chip-bg);
+      color:var(--chip-text);
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:.95rem;
+      user-select:none;
+      font-weight:700;
+    }
+
+    .chip.active,.finder-chip.active,.kiosk-btn.active{
+      background:var(--accent);
+      border-color:var(--accent);
+      color:#fff;
+    }
+
+    .summary-bar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      background:linear-gradient(180deg, rgba(50,84,126,.55), rgba(24,44,76,.55));
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:13px 15px;
+      margin-bottom:16px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(2px);
+    }
+
+    .pill{
+      border:1px solid var(--border);
+      background:var(--bg-soft);
+      color:var(--text);
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:700;
+    }
+
+    .scan-status{
+      margin-top:12px;
+      min-height:22px;
+      font-size:.95rem;
+      color:var(--text-muted);
+      font-weight:700;
+    }
+    .scan-status.success{color:var(--success)}
+    .scan-status.warning{color:var(--warning)}
+    .scan-status.error{color:var(--danger)}
+
+    .scanner-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .scanner-shell{
+      display:none;
+      margin-top:14px;
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius:22px;
+      background:var(--bg-elev);
+      box-shadow:var(--shadow);
+    }
+
+    .scanner-shell.active{display:block}
+
+    #reader{
+      width:100%;
+      min-height:320px;
+      border-radius:18px;
+      overflow:hidden;
+      background:#000;
+      position:relative;
+    }
+    #reader video{
+      width:100% !important;
+      height:auto !important;
+      display:block !important;
+      object-fit:cover;
+      background:#000;
+      border-radius:18px;
+    }
+    #reader canvas{
+      max-width:100%;
+      border-radius:18px;
+    }
+
+    .results-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
+      gap:18px;
+    }
+
+    .card,.finder-card,.panel,.def-card,.kiosk-card{
+      background:linear-gradient(180deg, #13294c, #0d1d36);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(2px);
+    }
+
+    html[data-theme="light"] .card,
+    html[data-theme="light"] .finder-card,
+    html[data-theme="light"] .panel,
+    html[data-theme="light"] .def-card,
+    html[data-theme="light"] .kiosk-card{
+      background:linear-gradient(180deg, #f7fbff, #edf4fb);
+    }
+
+    .card{border-radius:24px; overflow:hidden}
+    .card-image{
+      aspect-ratio:16 / 10;
+      background:var(--bg-soft);
+      overflow:hidden;
+    }
+    .card-image img{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:cover;
+    }
+
+    .no-image{
+      width:100%;
+      height:100%;
+      min-height:220px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--text-muted);
+      background:
+        radial-gradient(circle at top right, rgba(123,208,95,.14), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)),
+        var(--bg-soft);
+      font-size:1rem;
+      text-align:center;
+      padding:16px;
+      font-weight:700;
+    }
+
+    .card-body{padding:18px 18px 20px}
+    .card-title,.finder-card h3,.kiosk-card h3{
+      margin:0 0 10px;
+      font-size:1.15rem;
+      line-height:1.15;
+      font-weight:800;
+    }
+
+    .subline,.finder-meta,.kiosk-meta{
+      color:var(--text-muted);
+      font-size:.98rem;
+      line-height:1.35;
+      margin-bottom:12px;
+    }
+
+    .tag-row,.finder-tag-row,.detail-tag-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .tag,.trait-badge,.note-badge,.location-badge{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(98,126,176,.24);
+      color:var(--text);
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:.92rem;
+      font-weight:800;
+    }
+
+    .tag.green,.trait-badge.good{
+      background:rgba(113,193,96,.18);
+      color:#d9ffd0;
+    }
+    html[data-theme="light"] .tag.green, html[data-theme="light"] .trait-badge.good{color:#245d1a}
+
+    .details{
+      color:var(--text-muted);
+      font-size:.98rem;
+      line-height:1.4;
+      margin-bottom:14px;
+    }
+
+    .price-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .price{
+      font-size:1.1rem;
+      font-weight:900;
+      color:#fff;
+    }
+    html[data-theme="light"] .price{color:#182435}
+
+    .sku{font-size:.95rem; color:var(--text-muted)}
+
+    .product-btn{
+      width:100%;
+      justify-content:center;
+      background:linear-gradient(180deg,var(--accent-2), var(--accent));
+      border-color:var(--accent);
+      color:#fff;
+      font-size:1rem;
+      padding:15px 18px;
+      border-radius:20px;
+    }
+
+    .empty{
+      padding:34px;
+      text-align:center;
+      color:var(--text-muted);
+      border:1px dashed var(--border);
+      border-radius:22px;
+      background:var(--bg-elev);
+    }
+
+    .finder-toolbar{
+      display:grid;
+      grid-template-columns:2fr 1fr auto;
+      gap:12px;
+      align-items:end;
+      margin-bottom:14px;
+    }
+
+    .finder-layout{
+      display:grid;
+      grid-template-columns:390px minmax(0,1fr);
+      gap:16px;
+      align-items:start;
+    }
+
+    .panel{
+      border-radius:24px;
+      padding:18px;
+      overflow:hidden;
+    }
+
+    .panel h2,.zone-details h3,.def-card h3,.kiosk-demo-card h2,#locationDetails h3,#kioskDetailPanel h2,#kioskMapPanel h2{
+      margin:0 0 10px;
+      font-size:1.35rem;
+      color:var(--text) !important;
+      text-shadow:0 1px 0 rgba(0,0,0,.16);
+    }
+    html[data-theme="light"] .panel h2,
+    html[data-theme="light"] .zone-details h3,
+    html[data-theme="light"] .def-card h3,
+    html[data-theme="light"] .kiosk-demo-card h2,
+    html[data-theme="light"] #locationDetails h3,
+    html[data-theme="light"] #kioskDetailPanel h2,
+    html[data-theme="light"] #kioskMapPanel h2{
+      text-shadow:none;
+    }
+
+    .panel-lead,.zone-directions,.definitions-note,.finder-note,.kiosk-lead,.map-caption{
+      color:var(--text-muted);
+      line-height:1.42;
+      margin:0 0 14px;
+    }
+
+    .flag-legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:12px;
+    }
+
+    .flag-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid var(--border);
+      background:var(--bg-soft);
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:700;
+      color:var(--text);
+    }
+    .flag-chip-note{
+      background:transparent;
+      border-style:dashed;
+      font-weight:700;
+      color:var(--text-muted);
+    }
+
+    .flag-icon,.mini-flag{
+      width:0;
+      height:0;
+      border-top:9px solid transparent;
+      border-bottom:9px solid transparent;
+      border-left:16px solid currentColor;
+      display:inline-block;
+      color:var(--flag, #555);
+      flex:0 0 auto;
+    }
+    .mini-flag{border-top-width:7px; border-bottom-width:7px; border-left-width:13px}
+    .mini-flag.white{filter:drop-shadow(0 0 .8px rgba(0,0,0,.55))}
+
+    .finder-results,.kiosk-results{
+      display:grid;
+      gap:14px;
+      max-height:960px;
+      overflow:auto;
+      padding-right:2px;
+      scrollbar-width:thin;
+    }
+
+    .finder-card,.kiosk-card{
+      border-radius:22px;
+      padding:18px;
+      text-align:left;
+      width:100%;
+    }
+
+    .finder-card.active,.kiosk-card.active{
+      border-color:var(--accent);
+      box-shadow:0 0 0 2px rgba(123,208,95,.2), var(--shadow);
+    }
+
+    .finder-card .topline,.kiosk-card .topline{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+    }
+
+    .flag-inline{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight:800;
+      color:var(--text);
+      margin-bottom:10px;
+    }
+
+    .finder-card .details-text,.kiosk-card .details-text{
+      color:var(--text-muted);
+      line-height:1.4;
+      font-size:.96rem;
+    }
+
+    .map-shell{display:grid; gap:16px}
+    .map-board{
+      padding:16px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,.16)),
+        var(--map-bg);
+      border-radius:24px;
+      border:1px solid var(--border);
+      overflow:hidden;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .map-board svg{
+      display:block;
+      width:100%;
+      height:auto;
+      border-radius:18px;
+    }
+
+    .detail-map-board{min-height:280px}
+    .detail-map-board svg{min-height:260px}
+
+    .map-pan-shell{
+      border:1px solid var(--border);
+      border-radius:24px;
+      overflow:hidden;
+      background:var(--map-bg);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .map-board,.map-pan-shell,.detail-map-board{background:var(--map-bg) !important}
+
+    .mobile-map-tools{
+      display:none;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:8px;
+      margin-bottom:12px;
+    }
+
+    .mobile-map-tools .location-btn{
+      width:100%;
+      padding:12px 14px;
+      min-height:48px;
+    }
+
+    .legend-disclosure{
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:var(--bg-soft);
+      padding:10px 12px;
+      margin-bottom:12px;
+    }
+
+    .legend-disclosure summary{
+      cursor:pointer;
+      font-weight:800;
+      color:var(--text);
+      list-style:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .legend-disclosure summary::-webkit-details-marker{display:none}
+    .legend-disclosure summary::after{
+      content:"Show";
+      color:var(--text-muted);
+      font-size:.9rem;
+      font-weight:700;
+    }
+    .legend-disclosure[open] summary::after{content:"Hide"}
+    .legend-disclosure .flag-legend,.legend-disclosure .map-help{margin-top:12px}
+    .mobile-swipe-note{display:none}
+
+    .map-zone-shape{
+      fill:var(--map-zone);
+      stroke:var(--map-line);
+      stroke-width:2.5;
+      cursor:pointer;
+      transition:fill .18s ease, transform .18s ease, opacity .18s ease;
+    }
+    .map-zone-shape:hover{fill:#dce8c9}
+    .map-zone-shape.active{
+      fill:var(--map-zone-active);
+      stroke-width:4;
+    }
+
+    .map-label,.map-small,.map-static{
+      fill:var(--map-text);
+      font-family:Inter, Segoe UI, Arial, sans-serif;
+    }
+    .map-label{font-size:22px; font-weight:800; text-anchor:middle}
+    .map-small{font-size:16px; font-weight:700; text-anchor:middle}
+    .map-static{font-size:18px; font-weight:700}
+    .map-soft{fill:#e6ebf1; stroke:#b1becd; stroke-width:1.8}
+    .map-help{
+      color:var(--text-muted);
+      font-size:.95rem;
+      line-height:1.45;
+      margin-top:10px;
+    }
+    .map-static.subtle{opacity:.72}
+    .map-static.tiny{font-size:13px; font-weight:700}
+    .zone-details{display:grid; gap:10px}
+    .detail-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:4px;
+    }
+
+    .definitions-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(240px,1fr));
+      gap:14px;
+      margin-top:16px;
+    }
+
+    .def-card{
+      border-radius:20px;
+      padding:16px;
+    }
+
+    .def-card p{
+      margin:0;
+      color:var(--text-muted);
+      line-height:1.42;
+      font-size:.95rem;
+    }
+
+    .kiosk-shell{
+      display:grid;
+      gap:16px;
+    }
+
+    .kiosk-top{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+    }
+
+    .kiosk-field input{
+      font-size:1.15rem;
+      padding:16px 18px;
+      border-radius:20px;
+    }
+
+    .kiosk-actions{gap:12px}
+
+    .kiosk-btn{
+      padding:16px 20px;
+      font-size:1.03rem;
+      font-weight:800;
+      min-height:60px;
+      box-shadow:0 6px 18px rgba(0,0,0,.10);
+    }
+
+    .kiosk-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 340px;
+      gap:16px;
+    }
+
+    .kiosk-side{
+      display:grid;
+      gap:16px;
+    }
+
+    .kiosk-map-board{min-height:300px}
+    .kiosk-map-board svg{min-height:280px}
+
+    .status-note{
+      border:1px solid var(--border);
+      border-radius:20px;
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)), var(--bg-soft);
+      padding:14px 16px;
+      color:var(--text-muted);
+      line-height:1.4;
+      margin-bottom:14px;
+      box-shadow:0 12px 28px rgba(0,0,0,.12);
+    }
+
+    .kiosk-demo-card{
+      border:1px solid rgba(123,208,95,.35);
+      background:linear-gradient(180deg, rgba(123,208,95,.14), rgba(123,208,95,.06));
+      border-radius:22px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .kiosk-demo-card p{
+      margin:0 0 12px;
+      color:var(--text-muted);
+      line-height:1.42;
+    }
+
+    .demo-steps{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:10px;
+    }
+
+    .demo-step{
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:rgba(9,22,41,.22);
+      padding:12px;
+      min-height:0;
+    }
+    html[data-theme="light"] .demo-step{background:rgba(255,255,255,.78)}
+
+    .demo-step strong{
+      display:block;
+      margin-bottom:6px;
+      font-size:.95rem;
+    }
+
+    .demo-step span{
+      color:var(--text-muted);
+      line-height:1.35;
+      font-size:.92rem;
+    }
+
+    .you-are-here-note{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      border:1px solid rgba(215,74,74,.26);
+      background:rgba(215,74,74,.08);
+      color:var(--text);
+      border-radius:18px;
+      padding:12px 14px;
+      margin:0 0 12px;
+      line-height:1.38;
+    }
+
+    .you-are-here-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:38px;
+      height:38px;
+      border-radius:999px;
+      background:#de665e;
+      color:#fff;
+      font-size:.82rem;
+      font-weight:900;
+      letter-spacing:.02em;
+      flex:0 0 auto;
+    }
+
+    .ownership-footer{
+      margin-top:24px;
+      border-top:1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01)),
+        var(--bg-elev);
+      border-radius:24px 24px 0 0;
+      padding:18px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .ownership-footer__inner{
+      max-width:1100px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+      flex-wrap:wrap;
+      text-align:center;
+    }
+
+    .ownership-logo{
+      height:38px;
+      width:auto;
+      max-width:220px;
+      display:block;
+      object-fit:contain;
+      opacity:.98;
+      filter:drop-shadow(0 2px 10px rgba(0,0,0,.18));
+    }
+
+    .ownership-footer__text{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+
+    .ownership-name{
+      color:var(--text);
+      font-size:.95rem;
+      font-weight:800;
+      line-height:1.22;
+      letter-spacing:.02em;
+    }
+
+    .ownership-note{
+      color:var(--text-muted);
+      font-size:.78rem;
+      line-height:1.35;
+    }
+
+    @media (max-width: 1200px){
+      .hero{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 900px){
+      .container{
+        width:min(100%, calc(100% - 12px));
+        padding-top:12px;
+        padding-bottom:20px;
+      }
+
+      .hero{
+        grid-template-columns:1fr;
+        gap:12px;
+        padding:18px 16px;
+        border-radius:24px;
+        margin-bottom:12px;
+      }
+
+      .hero-copy h1{
+        font-size:clamp(1.9rem, 7vw, 2.45rem);
+        line-height:1.01;
+        margin-right:0;
+      }
+
+      .hero-copy p{
+        max-width:none;
+        font-size:.91rem;
+        line-height:1.24;
+        margin-top:7px;
+      }
+
+      .hero-actions{
+        width:100%;
+        max-width:100%;
+        gap:10px;
+      }
+
+      .view-tabs{
+        width:100%;
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0,1fr));
+        gap:8px;
+        overflow:visible;
+        padding-bottom:0;
+      }
+
+      .view-tab{
+        width:100%;
+        min-width:0;
+        min-height:50px;
+        padding:12px 10px;
+        font-size:.84rem;
+        line-height:1.1;
+        white-space:normal;
+        text-align:center;
+        justify-content:center;
+      }
+
+      .theme-toggle{
+        width:100%;
+        min-width:0;
+        min-height:50px;
+        padding:13px 14px;
+        text-align:center;
+        justify-content:center;
+      }
+
+      .controls-wrap,.panel{
+        padding:14px;
+        border-radius:20px;
+      }
+
+      .controls-grid,.scan-grid,.finder-toolbar,.kiosk-grid{
+        grid-template-columns:1fr;
+        gap:10px;
+      }
+
+      .finder-layout,.kiosk-side{
+        grid-template-columns:1fr;
+      }
+
+      .field input,.field select,.finder-field input,.finder-field select,.kiosk-field input{
+        border-radius:14px;
+        padding:12px 14px;
+      }
+
+      .chips,.finder-chip-row,.kiosk-actions,.quick-links{
+        gap:8px;
+      }
+
+      .chip,.finder-chip,.kiosk-btn{
+        font-size:.88rem;
+        padding:10px 12px;
+      }
+
+      .results-grid{
+        grid-template-columns:1fr;
+        gap:12px;
+      }
+
+      .card{border-radius:18px}
+      .card-body{padding:14px}
+
+      .card-title,.finder-card h3,.kiosk-card h3{
+        font-size:1.02rem;
+      }
+
+      .subline,.details,.sku,.finder-meta,.kiosk-meta,.finder-card .details-text,.kiosk-card .details-text,.def-card p{
+        font-size:.9rem;
+      }
+
+      #reader{min-height:280px}
+      .map-label{font-size:17px}
+      .map-small,.map-static{font-size:13px}
+      .detail-map-board{min-height:220px}
+      .mobile-map-tools{display:grid}
+      .mobile-swipe-note{display:block}
+      .demo-steps{grid-template-columns:1fr !important; gap:10px}
+      .demo-step{padding:12px 12px 13px}
+      .ownership-footer{
+        margin-top:20px;
+        padding:16px 12px calc(20px + env(safe-area-inset-bottom, 0px));
+        border-radius:20px 20px 0 0;
+      }
+      .ownership-logo{height:34px; max-width:180px}
+      .ownership-name{font-size:.9rem}
+      .ownership-note{font-size:.74rem}
+    }
+
+    @media (min-width: 901px){
+      .mobile-map-tools,.mobile-swipe-note{
+        display:none !important;
+      }
+
+      .legend-disclosure{
+        padding:0;
+        background:transparent;
+        border:0;
+        margin-bottom:12px;
+      }
+
+      .legend-disclosure summary{display:none}
+      .legend-disclosure .flag-legend,.legend-disclosure .map-help{margin-top:0}
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <section class="hero">
-    <div class="card hero-main">
-      <h1>Perennial Ordering Platform</h1>
-      <div class="subtle">An executive-ready perennial ordering prototype built on top of your current demo flow, expanded to reflect common wholesale grower workflows: availability intake, SKU crosswalk, multi-location allocation, manager review, vendor packet, QR-ready intake, and receiving exceptions.</div>
-      <div class="badges">
-        <span class="badge">Availability → Crosswalk → Allocation → Receiving</span>
-        <span class="badge">3 retail locations</span>
-        <span class="badge">SKU translation backbone</span>
-        <span class="badge">Exception-ready receiving</span>
-        <span class="badge">Single-file GitHub-ready</span>
-        <span class="badge">Foxfield Studio</span>
+  <div class="container">
+    <section class="hero">
+      <div class="hero-copy">
+        <h1 id="heroTitle">Suburban Perennials</h1>
+        <p id="heroSubtitle">Plant browser, nursery finder, and customer kiosk in one polished workflow. Search plants, direct customers, and confirm locations faster with clear maps and simpler answers.</p>
       </div>
-      <div class="hero-note">
-        This version is designed to show Roman and Matt what the <strong>next layer</strong> could look like without replacing the current system of record. It keeps the practical sheet-driven perennial workflow buyers already understand, then wraps it in a cleaner operating model: normalized status, location splits, vendor packet output, QR-ready intake, and a future-facing schema that can grow into real farm SKU crosswalks.
-      </div>
-    </div>
-    <aside class="card meta">
-      <div class="meta-grid">
-        <div class="field"><label>Order ID</label><input id="orderId" type="text" value="FTN-2026-0031" /></div>
-        <div class="field"><label>Requested ship week</label><input id="shipWeek" type="week" value="2026-W16" /></div>
-        <div class="field"><label>Organization</label><input id="orgName" type="text" value="Suburban Lawn & Garden" /></div>
-        <div class="field"><label>Vendor</label><input id="vendorName" type="text" value="Suburban Farm" /></div>
-        <div class="field"><label>Buyer</label><input id="buyerName" type="text" value="Chris Fox" /></div>
-        <div class="field"><label>Draft status</label>
-          <select id="draftStatus">
-            <option>Intake in progress</option>
-            <option selected>Manager review ready</option>
-            <option>Approved</option>
-            <option>Sent to vendor</option>
-            <option>Receiving</option>
-            <option>Complete</option>
-          </select>
+      <div class="hero-actions">
+        <div class="view-tabs" role="tablist" aria-label="App views">
+          <button id="tabBrowser" class="view-tab active" type="button" data-view="browser">Plant Browser</button>
+          <button id="tabFinder" class="view-tab" type="button" data-view="finder">Nursery Finder</button>
+          <button id="tabKiosk" class="view-tab" type="button" data-view="kiosk">Customer Kiosk</button>
         </div>
+        <button id="themeToggle" class="theme-toggle" type="button">Dark / Light: Dark</button>
       </div>
-      <div class="field">
-        <label>Internal notes</label>
-        <textarea id="draftNotes">Executive demo build: strongest page-1 intake rows carried forward from the current Suburban Farm draft, expanded with market-standard schema fields, location allocation, and receiving exceptions.</textarea>
-      </div>
-      <div class="toolbar">
-        <button class="btn-secondary theme-toggle" id="themeToggle" type="button" aria-pressed="false">🌙 <span>Dark mode</span></button>
-        <button class="btn-primary" id="saveBtn" type="button">Save browser draft</button>
-        <button class="btn-secondary" id="exportJsonBtn" type="button">Export JSON</button>
-        <button class="btn-secondary" id="exportCsvBtn" type="button">Export approved CSV</button>
-        <button class="btn-secondary" id="exportQrBtn" type="button">Export QR</button>
-        <button class="btn-secondary" id="printPacketBtn" type="button">Print packet</button>
-        <button class="btn-danger" id="resetBtn" type="button">Reset seed data</button>
-      </div>
-    </aside>
-  </section>
+    </section>
 
-  <section class="summary">
-    <div class="card metric"><div class="k">Requested lines</div><div class="v" id="metricLines">0</div><div class="s">rows with requested qty above zero</div></div>
-    <div class="card metric"><div class="k">Requested units</div><div class="v" id="metricUnits">0</div><div class="s">buyer draft demand</div></div>
-    <div class="card metric"><div class="k">Approved units</div><div class="v" id="metricApproved">0</div><div class="s">manager approved total</div></div>
-    <div class="card metric"><div class="k">Mapped rows</div><div class="v" id="metricMapped">0</div><div class="s">crosswalk progress</div></div>
-    <div class="card metric"><div class="k">Allocated units</div><div class="v" id="metricAllocated">0</div><div class="s">split across 3 stores</div></div>
-    <div class="card metric"><div class="k">Receiving watchlist</div><div class="v" id="metricExceptions">0</div><div class="s">exceptions + short ships</div></div>
-  </section>
-
-  <div class="nav">
-    <button class="active" data-panel="availabilityPanel">1. Availability intake</button>
-    <button data-panel="crosswalkPanel">2. SKU crosswalk</button>
-    <button data-panel="allocationPanel">3. Store allocation</button>
-    <button data-panel="reviewPanel">4. Manager review</button>
-    <button data-panel="packetPanel">5. Vendor packet</button>
-    <button data-panel="receivingPanel">6. Receiving</button>
-    <button data-panel="schemaPanel">7. Schema + standards</button>
-  </div>
-
-  <section class="card panel active" id="availabilityPanel">
-    <div class="panel-head">
-      <div>
-        <h2>Availability intake</h2>
-        <div class="panel-note">This is the digital intake queue for requested plant lines. It keeps the sheet-style workflow familiar, but already carries the extra fields needed for scale: vendor SKU, retail SKU, internal display name, active state, and location eligibility.</div>
-      </div>
-    </div>
-    <div class="filters">
-      <input id="availabilitySearch" type="text" placeholder="Search plant, size, group, or notes…" />
-      <select id="availabilityGroup"></select>
-      <select id="availabilityStatus"></select>
-      <select id="availabilityConfidence"></select>
-      <select id="availabilityView">
-        <option value="requested">Requested only</option>
-        <option value="all">Show all rows</option>
-      </select>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Group</th><th>Plant</th><th>Size</th><th>Farm avail</th><th>Req</th><th>Status</th><th>Confidence</th><th>Vendor SKU</th><th>Notes</th>
-          </tr>
-        </thead>
-        <tbody id="availabilityBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="card panel" id="crosswalkPanel">
-    <div class="panel-head">
-      <div>
-        <h2>SKU crosswalk</h2>
-        <div class="panel-note">This is the core translation layer: vendor SKU to retail SKU to internal display name, plus size, color, active state, and location eligibility. This is the backbone that lets the ordering module eventually feed the public finder and kiosk.</div>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Plant</th><th>Vendor SKU</th><th>Retail SKU</th><th>Internal display name</th><th>Size</th><th>Color</th><th>Active</th><th>Eligible locations</th>
-          </tr>
-        </thead>
-        <tbody id="crosswalkBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="card panel" id="allocationPanel">
-    <div class="panel-head">
-      <div>
-        <h2>Multi-location allocation</h2>
-        <div class="panel-note">Every approved line can split across Overland Park, Martin City, and Lenexa. This makes the ordering layer relevant to a three-location nursery group instead of a single-store buyer tool.</div>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Plant</th><th>Approved</th><th><div class="alloc-labels"><span>OP</span><span>MC</span><span>Lenexa</span></div></th><th>Allocated</th><th>Remaining</th><th>Eligibility</th>
-          </tr>
-        </thead>
-        <tbody id="allocationBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="card panel" id="reviewPanel">
-    <div class="panel-head">
-      <div>
-        <h2>Manager review</h2>
-        <div class="panel-note">This is where requested quantity becomes approved quantity, exceptions are flagged, and rows with weak mapping or allocation issues are caught before they go to the vendor packet.</div>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Plant</th><th>Requested</th><th>Approved</th><th>Decision</th><th>Mapping</th><th>Allocation</th><th>Buyer notes</th>
-          </tr>
-        </thead>
-        <tbody id="reviewBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="card panel" id="packetPanel">
-    <div class="panel-head">
-      <div>
-        <h2>Vendor packet preview</h2>
-        <div class="panel-note">Only approved lines appear here. The packet is structured to be realistic: vendor-facing quantities, store allocation notes, substitution guidance, and summary counts.</div>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Plant</th><th>Approved</th><th>Size</th><th>Vendor SKU</th><th>Retail SKU</th><th>Store split</th>
-            </tr>
-          </thead>
-          <tbody id="packetBody"></tbody>
-        </table>
-      </div>
-      <div class="stack">
-        <div class="mutedbox" id="packetSummary"></div>
-        <div class="mutedbox qr-box" id="qrPanel">
-          <div class="qr-head">
-            <strong>QR share + export</strong>
-            <button class="btn-secondary btn-small" id="refreshQrBtn" type="button">Refresh QR</button>
+    <section id="browserView" class="app-view">
+      <div class="controls-wrap">
+        <div class="controls-grid">
+          <div class="field">
+            <label for="searchInput">Search plants or SKU</label>
+            <input id="searchInput" type="search" placeholder="Hydrangea, yarrow, salvia, PPXCVP1…" />
           </div>
-          <div class="qr-grid">
-            <div class="qr-preview"><img id="qrPreview" alt="QR code preview" /></div>
-            <div class="stack" style="gap:10px">
-              <span class="small">Use this for a phone-friendly handoff. The QR points to the current live page when available, or falls back to a compact order summary.</span>
-              <div class="qr-url" id="qrValueLabel"></div>
+          <div class="field">
+            <label for="exposureFilter">Exposure</label>
+            <select id="exposureFilter">
+              <option value="">All Exposure</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="groupFilter">Plant Group</label>
+            <select id="groupFilter">
+              <option value="">All Plant Groups</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="colorFilter">Color</label>
+            <select id="colorFilter">
+              <option value="">All Colors</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="heightFilter">Height</label>
+            <select id="heightFilter">
+              <option value="">All Heights</option>
+              <option value="under12">Under 12"</option>
+              <option value="12to24">12–24"</option>
+              <option value="24to36">24–36"</option>
+              <option value="36plus">36"+</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="showCount">Show</label>
+            <select id="showCount">
+              <option value="24">24</option>
+              <option value="48" selected>48</option>
+              <option value="96">96</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="button-col">
+          <button id="clearFilters" class="btn secondary" type="button">Clear Filters</button>
+        </div>
+
+        <div id="traitChips" class="chips" aria-label="Quick plant traits"></div>
+
+        <section class="scan-panel" id="scanPanel" data-open="false">
+          <button id="scanPanelToggle" class="scan-panel-toggle" type="button" aria-expanded="false" aria-controls="scanPanelContent">
+            <div>
+              <strong>SKU Lookup + Scanner</strong>
+              <span>Type a SKU, paste one, or open the live scanner.</span>
+            </div>
+            <span class="chevron">⌄</span>
+          </button>
+          <div id="scanPanelContent" class="scan-panel-content" hidden>
+            <div class="scan-grid">
+              <div class="field">
+                <label for="scanSkuInput">SKU</label>
+                <input id="scanSkuInput" type="text" placeholder="Paste or scan a product SKU" />
+              </div>
+              <button id="findSkuBtn" class="btn primary" type="button">Find SKU</button>
+              <button id="startScannerBtn" class="btn secondary" type="button">Start Scanner</button>
+            </div>
+            <div class="scanner-actions">
+              <button id="stopScannerBtn" class="btn secondary" type="button">Stop Scanner</button>
+            </div>
+            <div id="scanStatus" class="scan-status"></div>
+            <div id="scannerShell" class="scanner-shell">
+              <div id="reader"></div>
             </div>
           </div>
-        </div>
-        <div class="mutedbox">
-          <strong>Status normalization</strong><br>
-          <span class="small">A = Available · L = Limited · S = To Size / No Color · T = Tight Buds · C = Color Showing · B = Blooming</span>
-        </div>
-        <div class="mutedbox">
-          <strong>Why this matters</strong><br>
-          <span class="small">The same line can now carry buyer intent, crosswalk logic, store allocation, and receiving history — all without losing the familiarity of the original sheet-based workflow.</span>
-        </div>
+        </section>
       </div>
-    </div>
-  </section>
 
-  <section class="card panel" id="receivingPanel">
-    <div class="panel-head">
-      <div>
-        <h2>Receiving + exceptions</h2>
-        <div class="panel-note">This is where the operational value becomes obvious. Short ships, substitutions, damage, wrong size, wrong color, and partial fills are tied back to each order line instead of living in markup or memory.</div>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Plant</th><th>Approved</th><th>Received</th><th>Variance</th><th>Exception</th><th>Condition</th><th>Receiving notes</th>
-          </tr>
-        </thead>
-        <tbody id="receivingBody"></tbody>
-      </table>
-    </div>
-  </section>
+      <div id="summaryBar" class="summary-bar"></div>
+      <section id="results" class="results-grid" aria-live="polite"></section>
+    </section>
 
-  <section class="card panel" id="schemaPanel">
-    <div class="panel-head">
-      <div>
-        <h2>Schema + market-standard model</h2>
-        <div class="panel-note">This demo is shaped to match the common pattern used by wholesale nursery availability and ordering systems: catalog master, availability snapshot, SKU crosswalk, order lines, and receiving exceptions.</div>
-      </div>
-    </div>
-    <div class="legend-grid" style="margin-bottom:14px">
-      <div class="card legend-card"><div class="chip ok">A</div><div style="margin-top:8px;font-weight:800">Available</div><div class="small">Orderable now</div></div>
-      <div class="card legend-card"><div class="chip warn">L</div><div style="margin-top:8px;font-weight:800">Limited</div><div class="small">Watch quantity</div></div>
-      <div class="card legend-card"><div class="chip pending">S</div><div style="margin-top:8px;font-weight:800">To size / no color</div><div class="small">Growing on</div></div>
-      <div class="card legend-card"><div class="chip pending">T</div><div style="margin-top:8px;font-weight:800">Tight buds</div><div class="small">Not fully open</div></div>
-      <div class="card legend-card"><div class="chip ok">C</div><div style="margin-top:8px;font-weight:800">Color showing</div><div class="small">Retail ready soon</div></div>
-      <div class="card legend-card"><div class="chip ok">B</div><div style="margin-top:8px;font-weight:800">Blooming</div><div class="small">Peak presentation</div></div>
-    </div>
-    <div class="schema-grid">
-      <div class="card schema-card">
-        <h3>Vendor catalog item</h3>
-<pre>{
-  vendor_name,
-  vendor_sku,
-  vendor_item_name,
-  botanical_name,
-  common_name,
-  product_class,
-  sellable_form,
-  default_tray_or_pot_size,
-  active
-}</pre>
-      </div>
-      <div class="card schema-card">
-        <h3>Availability snapshot</h3>
-<pre>{
-  snapshot_date,
-  vendor_name,
-  vendor_sku,
-  available_qty,
-  availability_status_vendor,
-  availability_status_internal,
-  ship_window,
-  minimum_qty
-}</pre>
-      </div>
-      <div class="card schema-card">
-        <h3>SKU crosswalk</h3>
-<pre>{
-  vendor_sku,
-  retail_sku,
-  internal_display_name,
-  size,
-  color,
-  vendor,
-  active,
-  location_eligibility
-}</pre>
-      </div>
-      <div class="card schema-card">
-        <h3>Order + receiving</h3>
-<pre>{
-  order_id,
-  requested_qty,
-  approved_qty,
-  store_allocations,
-  received_qty,
-  exception_type,
-  replacement_sku,
-  receiving_notes
-}</pre>
-      </div>
-    </div>
-  </section>
-
-  <div class="footer">C.G. FOX • Foxfield Studio • Perennial Ordering Platform • Executive-ready prototype</div>
-</div>
-
-<script>
-const STORAGE_KEY = 'nursery-ordering-platform-demo-v3-state';
-const THEME_KEY = 'nursery-ordering-platform-demo-v3-theme';
-const LOCATION_KEYS = ['op','mc','lx'];
-const LOCATION_LABELS = {
-  op: 'Overland Park',
-  mc: 'Martin City',
-  lx: 'Lenexa'
-};
-const STATUS_MAP = {
-  A:'Available',
-  L:'Limited',
-  S:'To Size / No Color',
-  T:'Tight Buds',
-  C:'Color Showing',
-  B:'Blooming'
-};
-const EXCEPTION_TYPES = ['', 'Short ship', 'Substitution', 'Damaged', 'Wrong size', 'Wrong color', 'Partial fill'];
-const QR_ENDPOINT = 'https://api.qrserver.com/v1/create-qr-code/?size=720x720&margin=18&data=';
-const CONDITION_TYPES = ['Pending', 'Good', 'Monitor', 'Issue'];
-
-const DEFAULT_ROWS = [
-  {line_id:'FARM-20260320-001',group:'GROUND COVER',item_name:'EUONYMUS COLORATUS',size:'606',farm_available_qty:467,requested_qty:3,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-002',group:'GROUND COVER',item_name:'EUONYMUS COLORATUS',size:'1 gal',farm_available_qty:266,requested_qty:6,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-003',group:'GROUND COVER',item_name:'VINCA MINOR',size:'0406 FLAT',farm_available_qty:588,requested_qty:10,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-004',group:'GROUND COVER',item_name:'VINCA MINOR',size:'1 gal',farm_available_qty:36,requested_qty:12,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-005',group:'GROUND COVER',item_name:'VINCA RALPH SHUGERT',size:'0406 FLAT',farm_available_qty:189,requested_qty:3,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-006',group:'GROW NATIVE',item_name:'ECHINACEA PALLIDA',size:'QP1',pack:'12 pk',farm_available_qty:25,requested_qty:1,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-007',group:'GROW NATIVE',item_name:'ECHINACEA PARADOXA',size:'1 gal',farm_available_qty:1,requested_qty:1,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-008',group:'GROW NATIVE',item_name:'MONARDA FISTULOSA',size:'QP1',pack:'12 pk',farm_available_qty:15,requested_qty:0,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-009',group:'GROW NATIVE',item_name:'PENSTEMON DIGITALIS',size:'QP1',pack:'12 pk',farm_available_qty:11,requested_qty:0,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-010',group:'GROW NATIVE',item_name:'PYCNANTHEMUM TENUIFOLIUM',size:'QP1',pack:'12 pk',farm_available_qty:7,requested_qty:1,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-011',group:'PERENNIAL',item_name:'ACHILLEA FIREFLY DIAMOND',size:'1 gal',farm_available_qty:164,requested_qty:12,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-012',group:'PERENNIAL',item_name:'ACHILLEA FIREFLY RED POP',size:'1 gal',farm_available_qty:28,requested_qty:12,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-013',group:'PERENNIAL',item_name:'ACHILLEA FIREFLY SUNSHINE',size:'1 gal',farm_available_qty:169,requested_qty:6,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-014',group:'PERENNIAL',item_name:'ACHILLEA SASSY SUMMER LEMON',size:'1 gal',farm_available_qty:121,requested_qty:6,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-015',group:'PERENNIAL',item_name:'ACHILLEA SASSY SUMMER SANGRIA',size:'1 gal',farm_available_qty:303,requested_qty:6,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-016',group:'PERENNIAL',item_name:'ACHILLEA SASSY SUMMER SUNSET',size:'1 gal',farm_available_qty:146,requested_qty:6,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-017',group:'PERENNIAL',item_name:'ACHILLEA SASSY SUMMER TAFFY',size:'1 gal',farm_available_qty:76,requested_qty:6,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-018',group:'PERENNIAL',item_name:'ALCEA FIESTA TIME',size:'1 gal',farm_available_qty:150,requested_qty:12,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-019',group:'PERENNIAL',item_name:'ALCEA MARS MAGIC',size:'1 gal',farm_available_qty:150,requested_qty:12,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-020',group:'PERENNIAL',item_name:'ALLIUM MILLENIUM',size:'1 gal',farm_available_qty:105,requested_qty:36,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-021',group:'PERENNIAL',item_name:'ANEMONE HONORINE JOBERT',size:'1 gal',farm_available_qty:229,requested_qty:0,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-022',group:'PERENNIAL',item_name:'AQUILEGIA PURPLE BLUE',size:'1 gal',farm_available_qty:3,requested_qty:0,status_code:'L',confidence:'Medium'},
-  {line_id:'FARM-20260320-023',group:'PERENNIAL',item_name:'AQUILEGIA RED WHITE',size:'1 gal',farm_available_qty:60,requested_qty:12,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-024',group:'PERENNIAL',item_name:'ARMERIA VICTOR REITER',size:'Quart',pack:'10 pk',farm_available_qty:1,requested_qty:1,status_code:'L',confidence:'Medium'},
-  {line_id:'FARM-20260320-025',group:'PERENNIAL',item_name:'ARTEMISIA SUNFERN OLYMPIA',size:'1 gal',farm_available_qty:58,requested_qty:0,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-026',group:'PERENNIAL',item_name:'CAREX EVERGOLD',size:'1 gal',farm_available_qty:112,requested_qty:24,status_code:'A',confidence:'High'},
-  {line_id:'FARM-20260320-027',group:'PERENNIAL',item_name:'CENTRANTHUS RUBER',size:'1 gal',farm_available_qty:31,requested_qty:6,status_code:'A',confidence:'High'}
-];
-
-function slug(text){
-  return String(text || '').toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-}
-function titleCase(text){
-  return String(text || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-}
-function defaultLocations(item){
-  if (item.group === 'GROUND COVER') return ['op','mc','lx'];
-  if (item.group === 'GROW NATIVE') return ['op','lx'];
-  return ['op','mc','lx'];
-}
-function splitQty(qty){
-  const q = Number(qty || 0);
-  const op = Math.floor(q * 0.35);
-  const mc = Math.floor(q * 0.40);
-  const lx = q - op - mc;
-  return {op, mc, lx};
-}
-function seedRows(){
-  return DEFAULT_ROWS.map((row, index) => {
-    const alloc = splitQty(row.requested_qty);
-    const vendorSku = `FARM-${slug(row.item_name).slice(0, 18)}-${String(index+1).padStart(3,'0')}`;
-    const retailSku = `SUB-${slug(row.item_name).slice(0, 10)}-${slug(row.size).slice(0,4) || 'BASE'}`;
-    return {
-      line_id: row.line_id,
-      source_date: '2026-03-20',
-      vendor: 'Suburban Farm',
-      order_source: 'Farm Availability Sheet',
-      product_group: row.group,
-      item_name: row.item_name,
-      item_description_raw: `${row.item_name} ${row.size}`,
-      container_or_size: row.size,
-      pack: row.pack || '',
-      farm_available_qty: Number(row.farm_available_qty || 0),
-      requested_qty: Number(row.requested_qty || 0),
-      approved_qty: Number(row.requested_qty || 0),
-      received_qty: 0,
-      status_code: row.status_code,
-      status_label: STATUS_MAP[row.status_code] || 'Available',
-      extraction_confidence: row.confidence,
-      buyer_notes: '',
-      vendor_sku: vendorSku,
-      retail_sku: retailSku,
-      internal_display_name: `${titleCase(row.item_name)} • ${row.size}`,
-      color: inferColor(row.item_name),
-      active: true,
-      location_eligibility: defaultLocations(row),
-      allocations: alloc,
-      manager_decision: row.requested_qty > 0 ? 'Approved' : 'Hold',
-      exception_type: '',
-      condition: 'Pending',
-      receiving_notes: '',
-      mapping_status: 'Draft mapped'
-    };
-  });
-}
-function inferColor(name){
-  const text = String(name || '').toLowerCase();
-  if (text.includes('red')) return 'Red';
-  if (text.includes('white')) return 'White';
-  if (text.includes('pink')) return 'Pink';
-  if (text.includes('yellow') || text.includes('lemon') || text.includes('sunshine')) return 'Yellow';
-  if (text.includes('purple') || text.includes('violet')) return 'Purple';
-  return '';
-}
-
-let rows = [];
-const els = {};
-
-function getStoredState(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){ return null; }
-}
-function saveState(){
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      rows,
-      meta: {
-        orderId: els.orderId.value,
-        shipWeek: els.shipWeek.value,
-        orgName: els.orgName.value,
-        vendorName: els.vendorName.value,
-        buyerName: els.buyerName.value,
-        draftStatus: els.draftStatus.value,
-        draftNotes: els.draftNotes.value
-      }
-    }));
-  }catch(e){}
-}
-function resetState(){
-  rows = seedRows();
-  els.orderId.value = 'FTN-2026-0031';
-  els.shipWeek.value = '2026-W16';
-  els.orgName.value = 'Suburban Lawn & Garden';
-  els.vendorName.value = 'Suburban Farm';
-  els.buyerName.value = 'Chris Fox';
-  els.draftStatus.value = 'Manager review ready';
-  els.draftNotes.value = 'Executive demo build: strongest page-1 intake rows carried forward from the current Suburban Farm draft, expanded with market-standard schema fields, location allocation, and receiving exceptions.';
-  saveState();
-  renderAll();
-}
-function loadState(){
-  const stored = getStoredState();
-  if (stored && Array.isArray(stored.rows)) {
-    rows = stored.rows;
-    const meta = stored.meta || {};
-    els.orderId.value = meta.orderId || 'FTN-2026-0031';
-    els.shipWeek.value = meta.shipWeek || '2026-W16';
-    els.orgName.value = meta.orgName || 'Suburban Lawn & Garden';
-    els.vendorName.value = meta.vendorName || 'Suburban Farm';
-    els.buyerName.value = meta.buyerName || 'Chris Fox';
-    els.draftStatus.value = meta.draftStatus || 'Manager review ready';
-    els.draftNotes.value = meta.draftNotes || '';
-  } else {
-    resetState();
-  }
-}
-function chipClass(conf){
-  if (conf === 'High') return 'high';
-  if (conf === 'Medium') return 'medium';
-  return 'low';
-}
-function statusChip(code){
-  const cls = code === 'A' || code === 'C' || code === 'B' ? 'ok' : (code === 'L' ? 'warn' : 'pending');
-  return `<span class="chip ${cls}">${code} · ${STATUS_MAP[code] || ''}</span>`;
-}
-function locationNames(keys){
-  return (keys || []).map(k => LOCATION_LABELS[k] || k).join(', ');
-}
-function totalAllocated(row){
-  return LOCATION_KEYS.reduce((sum,k)=>sum + Number((row.allocations||{})[k] || 0),0);
-}
-function renderNav(){
-  document.querySelectorAll('.nav button').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.panel).classList.add('active');
-      if (btn.dataset.panel === 'packetPanel') renderPacket();
-      if (btn.dataset.panel === 'receivingPanel') renderReceiving();
-    });
-  });
-}
-function renderFilters(){
-  const groups = ['All groups', ...new Set(rows.map(r=>r.product_group))];
-  els.availabilityGroup.innerHTML = groups.map(g=>`<option>${g}</option>`).join('');
-  els.availabilityStatus.innerHTML = ['All statuses', ...Object.keys(STATUS_MAP)].map(s=>`<option>${s}</option>`).join('');
-  els.availabilityConfidence.innerHTML = ['All confidence', 'High', 'Medium', 'Low'].map(s=>`<option>${s}</option>`).join('');
-}
-function filteredRows(){
-  const q = els.availabilitySearch.value.trim().toLowerCase();
-  const group = els.availabilityGroup.value;
-  const status = els.availabilityStatus.value;
-  const conf = els.availabilityConfidence.value;
-  const view = els.availabilityView.value;
-  return rows.filter(r=>{
-    if (view === 'requested' && Number(r.requested_qty || 0) <= 0) return false;
-    if (group !== 'All groups' && r.product_group !== group) return false;
-    if (status !== 'All statuses' && r.status_code !== status) return false;
-    if (conf !== 'All confidence' && r.extraction_confidence !== conf) return false;
-    if (q) {
-      const blob = [r.item_name, r.container_or_size, r.vendor_sku, r.retail_sku, r.internal_display_name, r.product_group, r.buyer_notes].join(' ').toLowerCase();
-      if (!blob.includes(q)) return false;
-    }
-    return true;
-  });
-}
-function bindNumberInput(selector, handler){
-  document.querySelectorAll(selector).forEach(input=>{
-    input.addEventListener('input', e=>handler(e));
-  });
-}
-function bindTextInput(selector, handler){
-  document.querySelectorAll(selector).forEach(input=>{
-    input.addEventListener('input', e=>handler(e));
-  });
-}
-function bindSelectInput(selector, handler){
-  document.querySelectorAll(selector).forEach(input=>{
-    input.addEventListener('change', e=>handler(e));
-  });
-}
-
-function renderAvailability(){
-  const data = filteredRows();
-  els.availabilityBody.innerHTML = data.map(r=>`
-    <tr>
-      <td>${r.product_group}</td>
-      <td><strong>${r.item_name}</strong><div class="small">${r.internal_display_name}</div></td>
-      <td>${r.container_or_size}${r.pack ? `<div class="small">${r.pack}</div>`:''}</td>
-      <td>${r.farm_available_qty}</td>
-      <td><input class="inline-input" type="number" min="0" data-line="${r.line_id}" data-field="requested_qty" value="${r.requested_qty}" /></td>
-      <td>${statusChip(r.status_code)}</td>
-      <td><span class="chip ${chipClass(r.extraction_confidence)}">${r.extraction_confidence}</span></td>
-      <td><input type="text" data-line="${r.line_id}" data-field="vendor_sku" value="${r.vendor_sku}" /></td>
-      <td><input type="text" data-line="${r.line_id}" data-field="buyer_notes" value="${r.buyer_notes || ''}" /></td>
-    </tr>
-  `).join('');
-  bindNumberInput('#availabilityBody input[data-field="requested_qty"]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row.requested_qty = Math.max(0, Number(e.target.value || 0));
-    if (row.approved_qty > row.requested_qty) row.approved_qty = row.requested_qty;
-    if (totalAllocated(row) > row.approved_qty) row.allocations = splitQty(row.approved_qty);
-    saveState(); renderAll();
-  });
-  bindTextInput('#availabilityBody input[data-field="vendor_sku"], #availabilityBody input[data-field="buyer_notes"]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row[e.target.dataset.field] = e.target.value;
-    saveState();
-    if (e.target.dataset.field === 'vendor_sku') renderCrosswalk();
-  });
-}
-function renderCrosswalk(){
-  const data = rows.filter(r=>Number(r.requested_qty || 0) > 0);
-  els.crosswalkBody.innerHTML = data.map(r=>`
-    <tr>
-      <td><strong>${r.item_name}</strong><div class="small">${r.product_group}</div></td>
-      <td><input type="text" data-line="${r.line_id}" data-field="vendor_sku" value="${r.vendor_sku}" /></td>
-      <td><input type="text" data-line="${r.line_id}" data-field="retail_sku" value="${r.retail_sku}" /></td>
-      <td><input type="text" data-line="${r.line_id}" data-field="internal_display_name" value="${r.internal_display_name}" /></td>
-      <td>${r.container_or_size}</td>
-      <td><input type="text" data-line="${r.line_id}" data-field="color" value="${r.color || ''}" /></td>
-      <td>
-        <select data-line="${r.line_id}" data-field="active">
-          <option value="true" ${r.active ? 'selected':''}>Active</option>
-          <option value="false" ${!r.active ? 'selected':''}>Inactive</option>
-        </select>
-      </td>
-      <td>
-        <label style="display:block"><input type="checkbox" data-line="${r.line_id}" data-loc="op" ${r.location_eligibility.includes('op')?'checked':''}/> OP</label>
-        <label style="display:block"><input type="checkbox" data-line="${r.line_id}" data-loc="mc" ${r.location_eligibility.includes('mc')?'checked':''}/> MC</label>
-        <label style="display:block"><input type="checkbox" data-line="${r.line_id}" data-loc="lx" ${r.location_eligibility.includes('lx')?'checked':''}/> Lenexa</label>
-      </td>
-    </tr>
-  `).join('');
-  bindTextInput('#crosswalkBody input[data-field]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row[e.target.dataset.field] = e.target.value;
-    row.mapping_status = row.vendor_sku && row.retail_sku && row.internal_display_name ? 'Ready' : 'Draft mapped';
-    saveState(); renderReview(); renderPacket(); renderMetrics();
-  });
-  bindSelectInput('#crosswalkBody select[data-field="active"]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row.active = e.target.value === 'true';
-    saveState();
-  });
-  document.querySelectorAll('#crosswalkBody input[type="checkbox"][data-loc]').forEach(box=>{
-    box.addEventListener('change', e=>{
-      const row = rows.find(r=>r.line_id === e.target.dataset.line);
-      const loc = e.target.dataset.loc;
-      const set = new Set(row.location_eligibility || []);
-      if (e.target.checked) set.add(loc); else set.delete(loc);
-      row.location_eligibility = [...set];
-      saveState(); renderAllocation();
-    });
-  });
-}
-function renderAllocation(){
-  const data = rows.filter(r=>Number(r.approved_qty || 0) > 0);
-  els.allocationBody.innerHTML = data.map(r=>{
-    const allocated = totalAllocated(r);
-    const remaining = Number(r.approved_qty || 0) - allocated;
-    return `
-      <tr>
-        <td><strong>${r.item_name}</strong><div class="small">${r.retail_sku || 'No retail SKU yet'}</div></td>
-        <td>${r.approved_qty}</td>
-        <td>
-          <div class="alloc-grid">
-            <input class="inline-input" type="number" min="0" data-line="${r.line_id}" data-loc="op" value="${r.allocations.op || 0}" />
-            <input class="inline-input" type="number" min="0" data-line="${r.line_id}" data-loc="mc" value="${r.allocations.mc || 0}" />
-            <input class="inline-input" type="number" min="0" data-line="${r.line_id}" data-loc="lx" value="${r.allocations.lx || 0}" />
+    <section id="finderView" class="app-view" hidden>
+      <div class="panel">
+        <div class="finder-toolbar">
+          <div class="finder-field">
+            <label for="finderSearch">Find a plant, zone, or SKU</label>
+            <input id="finderSearch" type="search" placeholder="Hydrangea, dogwood, Japanese maple, PPXCVP1…" />
           </div>
-        </td>
-        <td>${allocated}</td>
-        <td>${remaining}</td>
-        <td>${locationNames(r.location_eligibility)}</td>
-      </tr>
-    `;
-  }).join('');
-  bindNumberInput('#allocationBody input[data-loc]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row.allocations[e.target.dataset.loc] = Math.max(0, Number(e.target.value || 0));
-    saveState(); renderMetrics(); renderReview(); renderPacket();
-  });
-}
-function renderReview(){
-  const data = rows.filter(r=>Number(r.requested_qty || 0) > 0);
-  els.reviewBody.innerHTML = data.map(r=>{
-    const allocated = totalAllocated(r);
-    const allocState = allocated === Number(r.approved_qty || 0) ? '<span class="chip ok">Balanced</span>' : '<span class="chip warn">Needs check</span>';
-    const mapState = r.vendor_sku && r.retail_sku && r.internal_display_name ? '<span class="chip ok">Ready</span>' : '<span class="chip pending">Partial</span>';
-    return `
-      <tr>
-        <td><strong>${r.item_name}</strong><div class="small">${r.container_or_size}</div></td>
-        <td>${r.requested_qty}</td>
-        <td><input class="inline-input" type="number" min="0" data-line="${r.line_id}" data-field="approved_qty" value="${r.approved_qty}" /></td>
-        <td>
-          <select data-line="${r.line_id}" data-field="manager_decision">
-            <option ${r.manager_decision==='Approved'?'selected':''}>Approved</option>
-            <option ${r.manager_decision==='Hold'?'selected':''}>Hold</option>
-            <option ${r.manager_decision==='Review'?'selected':''}>Review</option>
-          </select>
-        </td>
-        <td>${mapState}</td>
-        <td>${allocState}</td>
-        <td><input type="text" data-line="${r.line_id}" data-field="buyer_notes" value="${r.buyer_notes || ''}" /></td>
-      </tr>
-    `;
-  }).join('');
-  bindNumberInput('#reviewBody input[data-field="approved_qty"]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row.approved_qty = Math.max(0, Number(e.target.value || 0));
-    if (totalAllocated(row) > row.approved_qty) row.allocations = splitQty(row.approved_qty);
-    saveState(); renderAll();
-  });
-  bindTextInput('#reviewBody input[data-field="buyer_notes"]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row.buyer_notes = e.target.value;
-    saveState();
-  });
-  bindSelectInput('#reviewBody select[data-field="manager_decision"]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row.manager_decision = e.target.value;
-    saveState();
-  });
-}
-function renderPacket(){
-  const data = rows.filter(r=>Number(r.approved_qty || 0) > 0 && r.manager_decision !== 'Hold');
-  els.packetBody.innerHTML = data.map(r=>`
-    <tr>
-      <td><strong>${r.item_name}</strong><div class="small">${r.internal_display_name}</div></td>
-      <td>${r.approved_qty}</td>
-      <td>${r.container_or_size}</td>
-      <td>${r.vendor_sku || '—'}</td>
-      <td>${r.retail_sku || '—'}</td>
-      <td>OP ${r.allocations.op || 0} · MC ${r.allocations.mc || 0} · LX ${r.allocations.lx || 0}</td>
-    </tr>
-  `).join('');
-  const approvedUnits = data.reduce((sum,r)=>sum + Number(r.approved_qty || 0),0);
-  const allocatedUnits = data.reduce((sum,r)=>sum + totalAllocated(r),0);
-  const unmapped = data.filter(r=>!(r.vendor_sku && r.retail_sku && r.internal_display_name)).length;
-  els.packetSummary.innerHTML = `
-    <strong>Packet summary</strong><br>
-    <span class="small">Vendor: ${els.vendorName.value}<br>
-    Buyer: ${els.buyerName.value}<br>
-    Ship week: ${els.shipWeek.value}<br>
-    Approved lines: ${data.length}<br>
-    Approved units: ${approvedUnits}<br>
-    Allocated units: ${allocatedUnits}<br>
-    Rows still needing mapping polish: ${unmapped}</span>
-  `;
-  renderQr();
-}
-function renderReceiving(){
-  const data = rows.filter(r=>Number(r.approved_qty || 0) > 0);
-  els.receivingBody.innerHTML = data.map(r=>{
-    const variance = Number(r.received_qty || 0) - Number(r.approved_qty || 0);
-    const varianceClass = variance === 0 ? 'ok' : (variance < 0 ? 'bad' : 'warn');
-    return `
-      <tr>
-        <td><strong>${r.item_name}</strong><div class="small">${r.retail_sku || 'No retail SKU'}</div></td>
-        <td>${r.approved_qty}</td>
-        <td><input class="inline-input" type="number" min="0" data-line="${r.line_id}" data-field="received_qty" value="${r.received_qty}" /></td>
-        <td><span class="chip ${varianceClass}">${variance}</span></td>
-        <td>
-          <select data-line="${r.line_id}" data-field="exception_type">
-            ${EXCEPTION_TYPES.map(t=>`<option ${r.exception_type===t?'selected':''}>${t}</option>`).join('')}
-          </select>
-        </td>
-        <td>
-          <select data-line="${r.line_id}" data-field="condition">
-            ${CONDITION_TYPES.map(t=>`<option ${r.condition===t?'selected':''}>${t}</option>`).join('')}
-          </select>
-        </td>
-        <td><input type="text" data-line="${r.line_id}" data-field="receiving_notes" value="${r.receiving_notes || ''}" /></td>
-      </tr>
-    `;
-  }).join('');
-  bindNumberInput('#receivingBody input[data-field="received_qty"]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row.received_qty = Math.max(0, Number(e.target.value || 0));
-    saveState(); renderMetrics(); renderReceiving();
-  });
-  bindTextInput('#receivingBody input[data-field="receiving_notes"]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row.receiving_notes = e.target.value;
-    saveState();
-  });
-  bindSelectInput('#receivingBody select[data-field]', e=>{
-    const row = rows.find(r=>r.line_id === e.target.dataset.line);
-    row[e.target.dataset.field] = e.target.value;
-    saveState(); renderMetrics();
-  });
-}
-function renderMetrics(){
-  const requestedLines = rows.filter(r=>Number(r.requested_qty || 0) > 0);
-  const requestedUnits = requestedLines.reduce((sum,r)=>sum + Number(r.requested_qty || 0),0);
-  const approvedUnits = requestedLines.reduce((sum,r)=>sum + Number(r.approved_qty || 0),0);
-  const mappedRows = requestedLines.filter(r=>r.vendor_sku && r.retail_sku && r.internal_display_name).length;
-  const allocatedUnits = requestedLines.reduce((sum,r)=>sum + totalAllocated(r),0);
-  const exceptions = requestedLines.filter(r=>{
-    const variance = Number(r.received_qty || 0) - Number(r.approved_qty || 0);
-    return variance !== 0 || !!r.exception_type;
-  }).length;
-  els.metricLines.textContent = requestedLines.length;
-  els.metricUnits.textContent = requestedUnits;
-  els.metricApproved.textContent = approvedUnits;
-  els.metricMapped.textContent = mappedRows;
-  els.metricAllocated.textContent = allocatedUnits;
-  els.metricExceptions.textContent = exceptions;
-}
+          <div class="finder-field">
+            <label for="finderCategory">Focus</label>
+            <select id="finderCategory">
+              <option value="">All nursery areas</option>
+              <option value="trees">Trees</option>
+              <option value="shrubs">Shrubs</option>
+              <option value="shade">Shade</option>
+              <option value="sun">Sun</option>
+              <option value="conifers">Conifers</option>
+              <option value="roses">Roses & Grasses</option>
+              <option value="rock-yard">Rock Yard</option>
+            </select>
+          </div>
+          <div class="finder-actions">
+            <button id="finderClearBtn" class="btn secondary" type="button">Clear</button>
+          </div>
+        </div>
 
-function buildQrValue(){
-  const approved = rows.filter(r=>Number(r.approved_qty || 0) > 0 && r.manager_decision !== 'Hold');
-  const approvedUnits = approved.reduce((sum,r)=>sum + Number(r.approved_qty || 0),0);
-  const liveHref = typeof location !== 'undefined' && location.href && !location.href.startsWith('file:') ? location.href : '';
-  if (liveHref) return liveHref;
-  return JSON.stringify({
-    type:'Perennial Ordering Platform executive demo',
-    order_id: els.orderId.value,
-    vendor: els.vendorName.value,
-    ship_week: els.shipWeek.value,
-    approved_lines: approved.length,
-    approved_units: approvedUnits
-  });
-}
-function qrImageUrl(){
-  return QR_ENDPOINT + encodeURIComponent(buildQrValue());
-}
-function renderQr(){
-  if(!els.qrPreview || !els.qrValueLabel) return;
-  const value = buildQrValue();
-  els.qrPreview.src = qrImageUrl();
-  els.qrValueLabel.textContent = value;
-}
-async function exportQr(){
-  const url = qrImageUrl();
-  const fileName = `${els.orderId.value || 'order'}-qr.png`;
-  try{
-    const res = await fetch(url, {mode:'cors'});
-    const blob = await res.blob();
-    downloadFile(fileName, blob, blob.type || 'image/png');
-  }catch(err){
-    const a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    a.download = fileName;
-    a.click();
-  }
-}
+        <div class="finder-chip-row" id="finderChipRow"></div>
+      </div>
 
-function exportJson(){
-  const payload = {
-    order_id: els.orderId.value,
-    ship_week: els.shipWeek.value,
-    organization: els.orgName.value,
-    vendor: els.vendorName.value,
-    buyer: els.buyerName.value,
-    status: els.draftStatus.value,
-    notes: els.draftNotes.value,
-    rows
-  };
-  downloadFile(`${els.orderId.value || 'order'}-demo.json`, JSON.stringify(payload, null, 2), 'application/json');
-}
-function exportCsv(){
-  const approved = rows.filter(r=>Number(r.approved_qty || 0) > 0 && r.manager_decision !== 'Hold');
-  const header = ['line_id','vendor','vendor_sku','retail_sku','item_name','internal_display_name','size','status_code','requested_qty','approved_qty','op_qty','mc_qty','lx_qty','exception_type','condition'];
-  const lines = [
-    header.join(','),
-    ...approved.map(r=>[
-      r.line_id, r.vendor, r.vendor_sku, r.retail_sku, r.item_name, r.internal_display_name, r.container_or_size, r.status_code,
-      r.requested_qty, r.approved_qty, r.allocations.op || 0, r.allocations.mc || 0, r.allocations.lx || 0, r.exception_type || '', r.condition || ''
-    ].map(csvEscape).join(','))
-  ];
-  downloadFile(`${els.orderId.value || 'order'}-approved.csv`, lines.join('\n'), 'text/csv');
-}
-function csvEscape(value){
-  const text = String(value ?? '');
-  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-}
-function downloadFile(name, content, type){
-  const blob = content instanceof Blob ? content : new Blob([content], {type});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = name; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
-}
-function applyTheme(theme){
-  const next = theme === 'dark' ? 'dark' : 'light';
-  document.body.setAttribute('data-theme', next);
-  try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
-  els.themeToggle.setAttribute('aria-pressed', String(next === 'dark'));
-  els.themeToggle.innerHTML = next === 'dark'
-    ? '☀️ <span>Light mode</span>'
-    : '🌙 <span>Dark mode</span>';
-}
-function preferredTheme(){
-  try{
-    const saved = localStorage.getItem(THEME_KEY);
-    if (saved === 'dark' || saved === 'light') return saved;
-  }catch(e){}
-  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-function renderAll(){
-  renderFilters();
-  renderAvailability();
-  renderCrosswalk();
-  renderAllocation();
-  renderReview();
-  renderPacket();
-  renderReceiving();
-  renderMetrics();
-}
-function initEls(){
-  [
-    'orderId','shipWeek','orgName','vendorName','buyerName','draftStatus','draftNotes','themeToggle','saveBtn','exportJsonBtn',
-    'exportCsvBtn','exportQrBtn','printPacketBtn','resetBtn','refreshQrBtn','availabilitySearch','availabilityGroup','availabilityStatus','availabilityConfidence',
-    'availabilityView','availabilityBody','crosswalkBody','allocationBody','reviewBody','packetBody','packetSummary','qrPreview','qrValueLabel','receivingBody',
-    'metricLines','metricUnits','metricApproved','metricMapped','metricAllocated','metricExceptions'
-  ].forEach(id=>els[id]=document.getElementById(id));
-}
-function initEvents(){
-  ['orderId','shipWeek','orgName','vendorName','buyerName','draftStatus','draftNotes'].forEach(id=>{
-    els[id].addEventListener('input', saveState);
-    els[id].addEventListener('change', saveState);
-  });
-  ['availabilitySearch','availabilityGroup','availabilityStatus','availabilityConfidence','availabilityView'].forEach(id=>{
-    els[id].addEventListener('input', renderAvailability);
-    els[id].addEventListener('change', renderAvailability);
-  });
-  els.themeToggle.addEventListener('click', ()=>applyTheme(document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
-  els.saveBtn.addEventListener('click', ()=>{ saveState(); alert('Draft saved in this browser.'); });
-  els.exportJsonBtn.addEventListener('click', exportJson);
-  els.exportCsvBtn.addEventListener('click', exportCsv);
-  els.exportQrBtn.addEventListener('click', exportQr);
-  els.refreshQrBtn.addEventListener('click', renderQr);
-  els.printPacketBtn.addEventListener('click', ()=>window.print());
-  els.resetBtn.addEventListener('click', ()=>{
-    if (confirm('Reset this demo back to the seeded v3 state?')) resetState();
-  });
-}
-initEls();
-renderNav();
-initEvents();
-applyTheme(preferredTheme());
-loadState();
-renderAll();
-</script>
+      <div class="finder-layout">
+        <div class="panel">
+          <div class="finder-results" id="finderResults"></div>
+        </div>
+
+        <div class="map-shell">
+          <section class="panel">
+            <h2>Overview map</h2>
+            <details class="legend-disclosure" id="legendDisclosure" open>
+              <summary>Field flag legend</summary>
+              <div class="flag-legend" id="flagLegend"></div>
+              <p class="map-help">Flags are drawn only where they appear on the paper map example. Zone highlighting stays interactive for plant lookup.</p>
+            </details>
+
+            <div class="mobile-map-tools" id="mobileMapTools" aria-label="Mobile map jump controls">
+              <button type="button" class="location-btn" data-map-focus="left">Left yard</button>
+              <button type="button" class="location-btn" data-map-focus="center">Center</button>
+              <button type="button" class="location-btn" data-map-focus="houses">Hoop houses</button>
+              <button type="button" class="location-btn" data-map-focus="perennials">Perennials</button>
+            </div>
+
+            <div class="map-pan-shell" id="mapPanShell">
+              <div class="map-board" id="overviewMapBoard"></div>
+            </div>
+
+            <p class="map-caption" id="overviewMapCaption">The full nursery stays visible while the selected destination stays highlighted.</p>
+
+            <p class="map-help mobile-swipe-note">Swipe the map horizontally on mobile. Use the quick jump buttons if you want to move straight to hoop houses or perennials.</p>
+
+            <div class="map-help-row quick-links">
+              <button type="button" class="location-btn" data-zone-jump="house4">Azaleas / Rhododendron</button>
+              <button type="button" class="location-btn" data-zone-jump="house5">Hydrangeas</button>
+              <button type="button" class="location-btn" data-zone-jump="house7">Japanese Maples</button>
+              <button type="button" class="location-btn" data-zone-jump="house8">Dogwoods</button>
+            </div>
+
+            <p class="map-help">You are here: customers typically enter this part of the nursery from the <strong>perennials / checkout</strong> side at the bottom of the map. Hoop houses are on the right. Ball &amp; Burlap trees are at the top. Bulk goods and rock yard are left.</p>
+          </section>
+
+          <section class="panel">
+            <h2>Closer look</h2>
+            <p class="panel-lead">The selected section zooms here so staff and customers can confirm the next move on a phone or kiosk.</p>
+            <div class="map-board detail-map-board" id="detailMapBoard"></div>
+            <p class="map-caption" id="detailMapCaption">Select a plant or tap a zone to zoom into that section.</p>
+          </section>
+
+          <section class="panel zone-details" id="locationDetails">
+            <h3>Select a plant or zone</h3>
+            <p class="finder-note">This panel shows the location, any flag cue from the sheets, and a short direction line you can use with customers on the floor.</p>
+          </section>
+
+          <section class="panel">
+            <h2>Nursery notes</h2>
+            <p class="definitions-note">These are shortened from the paper brochure so staff and kiosk users can answer quick questions without leaving the app.</p>
+            <div class="definitions-grid" id="definitionsGrid"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section id="kioskView" class="app-view" hidden>
+      <div class="kiosk-shell">
+        <section class="kiosk-top">
+          <div class="kiosk-demo-card">
+            <div class="status-note"><strong>Customer mode:</strong> big search, fast buttons, short directions, and a map that reads instantly from the perennials / checkout side.</div>
+            <h2>Customer Kiosk</h2>
+            <p>Built for quick self-service: search, tap one result, and get a plain-English direction with a clear starting point on the map.</p>
+            <div class="demo-steps">
+              <div class="demo-step">
+                <strong>1. Search</strong>
+                <span>Use the large search box or tap a quick button like Trees, Shade, or Pollinator.</span>
+              </div>
+              <div class="demo-step">
+                <strong>2. Select</strong>
+                <span>Tap one result card to lock in the destination and simplify the answer.</span>
+              </div>
+              <div class="demo-step">
+                <strong>3. Go</strong>
+                <span>Show the customer the highlighted map, short direction, and larger map option if needed.</span>
+              </div>
+            </div>
+          </div>
+
+          <section class="panel">
+            <div class="kiosk-field">
+              <label for="kioskSearch">Search plants or SKU</label>
+              <input id="kioskSearch" type="search" placeholder="Hydrangea, yew, Japanese maple, salvia, SKU…" />
+            </div>
+            <div class="kiosk-actions" id="kioskActions"></div>
+          </section>
+        </section>
+
+        <section class="kiosk-grid">
+          <div class="panel">
+            <div class="you-are-here-note">
+              <span class="you-are-here-pill">You</span>
+              <div>Customers typically start from the <strong>perennials / checkout</strong> side. Keep the answer short and point to the highlighted destination first.</div>
+            </div>
+            <div class="kiosk-results" id="kioskResults"></div>
+          </div>
+
+          <div class="kiosk-side">
+            <section class="panel" id="kioskDetailPanel">
+              <h2>Directions</h2>
+              <p class="kiosk-lead">No kiosk result is selected yet. Search by plant name or use the quick buttons to narrow the answer.</p>
+            </section>
+
+            <section class="panel" id="kioskMapPanel">
+              <h2>Map</h2>
+              <div class="map-board kiosk-map-board" id="kioskMapBoard"></div>
+              <div class="detail-actions">
+                <button id="kioskOpenLargeMap" class="location-btn" type="button">Open in Nursery Finder</button>
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <footer class="ownership-footer">
+      <div class="ownership-footer__inner">
+        <img
+          src="./images/cg-fox-foxfield-studio.png"
+          alt="C.G. Fox, Foxfield Studio"
+          class="ownership-logo"
+          onerror="this.style.display='none';"
+        />
+        <div class="ownership-footer__text">
+          <div class="ownership-name">C.G. Fox • Foxfield Studio</div>
+          <div class="ownership-note">Concept, product design, and application build</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode" defer></script>
+  <script>
+    const NURSERY_MAPS_LINK = "https://www.google.com/maps";
+    const HEIGHT_OPTIONS = [
+      { value: "under12", label: 'Under 12"', test: inches => inches > 0 && inches < 12 },
+      { value: "12to24", label: '12–24"', test: inches => inches >= 12 && inches <= 24 },
+      { value: "24to36", label: '24–36"', test: inches => inches > 24 && inches <= 36 },
+      { value: "36plus", label: '36"+', test: inches => inches > 36 }
+    ];
+
+    const MAP_ZONES = [
+      { id:"bbt", title:"Ball & Burlap Trees", subtitle:"Top field", focusGroup:"field", x:60, y:42, w:340, h:128, type:"tree", color:"#4fb3c8", direction:"Head toward the top field for Ball & Burlap trees." },
+      { id:"container-trees", title:"Container Trees", subtitle:"Upper left", focusGroup:"field", x:36, y:226, w:228, h:118, type:"tree", color:"#4fb3c8", direction:"Move up the left side toward the container trees section." },
+      { id:"field-shrub", title:"Flowering Shrubs", subtitle:"Center field", focusGroup:"center", x:300, y:226, w:232, h:116, type:"shrub", color:"#de665e", direction:"Go into the center field area for flowering shrubs." },
+      { id:"conifers", title:"Conifers", subtitle:"Lower left", focusGroup:"left", x:34, y:386, w:214, h:108, type:"conifer", color:"#e59a42", direction:"Move left and slightly up for the conifer section." },
+      { id:"rock-yard", title:"Rock Yard", subtitle:"Left side", focusGroup:"left", x:34, y:530, w:214, h:94, type:"rock-yard", color:"#ffffff", direction:"Bulk goods and rock yard are on the far left side." },
+      { id:"shade-perennials", title:"Shade Perennials", subtitle:"Lower center left", focusGroup:"perennials", x:290, y:558, w:202, h:106, type:"shade", color:"#4fb3c8", direction:"Start from checkout and move into the shade perennial beds." },
+      { id:"sun-perennials", title:"Sun Perennials", subtitle:"Lower center right", focusGroup:"perennials", x:510, y:558, w:212, h:106, type:"sun", color:"#e59a42", direction:"Start from checkout and move into the sun perennial beds." },
+      { id:"roses", title:"Roses & Grasses", subtitle:"Lower right", focusGroup:"perennials", x:740, y:558, w:164, h:106, type:"roses", color:"#de665e", direction:"Head right from the perennial area for roses and grasses." },
+      { id:"house4", title:"Azaleas / Rhododendron", subtitle:"Hoop House 4", focusGroup:"houses", x:738, y:94, w:164, h:68, type:"house", color:"#de665e", direction:"Go to the right-side hoop houses. House 4 carries azaleas and rhododendron." },
+      { id:"house5", title:"Hydrangeas", subtitle:"Hoop House 5", focusGroup:"houses", x:738, y:176, w:164, h:68, type:"house", color:"#4fb3c8", direction:"Go to the right-side hoop houses. House 5 carries hydrangeas." },
+      { id:"house7", title:"Japanese Maples", subtitle:"Hoop House 7", focusGroup:"houses", x:738, y:340, w:164, h:68, type:"house", color:"#e59a42", direction:"Go to the right-side hoop houses. House 7 carries Japanese maples." },
+      { id:"house8", title:"Dogwoods", subtitle:"Hoop House 8", focusGroup:"houses", x:738, y:422, w:164, h:68, type:"house", color:"#ffffff", direction:"Go to the right-side hoop houses. House 8 carries dogwoods." }
+    ];
+
+    const NURSERY_NOTES = [
+      { title:"Perennials", copy:"The perennial department is the primary customer entry point in this workflow. Shade and sun areas are split for easier guidance." },
+      { title:"Hoop houses", copy:"Use the quick links when customers ask for azaleas, hydrangeas, Japanese maples, or dogwoods. It is faster than explaining every turn." },
+      { title:"Ball & Burlap trees", copy:"Large specimen trees live at the top field. Start with the overview map so customers keep their bearings." },
+      { title:"Bulk goods and rock yard", copy:"Keep the wording simple: rock yard and bulk goods are on the left side of the property." }
+    ];
+
+    const els = {
+      themeToggle: document.getElementById("themeToggle"),
+      viewTabs: [...document.querySelectorAll(".view-tab")],
+      heroTitle: document.getElementById("heroTitle"),
+      heroSubtitle: document.getElementById("heroSubtitle"),
+
+      browserView: document.getElementById("browserView"),
+      finderView: document.getElementById("finderView"),
+      kioskView: document.getElementById("kioskView"),
+
+      searchInput: document.getElementById("searchInput"),
+      exposureFilter: document.getElementById("exposureFilter"),
+      groupFilter: document.getElementById("groupFilter"),
+      colorFilter: document.getElementById("colorFilter"),
+      heightFilter: document.getElementById("heightFilter"),
+      showCount: document.getElementById("showCount"),
+      clearFilters: document.getElementById("clearFilters"),
+      traitChips: document.getElementById("traitChips"),
+      summaryBar: document.getElementById("summaryBar"),
+      results: document.getElementById("results"),
+
+      scanPanel: document.getElementById("scanPanel"),
+      scanPanelToggle: document.getElementById("scanPanelToggle"),
+      scanPanelContent: document.getElementById("scanPanelContent"),
+      scanSkuInput: document.getElementById("scanSkuInput"),
+      findSkuBtn: document.getElementById("findSkuBtn"),
+      startScannerBtn: document.getElementById("startScannerBtn"),
+      stopScannerBtn: document.getElementById("stopScannerBtn"),
+      scanStatus: document.getElementById("scanStatus"),
+      scannerShell: document.getElementById("scannerShell"),
+
+      finderSearch: document.getElementById("finderSearch"),
+      finderCategory: document.getElementById("finderCategory"),
+      finderClearBtn: document.getElementById("finderClearBtn"),
+      finderChipRow: document.getElementById("finderChipRow"),
+      finderResults: document.getElementById("finderResults"),
+      flagLegend: document.getElementById("flagLegend"),
+      overviewMapBoard: document.getElementById("overviewMapBoard"),
+      detailMapBoard: document.getElementById("detailMapBoard"),
+      overviewMapCaption: document.getElementById("overviewMapCaption"),
+      detailMapCaption: document.getElementById("detailMapCaption"),
+      mapPanShell: document.getElementById("mapPanShell"),
+      legendDisclosure: document.getElementById("legendDisclosure"),
+      mobileMapTools: document.getElementById("mobileMapTools"),
+      locationDetails: document.getElementById("locationDetails"),
+      definitionsGrid: document.getElementById("definitionsGrid"),
+      zoneJumpButtons: [...document.querySelectorAll("[data-zone-jump]")],
+
+      kioskSearch: document.getElementById("kioskSearch"),
+      kioskActions: document.getElementById("kioskActions"),
+      kioskResults: document.getElementById("kioskResults"),
+      kioskDetailPanel: document.getElementById("kioskDetailPanel"),
+      kioskMapBoard: document.getElementById("kioskMapBoard"),
+      kioskOpenLargeMap: document.getElementById("kioskOpenLargeMap"),
+    };
+
+    const state = {
+      theme: localStorage.getItem("suburban-theme") || "dark",
+      currentView: "browser",
+      plants: [],
+      filteredPlants: [],
+      searchTerm: "",
+      exposure: "",
+      group: "",
+      color: "",
+      height: "",
+      showCount: "48",
+      activeTraits: new Set(),
+
+      scanPanelOpen: false,
+      scanner: null,
+      scannerActive: false,
+      scanLock: false,
+
+      finderQuery: "",
+      finderCategory: "",
+      finderTraits: new Set(),
+      finderResults: [],
+      selectedFinderId: "",
+      selectedZoneIds: [],
+
+      kioskTrait: "",
+      kioskResults: [],
+      selectedKioskId: "",
+    };
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function normalizeText(value = "") {
+      return String(value)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    }
+
+    function normalizeSpaces(value = "") {
+      return String(value).replace(/\s+/g, " ").trim();
+    }
+
+    function titleCase(value = "") {
+      return String(value)
+        .split(/[\s_-]+/)
+        .filter(Boolean)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(" ");
+    }
+
+    function uniqueValues(values = []) {
+      return [...new Set(values.filter(Boolean))];
+    }
+
+    function parseFirstNumber(value = "") {
+      const text = String(value || "");
+      if (!text) return 0;
+      const ft = text.match(/(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)/i);
+      const inch = text.match(/(\d+(?:\.\d+)?)\s*(?:in|inch|inches|")/i);
+      if (ft) return Number(ft[1]) * 12;
+      if (inch) return Number(inch[1]);
+      const range = text.match(/(\d+(?:\.\d+)?)/);
+      return range ? Number(range[1]) : 0;
+    }
+
+    function bucketHeight(plant) {
+      const inches = parseFirstNumber(plant.height || plant.size || "");
+      const option = HEIGHT_OPTIONS.find(entry => entry.test(inches));
+      return option ? option.value : "";
+    }
+
+    function getExposure(plant) {
+      const light = normalizeText(plant.light || plant.light_inferred || "");
+      if (light.includes("shade")) return "Shade";
+      if (light.includes("sun")) return "Sun";
+      if (light.includes("mix") || light.includes("part")) return "Mixed";
+      return "Unknown";
+    }
+
+    function isRoseLikeItem(plant) {
+      const values = [
+        plant?.plant_group,
+        plant?.category,
+        plant?.section,
+        plant?.series,
+        plant?.common,
+        plant?.genus,
+        plant?.name
+      ].map(value => normalizeSpaces(value || "").toLowerCase()).filter(Boolean);
+
+      if (values.some(value => value === "roses" || value === "rose")) return true;
+      if (values.some(value => value.includes("drift rose") || value.includes("knock out rose"))) return true;
+      if (values.includes("rosa")) return true;
+      return normalizeText(plant?.genus || "") === "rosa";
+    }
+
+    function isGrassLikeItem(plant) {
+      const values = [
+        plant?.plant_group,
+        plant?.category,
+        plant?.section,
+        plant?.common,
+        plant?.genus,
+        plant?.name,
+        plant?.source_department,
+        plant?.source_subdepartment
+      ].map(value => normalizeSpaces(value || "").toLowerCase()).filter(Boolean).join(" ");
+
+      return /grass|grasses|carex|liriope|miscanthus|pennisetum|calamagrostis|switchgrass|bluestem|yucca/.test(values);
+    }
+
+    function isConiferLikeItem(plant) {
+      const values = [
+        plant?.plant_group,
+        plant?.category,
+        plant?.common,
+        plant?.genus,
+        plant?.name
+      ].map(value => normalizeSpaces(value || "").toLowerCase()).filter(Boolean).join(" ");
+
+      return /conifer|spruce|pine|fir|juniper|arborvitae|cypress/.test(values);
+    }
+
+    function getPlantGroup(plant) {
+      if (!plant) return "Plant";
+      if (isRoseLikeItem(plant)) return "Roses";
+      if (isGrassLikeItem(plant)) return "Perennial Grasses";
+      const group = normalizeSpaces(plant.plant_group || plant.category || plant.section || "");
+      if (group) return group;
+      return "Plant";
+    }
+
+    function getColorLabel(plant) {
+      return normalizeSpaces(plant.color || "");
+    }
+
+    function plantSearchBlob(plant) {
+      return [
+        plant.name, plant.common, plant.genus, plant.series, plant.sku, plant.color,
+        plant.category, plant.plant_group, plant.section, plant.light, plant.size
+      ].map(value => normalizeSpaces(value || "")).filter(Boolean).join(" ").toLowerCase();
+    }
+
+    function withSatelliteView(url) {
+      if (!url) return url;
+      if (/google\.[^/]+\/maps/i.test(url) || /maps\.app\.goo\.gl/i.test(url)) {
+        if (/[?&]t=k\b/i.test(url)) return url;
+        return url + (url.includes("?") ? "&t=k" : "?t=k");
+      }
+      return url;
+    }
+
+    function kioskTraitsFromPlant(plant) {
+      const tags = [];
+      const exposure = getExposure(plant);
+      if (exposure === "Shade") tags.push("shade");
+      if (exposure === "Sun") tags.push("sun");
+      if (plant.pollinator) tags.push("pollinator-friendly");
+      if (plant.drought) tags.push("drought-tolerant");
+      if (plant.deer) tags.push("deer-resistant");
+      if (isConiferLikeItem(plant)) tags.push("conifers");
+      if (isRoseLikeItem(plant)) tags.push("roses");
+      if (isGrassLikeItem(plant)) tags.push("grasses");
+      return uniqueValues(tags);
+    }
+
+    function zoneTitle(zoneId) {
+      const zone = MAP_ZONES.find(z => z.id === zoneId);
+      if (!zone) return zoneId;
+      return zone.subtitle ? `${zone.title} — ${zone.subtitle}` : zone.title;
+    }
+
+    function colorForZone(zoneId) {
+      const zone = MAP_ZONES.find(z => z.id === zoneId);
+      return zone?.color || "#7bd05f";
+    }
+
+    function directionFromZone(item) {
+      const zone = MAP_ZONES.find(z => (item.zoneIds || []).includes(z.id)) || null;
+      return zone?.direction || "Use the highlighted map to guide the next move.";
+    }
+
+    function finderCategoryForPlant(plant) {
+      if (isConiferLikeItem(plant)) return "conifers";
+      if (isRoseLikeItem(plant)) return "roses";
+      if (isGrassLikeItem(plant)) return "roses";
+      const exposure = getExposure(plant);
+      if (exposure === "Shade") return "shade";
+      if (exposure === "Sun") return "sun";
+      const text = normalizeText([plant.category, plant.plant_group, plant.name, plant.common, plant.genus].join(" "));
+      if (/tree|dogwood|maple|oak|elm|birch/.test(text)) return "trees";
+      if (/shrub|hydrangea|azalea|rhododendron|boxwood|spirea|viburnum|weigela/.test(text)) return "shrubs";
+      return "";
+    }
+
+    function kioskZoneMetaForPlant(plant) {
+      const group = getPlantGroup(plant);
+      const exposure = getExposure(plant);
+      const text = normalizeText([
+        plant.category, plant.section, plant.plant_group, plant.source_department,
+        plant.source_subdepartment, plant.category_path, plant.name, plant.common, group
+      ].join(" "));
+
+      if (/dogwood/.test(text)) {
+        return { zoneIds:["house8"], locationLabel:"Dogwoods", area:"Hoop House 8", flagColor:"#ffffff", topCategory:"Tree" };
+      }
+      if (/japanese maple|acer palmatum/.test(text)) {
+        return { zoneIds:["house7"], locationLabel:"Japanese Maples", area:"Hoop House 7", flagColor:"#e59a42", topCategory:"Tree" };
+      }
+      if (/azalea|rhododendron/.test(text)) {
+        return { zoneIds:["house4"], locationLabel:"Azaleas / Rhododendron", area:"Hoop House 4", flagColor:"#de665e", topCategory:"Shrub" };
+      }
+      if (/hydrangea/.test(text)) {
+        return { zoneIds:["house5"], locationLabel:"Hydrangeas", area:"Hoop House 5", flagColor:"#4fb3c8", topCategory:"Shrub" };
+      }
+      if (group === "Roses" || group === "Perennial Grasses" || /grass|liriope|yucca/.test(text)) {
+        return { zoneIds:["roses"], locationLabel:"Roses & Grasses", area:"Lower-right rose / grass section", flagColor:"#de665e", topCategory: group === "Roses" ? "Shrub" : "Plant" };
+      }
+      if (/rock yard|river rock|flagstone|gravel|pebble|boulder|bulk stone|mulch/.test(text)) {
+        return { zoneIds:["rock-yard"], locationLabel:"Rock Yard", area:"Left yard / bulk goods side", flagColor:"#ffffff", topCategory:"Other" };
+      }
+      if (isConiferLikeItem(plant)) {
+        return { zoneIds:["conifers"], locationLabel:"Conifers", area:"Left side conifer section", flagColor:"#e59a42", topCategory:"Tree" };
+      }
+      if (/tree|maple|oak|elm|birch|evergreen/.test(text)) {
+        return { zoneIds:["container-trees"], locationLabel:"Container Trees", area:"Upper left tree section", flagColor:"#4fb3c8", topCategory:"Tree" };
+      }
+      if (/shrub|boxwood|spirea|viburnum|weigela/.test(text)) {
+        return { zoneIds:["field-shrub"], locationLabel:"Flowering Shrubs", area:"Center field shrub area", flagColor:"#de665e", topCategory:"Shrub" };
+      }
+      if (exposure === "Shade") {
+        return { zoneIds:["shade-perennials"], locationLabel:"Shade Perennials", area:"Shade perennial yard", flagColor:"#4fb3c8", topCategory:"Plant" };
+      }
+      return { zoneIds:["sun-perennials"], locationLabel:"Sun Perennials", area:"Sun perennial yard", flagColor:"#e59a42", topCategory:"Plant" };
+    }
+
+    function normalizePlantsData(data) {
+      return data.map((plant, index) => {
+        const normalized = { ...plant };
+        normalized.id = plant.id || `plant-${index + 1}`;
+        normalized.name = normalizeSpaces(plant.name || "Unnamed Plant");
+        normalized.common = normalizeSpaces(plant.common || "");
+        normalized.genus = normalizeSpaces(plant.genus || "");
+        normalized.color = normalizeSpaces(plant.color || "");
+        normalized.size = normalizeSpaces(plant.size || "");
+        normalized.searchBlob = plantSearchBlob(normalized);
+        normalized.browserGroup = getPlantGroup(normalized);
+        normalized.exposureLabel = getExposure(normalized);
+        normalized.heightBucket = bucketHeight(normalized);
+        normalized.traits = kioskTraitsFromPlant(normalized);
+        return normalized;
+      });
+    }
+
+    function populateFilters(plants) {
+      const exposures = uniqueValues(plants.map(getExposure)).sort();
+      const groups = uniqueValues(plants.map(getPlantGroup)).sort((a, b) => a.localeCompare(b));
+      const colors = uniqueValues(plants.map(getColorLabel)).sort((a, b) => a.localeCompare(b));
+
+      els.exposureFilter.innerHTML = `<option value="">All Exposure</option>${exposures.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
+      els.groupFilter.innerHTML = `<option value="">All Plant Groups</option>${groups.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
+      els.colorFilter.innerHTML = `<option value="">All Colors</option>${colors.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
+    }
+
+    function renderTraitChips() {
+      const chips = [
+        ["shade", "Shade"],
+        ["sun", "Sun"],
+        ["pollinator-friendly", "Pollinator"],
+        ["drought-tolerant", "Drought"],
+        ["deer-resistant", "Deer"],
+        ["conifers", "Conifers"],
+        ["roses", "Roses"],
+        ["grasses", "Grasses"]
+      ];
+
+      els.traitChips.innerHTML = chips.map(([value, label]) => {
+        const active = state.activeTraits.has(value) ? " active" : "";
+        return `<button class="chip${active}" type="button" data-trait="${value}">${label}</button>`;
+      }).join("");
+
+      els.traitChips.querySelectorAll("[data-trait]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const trait = btn.dataset.trait;
+          if (state.activeTraits.has(trait)) state.activeTraits.delete(trait);
+          else state.activeTraits.add(trait);
+          renderTraitChips();
+          applyFilters();
+        });
+      });
+    }
+
+    function plantMatchesFilters(plant) {
+      const query = normalizeText(state.searchTerm);
+      if (query && !plant.searchBlob.includes(query) && normalizeText(plant.sku || "") !== query) return false;
+      if (state.exposure && getExposure(plant) !== state.exposure) return false;
+      if (state.group && getPlantGroup(plant) !== state.group) return false;
+      if (state.color && getColorLabel(plant) !== state.color) return false;
+      if (state.height && plant.heightBucket !== state.height) return false;
+      if (state.activeTraits.size && ![...state.activeTraits].every(tag => plant.traits.includes(tag))) return false;
+      return true;
+    }
+
+    function applyFilters() {
+      state.searchTerm = els.searchInput.value || "";
+      state.exposure = els.exposureFilter.value || "";
+      state.group = els.groupFilter.value || "";
+      state.color = els.colorFilter.value || "";
+      state.height = els.heightFilter.value || "";
+      state.showCount = els.showCount.value || "48";
+
+      const filtered = state.plants.filter(plantMatchesFilters);
+      state.filteredPlants = filtered;
+      renderSummaryBar(filtered);
+      renderPlantCards(filtered);
+    }
+
+    function renderSummaryBar(plants) {
+      const total = plants.length;
+      const shown = state.showCount === "all" ? total : Math.min(total, Number(state.showCount || 48));
+      const chips = [
+        `<span class="pill">${shown} of ${total} shown</span>`,
+        `<span class="pill">${state.plants.length} products loaded</span>`,
+        `<span class="pill">Dark / Light ready</span>`
+      ];
+      if (state.searchTerm) chips.push(`<span class="pill">Search: ${escapeHtml(state.searchTerm)}</span>`);
+      if (state.exposure) chips.push(`<span class="pill">Exposure: ${escapeHtml(state.exposure)}</span>`);
+      if (state.group) chips.push(`<span class="pill">Group: ${escapeHtml(state.group)}</span>`);
+      els.summaryBar.innerHTML = chips.join("");
+    }
+
+    function renderPlantCards(plants) {
+      if (!plants.length) {
+        els.results.innerHTML = `<div class="empty">No plants matched those filters. Try clearing a filter or broadening the search.</div>`;
+        return;
+      }
+
+      const count = state.showCount === "all" ? plants.length : Number(state.showCount || 48);
+      const sliced = plants.slice(0, count);
+
+      els.results.innerHTML = sliced.map(plant => {
+        const exposure = getExposure(plant);
+        const extraTags = [];
+        if (plant.pollinator) extraTags.push("Pollinator");
+        if (plant.drought) extraTags.push("Drought");
+        if (plant.deer) extraTags.push("Deer");
+        if (plant.native) extraTags.push("Native");
+        const img = plant.image || "";
+        return `
+          <article class="card">
+            <div class="card-image">
+              ${img
+                ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(plant.name || "Plant")}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>'">`
+                : `<div class="no-image">No image available</div>`}
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">${escapeHtml(plant.name || "Unnamed Plant")}</h3>
+              <div class="subline">${escapeHtml((plant.common || "") + (plant.common && plant.genus ? " • " : "") + (plant.genus || ""))}</div>
+              <div class="tag-row">
+                <span class="tag green">${escapeHtml(exposure)}</span>
+                <span class="tag">${escapeHtml(getPlantGroup(plant))}</span>
+                ${plant.size ? `<span class="tag">${escapeHtml(plant.size)}</span>` : ""}
+              </div>
+              <div class="details">
+                ${plant.size ? `Size: ${escapeHtml(plant.size)}<br>` : ""}
+                ${(plant.height || plant.width) ? `Mature size: ${escapeHtml(plant.height || "—")} × ${escapeHtml(plant.width || "—")}` : ""}
+              </div>
+              ${extraTags.length ? `<div class="tag-row">${extraTags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
+              <div class="price-row">
+                <div class="price">${escapeHtml(plant.price || "")}</div>
+                <div class="sku">SKU: ${escapeHtml(plant.sku || "—")}</div>
+              </div>
+              ${plant.link ? `<a class="btn product-btn" href="${escapeHtml(plant.link)}" target="_blank" rel="noopener noreferrer">View Product</a>` : ""}
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function setScanPanelOpen(open, { preserveScanner = false } = {}) {
+      state.scanPanelOpen = !!open;
+      els.scanPanel.dataset.open = String(!!open);
+      els.scanPanelToggle.setAttribute("aria-expanded", String(!!open));
+      els.scanPanelContent.hidden = !open;
+      if (!open && !preserveScanner) stopLiveScanner(true);
+    }
+
+    function setScanStatus(message, kind = "") {
+      els.scanStatus.className = `scan-status${kind ? " " + kind : ""}`;
+      els.scanStatus.textContent = message || "";
+    }
+
+    function updateScannerUi() {
+      if (state.scannerActive) {
+        els.startScannerBtn.disabled = true;
+        els.stopScannerBtn.disabled = false;
+        els.scannerShell.classList.add("active");
+      } else {
+        els.startScannerBtn.disabled = false;
+        els.stopScannerBtn.disabled = true;
+        els.scannerShell.classList.remove("active");
+      }
+    }
+
+    function ensureScannerLibrary() {
+      if (!window.Html5Qrcode) {
+        setScanStatus("Scanner library did not load.", "error");
+        return false;
+      }
+      return true;
+    }
+
+    async function startLiveScanner() {
+      setScanPanelOpen(true, { preserveScanner: true });
+      if (!ensureScannerLibrary()) return;
+      if (state.scannerActive) {
+        setScanStatus("Scanner is already running.", "warning");
+        return;
+      }
+      els.scannerShell.classList.add("active");
+      setScanStatus("Requesting camera access…", "");
+      try {
+        const cameras = await Html5Qrcode.getCameras();
+        if (!cameras || !cameras.length) throw new Error("No cameras found.");
+        let chosen = cameras[0];
+        const rearCam = cameras.find(c => /back|rear|environment|world/i.test(c.label || "")) || cameras[cameras.length - 1];
+        if (rearCam) chosen = rearCam;
+        state.scanner = new Html5Qrcode("reader");
+        const config = { fps: 10, qrbox: { width: 320, height: 120 }, disableFlip: false, rememberLastUsedCamera: true };
+        const onScanSuccess = async decodedText => {
+          if (state.scanLock) return;
+          state.scanLock = true;
+          try {
+            runSkuLookup(decodedText, "scanner");
+            await stopLiveScanner(true);
+          } finally {
+            setTimeout(() => { state.scanLock = false; }, 900);
+          }
+        };
+        await state.scanner.start(chosen.id, config, onScanSuccess, () => {});
+        state.scannerActive = true;
+        updateScannerUi();
+        setScanStatus(`Scanner is live. Using: ${chosen.label || "camera"}`, "success");
+      } catch (err) {
+        console.error("Scanner start failed:", err);
+        try {
+          if (state.scanner) await state.scanner.clear();
+        } catch (_) {}
+        state.scanner = null;
+        state.scannerActive = false;
+        updateScannerUi();
+        els.scannerShell.classList.remove("active");
+        setScanStatus("Could not start live scanner cleanly on this device.", "error");
+      }
+    }
+
+    async function stopLiveScanner(silent = false) {
+      if (!state.scanner) {
+        state.scannerActive = false;
+        updateScannerUi();
+        if (!silent) setScanStatus("Scanner stopped.", "warning");
+        return;
+      }
+      try {
+        if (state.scannerActive) await state.scanner.stop();
+      } catch (err) {
+        console.warn("Scanner stop warning:", err);
+      }
+      try {
+        await state.scanner.clear();
+      } catch (err) {
+        console.warn("Scanner clear warning:", err);
+      }
+      state.scanner = null;
+      state.scannerActive = false;
+      updateScannerUi();
+      if (!silent) setScanStatus("Scanner stopped.", "warning");
+    }
+
+    function runSkuLookup(value, source = "manual") {
+      const query = normalizeText(value || "");
+      if (!query) {
+        setScanStatus("Enter or scan a SKU first.", "warning");
+        return;
+      }
+
+      const plant = state.plants.find(entry => normalizeText(entry.sku || "") === query);
+      if (!plant) {
+        setScanStatus(`No SKU match found for ${value}.`, "error");
+        return;
+      }
+
+      setScanStatus(`Matched ${plant.name} (${plant.sku}) from ${source}.`, "success");
+      els.searchInput.value = plant.sku || plant.name;
+      state.searchTerm = els.searchInput.value;
+      showView("browser");
+      applyFilters();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function buildFinderItems() {
+      const plantItems = state.plants.map((plant, index) => {
+        const meta = kioskZoneMetaForPlant(plant);
+        const traits = kioskTraitsFromPlant(plant);
+        return {
+          id: `finder-${index + 1}`,
+          name: plant.name,
+          sku: plant.sku || "",
+          category: meta.topCategory || "Plant",
+          browserGroup: getPlantGroup(plant),
+          zoneIds: meta.zoneIds || [],
+          locationLabel: meta.locationLabel,
+          area: meta.area,
+          flagColor: meta.flagColor,
+          traits,
+          searchBlob: [
+            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group,
+            plant.category, plant.section, meta.locationLabel, meta.area, traits.join(" "), getExposure(plant)
+          ].join(" ").toLowerCase()
+        };
+      });
+
+      const manualItems = [
+        { id:"manual-house4", name:"Azaleas / Rhododendron", sku:"", category:"Shrub", browserGroup:"Shrubs", zoneIds:["house4"], locationLabel:"Hoop House 4", area:"Right-side hoop houses", flagColor:"#de665e", traits:["shrubs"], searchBlob:"azalea rhododendron hoop house 4 shrub" },
+        { id:"manual-house5", name:"Hydrangeas", sku:"", category:"Shrub", browserGroup:"Shrubs", zoneIds:["house5"], locationLabel:"Hoop House 5", area:"Right-side hoop houses", flagColor:"#4fb3c8", traits:["shrubs"], searchBlob:"hydrangea hoop house 5 shrub" },
+        { id:"manual-house7", name:"Japanese Maples", sku:"", category:"Tree", browserGroup:"Trees", zoneIds:["house7"], locationLabel:"Hoop House 7", area:"Right-side hoop houses", flagColor:"#e59a42", traits:["trees"], searchBlob:"japanese maple hoop house 7 tree" },
+        { id:"manual-house8", name:"Dogwoods", sku:"", category:"Tree", browserGroup:"Trees", zoneIds:["house8"], locationLabel:"Hoop House 8", area:"Right-side hoop houses", flagColor:"#ffffff", traits:["trees"], searchBlob:"dogwood hoop house 8 tree" },
+        { id:"manual-rock", name:"Rock Yard", sku:"", category:"Other", browserGroup:"Rock Yard", zoneIds:["rock-yard"], locationLabel:"Rock Yard", area:"Left yard / bulk goods side", flagColor:"#ffffff", traits:["rock-yard"], searchBlob:"rock yard bulk goods gravel stone flagstone boulder left side" }
+      ];
+
+      const dedupe = new Map();
+      [...plantItems, ...manualItems].forEach(item => {
+        const key = normalizeText(item.sku || `${item.name}|${item.locationLabel}`);
+        if (!dedupe.has(key)) dedupe.set(key, item);
+      });
+      return [...dedupe.values()].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    function sortFinderItems(items) {
+      return [...items].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    function renderFinderChips() {
+      const chips = [
+        ["trees", "Trees"],
+        ["shrubs", "Shrubs"],
+        ["shade", "Shade"],
+        ["sun", "Sun"],
+        ["conifers", "Conifers"],
+        ["roses", "Roses & Grasses"],
+        ["rock-yard", "Rock Yard"],
+        ["pollinator-friendly", "Pollinator"]
+      ];
+
+      els.finderChipRow.innerHTML = chips.map(([value, label]) => {
+        const active = state.finderTraits.has(value) ? " active" : "";
+        return `<button type="button" class="finder-chip${active}" data-finder-chip="${value}">${label}</button>`;
+      }).join("");
+
+      els.finderChipRow.querySelectorAll("[data-finder-chip]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const value = btn.dataset.finderChip;
+          if (state.finderTraits.has(value)) state.finderTraits.delete(value);
+          else state.finderTraits.add(value);
+          renderFinderChips();
+          applyFinderFilters();
+        });
+      });
+    }
+
+    function finderMatches(item, query, category, pickedTraits) {
+      if (query && !String(item.searchBlob || "").includes(query) && normalizeText(item.sku || "") !== query) return false;
+
+      if (category) {
+        const cat = normalizeText(category);
+        if (cat === "trees" && item.category !== "Tree" && item.category !== "Tree/Shrub") return false;
+        if (cat === "shrubs" && item.category !== "Shrub" && item.category !== "Tree/Shrub") return false;
+        if (cat === "conifers" && item.browserGroup !== "Conifers" && !(item.traits || []).includes("conifers")) return false;
+        if (cat === "roses" && item.browserGroup !== "Roses" && item.browserGroup !== "Perennial Grasses" && !(item.traits || []).includes("roses") && !(item.traits || []).includes("grasses")) return false;
+        if (cat === "rock yard" || cat === "rock-yard") {
+          if (item.browserGroup !== "Rock Yard" && !(item.traits || []).includes("rock-yard")) return false;
+        }
+        if (cat === "shade" && !(item.traits || []).includes("shade")) return false;
+        if (cat === "sun" && !(item.traits || []).includes("sun")) return false;
+      }
+
+      const picked = [...pickedTraits];
+      if (!picked.length) return true;
+      return picked.every(tag => (item.traits || []).includes(tag) || normalizeText(item.category).includes(tag));
+    }
+
+    function buildDetailHtml(item, mode = "finder") {
+      const tags = uniqueValues([
+        ...(item.zoneIds || []).map(zoneId => zoneTitle(zoneId)),
+        ...(item.traits || []).map(tag => titleCase(tag.replace(/-/g, " "))),
+      ]);
+
+      return `
+        <h3>${escapeHtml(item.name)}</h3>
+        <p class="${mode === "finder" ? "finder-note" : "kiosk-lead"}">${escapeHtml(item.locationLabel || "Nursery location")}${item.area ? ` • ${escapeHtml(item.area)}` : ""}</p>
+        ${item.sku ? `<div class="finder-meta">SKU: ${escapeHtml(item.sku)}</div>` : ""}
+        <div class="detail-tag-row">${tags.map(tag => `<span class="location-badge">${escapeHtml(tag)}</span>`).join("") || `<span class="location-badge">General lookup</span>`}</div>
+        <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
+        <div class="detail-actions">
+          <a class="map-link" href="${escapeHtml(withSatelliteView(NURSERY_MAPS_LINK))}" target="_blank" rel="noopener noreferrer">Open Google Maps</a>
+          <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy quick line</button>
+        </div>
+      `;
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        console.warn("Clipboard warning:", err);
+      }
+    }
+
+    function wireCopyButtons(root) {
+      root.querySelectorAll("[data-copy-line]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await copyText(btn.dataset.copyLine || "");
+          btn.textContent = "Copied";
+          setTimeout(() => { btn.textContent = "Copy quick line"; }, 900);
+        });
+      });
+    }
+
+    function renderFlagLegend() {
+      const items = [
+        { label:"Red field flag", color:"#de665e" },
+        { label:"Orange field flag", color:"#e59a42" },
+        { label:"Teal field flag", color:"#4fb3c8" },
+        { label:"White field flag", color:"#ffffff" }
+      ];
+      els.flagLegend.innerHTML = items.map(item => `
+        <span class="flag-chip">
+          <span class="mini-flag${item.color === '#ffffff' ? ' white' : ''}" style="color:${item.color}"></span>
+          ${item.label}
+        </span>
+      `).join("") + `<span class="flag-chip flag-chip-note">Zone highlighting stays interactive for plant lookup.</span>`;
+    }
+
+    function renderDefinitions() {
+      els.definitionsGrid.innerHTML = NURSERY_NOTES.map(note => `
+        <article class="def-card">
+          <h3>${escapeHtml(note.title)}</h3>
+          <p>${escapeHtml(note.copy)}</p>
+        </article>
+      `).join("");
+    }
+
+    function labelSvg(x, y, text, size = 14, weight = 800, fill = "var(--map-text)") {
+      return `<text x="${x}" y="${y}" fill="${fill}" font-size="${size}" font-weight="${weight}" font-family="Inter, Segoe UI, Arial, sans-serif">${escapeHtml(text)}</text>`;
+    }
+
+    function zoneRect(zone, activeIds = []) {
+      const active = activeIds.includes(zone.id);
+      const cx = zone.x + zone.w / 2;
+      const cy = zone.y + zone.h / 2;
+      return `
+        <g data-zone="${zone.id}">
+          <rect class="map-zone-shape${active ? " active" : ""}" x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="18" ry="18"></rect>
+          <text class="map-label" x="${cx}" y="${cy - 4}">${escapeHtml(zone.title)}</text>
+          <text class="map-small" x="${cx}" y="${cy + 22}">${escapeHtml(zone.subtitle || "")}</text>
+          <g transform="translate(${zone.x + zone.w - 26}, ${zone.y + 14})">
+            <polygon points="0,0 14,7 0,14" fill="${zone.color || "#fff"}" ${zone.color === "#ffffff" ? 'stroke="rgba(0,0,0,.45)" stroke-width="1"' : ""}></polygon>
+          </g>
+        </g>
+      `;
+    }
+
+    function overviewMapSvg(activeIds = []) {
+      return `
+        <svg viewBox="0 0 930 690" role="img" aria-label="Nursery overview map">
+          <rect x="18" y="18" rx="30" ry="30" width="894" height="654" fill="none" stroke="var(--map-divider)" stroke-width="2"></rect>
+          <rect class="map-soft" x="722" y="60" rx="22" ry="22" width="194" height="450"></rect>
+          <text class="map-static" x="775" y="45">Hoop Houses</text>
+          ${labelSvg(54, 368, "Employees Only", 14, 800, "var(--text-muted)")}
+          ${labelSvg(458, 652, "Perennials / checkout side", 16, 900, "var(--text-muted)")}
+          ${MAP_ZONES.map(zone => zoneRect(zone, activeIds)).join("")}
+          <circle cx="610" cy="652" r="12" fill="#de665e" stroke="rgba(24,36,53,.55)" stroke-width="3"></circle>
+          <circle cx="610" cy="652" r="24" fill="rgba(223,79,74,.13)"></circle>
+          <text x="590" y="683" fill="#de665e" font-size="16" font-weight="900" font-family="Inter, Segoe UI, Arial, sans-serif">You are here</text>
+        </svg>
+      `;
+    }
+
+    function detailMapSvg(zoneId) {
+      const zone = MAP_ZONES.find(entry => entry.id === zoneId) || null;
+      if (!zone) {
+        return `<div class="empty">Select a plant or tap a zone to zoom into that section.</div>`;
+      }
+      return `
+        <svg viewBox="${Math.max(zone.x - 30, 0)} ${Math.max(zone.y - 24, 0)} ${Math.min(zone.w + 60, 420)} ${Math.min(zone.h + 60, 260)}" role="img" aria-label="${escapeHtml(zone.title)} closer look">
+          ${zoneRect(zone, [zone.id])}
+          ${labelSvg(zone.x + 18, zone.y - 8, zone.title, 18, 900)}
+        </svg>
+      `;
+    }
+
+    function bindMapZoneClicks(root) {
+      root.querySelectorAll("[data-zone]").forEach(el => {
+        el.addEventListener("click", () => handleZoneClick(el.dataset.zone));
+      });
+    }
+
+    function renderFinderMaps(zoneIds = [], contextItems = []) {
+      const active = zoneIds.length ? zoneIds : state.selectedZoneIds;
+      els.overviewMapBoard.innerHTML = overviewMapSvg(active);
+      bindMapZoneClicks(els.overviewMapBoard);
+
+      const detailZone = active[0] || "";
+      els.detailMapBoard.innerHTML = detailMapSvg(detailZone);
+      bindMapZoneClicks(els.detailMapBoard);
+
+      els.overviewMapCaption.textContent = active.length
+        ? `Selected area: ${zoneTitle(active[0])}. The full nursery stays visible while the destination stays highlighted.`
+        : "The full nursery stays visible while the selected destination stays highlighted.";
+
+      els.detailMapCaption.textContent = detailZone
+        ? `Closer look: ${zoneTitle(detailZone)}.`
+        : "Select a plant or tap a zone to zoom into that section.";
+    }
+
+    function renderFinderResults() {
+      if (!state.finderResults.length) {
+        els.finderResults.innerHTML = `<div class="empty">No nursery matches found. Try a broader plant name, SKU, or clear a filter.</div>`;
+        return;
+      }
+
+      els.finderResults.innerHTML = state.finderResults.map(item => {
+        const active = state.selectedFinderId === item.id ? " active" : "";
+        const flagColor = item.flagColor || "#7bd05f";
+        return `
+          <button class="finder-card${active}" type="button" data-finder-id="${escapeHtml(item.id)}">
+            <div class="topline">
+              <div>
+                <div class="flag-inline"><span class="mini-flag${flagColor === '#ffffff' ? ' white' : ''}" style="color:${flagColor}"></span>${escapeHtml(item.locationLabel || "Nursery location")}</div>
+                <h3>${escapeHtml(item.name)}</h3>
+              </div>
+              ${item.sku ? `<div class="sku">SKU: ${escapeHtml(item.sku)}</div>` : ""}
+            </div>
+            <div class="finder-meta">${escapeHtml(item.area || "")}</div>
+            <div class="finder-tag-row">
+              ${(item.zoneIds || []).map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("")}
+            </div>
+            <div class="details-text">${escapeHtml(directionFromZone(item))}</div>
+          </button>
+        `;
+      }).join("");
+
+      els.finderResults.querySelectorAll("[data-finder-id]").forEach(btn => {
+        btn.addEventListener("click", () => selectFinderItem(btn.dataset.finderId));
+      });
+    }
+
+    function selectFinderItem(itemId) {
+      const item = state.finderResults.find(entry => entry.id === itemId) || buildFinderItems().find(entry => entry.id === itemId);
+      if (!item) return;
+      state.selectedFinderId = item.id;
+      state.selectedZoneIds = (item.zoneIds || []).slice();
+      renderFinderResults();
+      renderFinderMaps(item.zoneIds || [], [item]);
+      els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
+      wireCopyButtons(els.locationDetails);
+    }
+
+    function handleZoneClick(zoneId) {
+      const zone = MAP_ZONES.find(entry => entry.id === zoneId);
+      if (!zone) return;
+      const directItem = state.finderResults.find(entry => (entry.zoneIds || []).includes(zoneId)) || {
+        id:`zone-${zoneId}`,
+        name: zone.title,
+        sku: "",
+        locationLabel: zone.title,
+        area: zone.subtitle || "",
+        zoneIds: [zone.id],
+        flagColor: zone.color,
+        traits: []
+      };
+      state.selectedFinderId = directItem.id;
+      state.selectedZoneIds = [zoneId];
+      renderFinderResults();
+      renderFinderMaps([zoneId], [directItem]);
+      els.locationDetails.innerHTML = buildDetailHtml(directItem, "finder");
+      wireCopyButtons(els.locationDetails);
+    }
+
+    function applyFinderFilters() {
+      state.finderQuery = normalizeText(els.finderSearch.value);
+      state.finderCategory = els.finderCategory.value;
+      const allItems = buildFinderItems();
+
+      state.finderResults = sortFinderItems(
+        allItems.filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits))
+      );
+
+      const stillSelected = state.selectedFinderId &&
+        state.finderResults.some(item => item.id === state.selectedFinderId);
+
+      if (stillSelected) {
+        renderFinderResults();
+        selectFinderItem(state.selectedFinderId);
+        return;
+      }
+
+      if (state.finderResults.length) {
+        const nextItem = state.finderResults[0];
+        state.selectedFinderId = nextItem.id;
+        state.selectedZoneIds = (nextItem.zoneIds || []).slice();
+        renderFinderResults();
+        renderFinderMaps(nextItem.zoneIds || [], [nextItem]);
+        els.locationDetails.innerHTML = buildDetailHtml(nextItem, "finder");
+        wireCopyButtons(els.locationDetails);
+        return;
+      }
+
+      state.selectedFinderId = "";
+      state.selectedZoneIds = [];
+      renderFinderResults();
+      renderFinderMaps([], []);
+      els.locationDetails.innerHTML = `
+        <h3>No match selected</h3>
+        <p class="finder-note">No nursery matches found. Try a broader plant name, SKU, or clear a filter.</p>
+      `;
+    }
+
+    function clearFinder() {
+      els.finderSearch.value = "";
+      els.finderCategory.value = "";
+      state.finderQuery = "";
+      state.finderCategory = "";
+      state.finderTraits.clear();
+      renderFinderChips();
+      applyFinderFilters();
+    }
+
+    function getKioskItems() {
+      const allItems = buildFinderItems();
+      const query = normalizeText(els.kioskSearch.value || "");
+      const picked = state.kioskTrait || "";
+
+      const filtered = allItems.filter(item => {
+        const blob = String(item.searchBlob || "").toLowerCase();
+        const group = String(item.browserGroup || item.category || "");
+        const sku = String(item.sku || "");
+        if (query && !blob.includes(query) && normalizeText(sku) !== query) return false;
+        if (!picked) return true;
+        if (picked === "Tree") return item.category === "Tree" || item.category === "Tree/Shrub";
+        if (picked === "Shrub") return item.category === "Shrub" || item.category === "Tree/Shrub";
+        if (picked === "conifers") return group === "Conifers" || (item.traits || []).includes("conifers");
+        if (picked === "roses") return group === "Roses" || (item.traits || []).includes("roses");
+        if (picked === "grasses") return group === "Perennial Grasses" || (item.traits || []).includes("grasses");
+        if (picked === "rock-yard") return group === "Rock Yard" || (item.traits || []).includes("rock-yard");
+        if (picked === "shade") return (item.traits || []).includes("shade");
+        if (picked === "pollinator-friendly") return (item.traits || []).includes("pollinator-friendly");
+        return true;
+      });
+
+      return sortFinderItems(filtered);
+    }
+
+    function renderKioskActions() {
+      const actions = [
+        { label:"All Plants", value:"" },
+        { label:"Trees", value:"Tree" },
+        { label:"Shrubs", value:"Shrub" },
+        { label:"Shade", value:"shade" },
+        { label:"Conifers", value:"conifers" },
+        { label:"Roses", value:"roses" },
+        { label:"Grasses", value:"grasses" },
+        { label:"Pollinator", value:"pollinator-friendly" }
+      ];
+
+      const hasQuery = !!normalizeText(els.kioskSearch.value || "");
+      const hasFilter = !!state.kioskTrait;
+      if (hasQuery || hasFilter) actions.push({ label:"Clear Search", value:"__clear__" });
+
+      els.kioskActions.innerHTML = actions.map(action => {
+        const active = state.kioskTrait === action.value || (action.value === "__clear__" && (hasQuery || hasFilter)) ? " active" : "";
+        return `<button type="button" class="kiosk-btn${active}" data-kiosk-value="${escapeHtml(action.value)}">${escapeHtml(action.label)}</button>`;
+      }).join("");
+
+      els.kioskActions.querySelectorAll("[data-kiosk-value]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const value = btn.dataset.kioskValue;
+          if (value === "__clear__") {
+            els.kioskSearch.value = "";
+            state.kioskTrait = "";
+          } else {
+            state.kioskTrait = value;
+          }
+          renderKioskActions();
+          applyKioskFilters();
+        });
+      });
+    }
+
+    function renderKioskMap(item) {
+      if (!item) {
+        els.kioskMapBoard.innerHTML = overviewMapSvg([]);
+        bindMapZoneClicks(els.kioskMapBoard);
+        return;
+      }
+      els.kioskMapBoard.innerHTML = overviewMapSvg(item.zoneIds || []);
+      bindMapZoneClicks(els.kioskMapBoard);
+    }
+
+    function renderKioskDetail(item) {
+      if (!item) {
+        els.kioskDetailPanel.innerHTML = `
+          <h2>Directions</h2>
+          <p class="kiosk-lead">No kiosk result is selected yet. Search by plant name or use the quick buttons to narrow the answer.</p>
+        `;
+        renderKioskMap(null);
+        return;
+      }
+      els.kioskDetailPanel.innerHTML = buildDetailHtml(item, "kiosk");
+      wireCopyButtons(els.kioskDetailPanel);
+      renderKioskMap(item);
+    }
+
+    function renderKioskResults() {
+      if (!state.kioskResults.length) {
+        els.kioskResults.innerHTML = `<div class="empty">No matches in kiosk mode. Try another search or clear a quick filter.</div>`;
+        renderKioskDetail(null);
+        return;
+      }
+
+      els.kioskResults.innerHTML = state.kioskResults.map(item => {
+        const active = state.selectedKioskId === item.id ? " active" : "";
+        return `
+          <button class="kiosk-card${active}" type="button" data-kiosk-id="${escapeHtml(item.id)}">
+            <div class="topline">
+              <div>
+                <h3>${escapeHtml(item.name)}</h3>
+                <div class="kiosk-meta">${escapeHtml(item.locationLabel || "")}${item.area ? ` • ${escapeHtml(item.area)}` : ""}</div>
+              </div>
+              ${item.sku ? `<div class="sku">SKU: ${escapeHtml(item.sku)}</div>` : ""}
+            </div>
+            <div class="finder-tag-row">
+              ${(item.zoneIds || []).map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("")}
+            </div>
+            <div class="details-text">${escapeHtml(directionFromZone(item))}</div>
+          </button>
+        `;
+      }).join("");
+
+      els.kioskResults.querySelectorAll("[data-kiosk-id]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const item = state.kioskResults.find(entry => entry.id === btn.dataset.kioskId);
+          if (!item) return;
+          state.selectedKioskId = item.id;
+          renderKioskResults();
+          renderKioskDetail(item);
+        });
+      });
+    }
+
+    function applyKioskFilters() {
+      state.kioskResults = getKioskItems();
+
+      let selected = state.kioskResults.find(item => item.id === state.selectedKioskId) || null;
+      if (!selected && state.kioskResults.length) {
+        selected = state.kioskResults[0];
+        state.selectedKioskId = selected.id;
+      }
+      if (!selected) {
+        state.selectedKioskId = "";
+        renderKioskResults();
+        return;
+      }
+
+      renderKioskResults();
+      renderKioskDetail(selected);
+    }
+
+    function setTheme(theme) {
+      state.theme = theme === "light" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", state.theme);
+      localStorage.setItem("suburban-theme", state.theme);
+      els.themeToggle.textContent = `Dark / Light: ${state.theme === "dark" ? "Dark" : "Light"}`;
+    }
+
+    function showView(view) {
+      state.currentView = view;
+      els.browserView.hidden = view !== "browser";
+      els.finderView.hidden = view !== "finder";
+      els.kioskView.hidden = view !== "kiosk";
+      els.viewTabs.forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
+      if (view === "finder") applyFinderFilters();
+      if (view === "kiosk") applyKioskFilters();
+    }
+
+    function syncMobileMapUi() {
+      if (window.innerWidth > 900 && els.legendDisclosure) {
+        els.legendDisclosure.open = true;
+      }
+    }
+
+    function jumpMapFocus(focus) {
+      const idsByFocus = {
+        left: ["conifers", "rock-yard"],
+        center: ["field-shrub"],
+        houses: ["house4"],
+        perennials: ["shade-perennials"]
+      };
+      const zoneId = (idsByFocus[focus] || [])[0];
+      if (zoneId) handleZoneClick(zoneId);
+    }
+
+    async function loadPlants() {
+      try {
+        const res = await fetch("./plants.json", { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        state.plants = normalizePlantsData(Array.isArray(data) ? data : []);
+        populateFilters(state.plants);
+        renderTraitChips();
+        applyFilters();
+        renderDefinitions();
+        renderFlagLegend();
+        renderFinderChips();
+        renderFinderMaps([], []);
+        applyFinderFilters();
+        renderKioskActions();
+        renderKioskMap(null);
+        applyKioskFilters();
+      } catch (err) {
+        console.error(err);
+        els.summaryBar.innerHTML = `<span class="pill">Failed to load plants</span>`;
+        els.results.innerHTML = `<div class="empty">Could not load <code>plants.json</code>. ${escapeHtml(err.message)}</div>`;
+        els.finderResults.innerHTML = `<div class="empty">Finder data could not load because plants.json failed.</div>`;
+        els.kioskResults.innerHTML = `<div class="empty">Kiosk data could not load because plants.json failed.</div>`;
+      }
+    }
+
+    function wireEvents() {
+      els.themeToggle.addEventListener("click", () => {
+        setTheme(state.theme === "dark" ? "light" : "dark");
+      });
+
+      els.viewTabs.forEach(btn => {
+        btn.addEventListener("click", () => showView(btn.dataset.view));
+      });
+
+      els.searchInput.addEventListener("input", applyFilters);
+      els.exposureFilter.addEventListener("change", applyFilters);
+      els.groupFilter.addEventListener("change", applyFilters);
+      els.colorFilter.addEventListener("change", applyFilters);
+      els.heightFilter.addEventListener("change", applyFilters);
+      els.showCount.addEventListener("change", applyFilters);
+      els.clearFilters.addEventListener("click", () => {
+        els.searchInput.value = "";
+        els.exposureFilter.value = "";
+        els.groupFilter.value = "";
+        els.colorFilter.value = "";
+        els.heightFilter.value = "";
+        els.showCount.value = "48";
+        state.activeTraits.clear();
+        renderTraitChips();
+        applyFilters();
+      });
+
+      els.scanPanelToggle.addEventListener("click", () => {
+        setScanPanelOpen(!state.scanPanelOpen);
+      });
+      els.findSkuBtn.addEventListener("click", () => runSkuLookup(els.scanSkuInput.value, "manual"));
+      els.startScannerBtn.addEventListener("click", () => { startLiveScanner(); });
+      els.stopScannerBtn.addEventListener("click", () => { stopLiveScanner(false); });
+
+      els.scanSkuInput.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          runSkuLookup(els.scanSkuInput.value, "manual");
+        }
+      });
+
+      els.finderSearch.addEventListener("input", applyFinderFilters);
+      els.finderCategory.addEventListener("change", applyFinderFilters);
+      els.finderClearBtn.addEventListener("click", clearFinder);
+      els.zoneJumpButtons.forEach(btn => {
+        btn.addEventListener("click", () => handleZoneClick(btn.dataset.zoneJump));
+      });
+
+      els.mobileMapTools?.querySelectorAll("[data-map-focus]").forEach(btn => {
+        btn.addEventListener("click", () => jumpMapFocus(btn.dataset.mapFocus));
+      });
+
+      window.addEventListener("resize", syncMobileMapUi);
+
+      els.kioskSearch.addEventListener("input", () => {
+        renderKioskActions();
+        applyKioskFilters();
+      });
+
+      els.kioskOpenLargeMap?.addEventListener("click", () => {
+        const item = getKioskItems().find(entry => entry.id === state.selectedKioskId);
+        if (!item) return;
+        showView("finder");
+        const mappedFinder = buildFinderItems().find(entry => normalizeText(entry.name) === normalizeText(item.name)) || null;
+        if (mappedFinder) {
+          state.selectedFinderId = mappedFinder.id;
+          applyFinderFilters();
+          selectFinderItem(mappedFinder.id);
+        } else {
+          renderFinderMaps(item.zoneIds || [], [item]);
+          els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
+          wireCopyButtons(els.locationDetails);
+        }
+        els.finderView?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+
+    setTheme(state.theme);
+    wireEvents();
+    syncMobileMapUi();
+    showView("browser");
+    loadPlants();
+  </script>
 </body>
 </html>
