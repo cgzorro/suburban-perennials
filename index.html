@@ -168,9 +168,9 @@
       width: 100%;
       overflow-x: auto;
       overflow-y: hidden;
-      padding: 2px 28px 6px 0;
+      padding: 2px 24px 6px 0;
       margin: 0;
-      scroll-padding-right: 28px;
+      scroll-padding-right: 24px;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
@@ -191,7 +191,7 @@
       border: 1px solid var(--border);
       color: var(--text);
       cursor: pointer;
-      transition: background .18s ease, border-color .18s ease, color .18s ease, opacity .18s ease, transform .18s ease;
+      transition: background .18s ease, border-color .18s ease, color .18s ease, opacity .18s ease, transform .18s ease, box-shadow .18s ease;
     }
 
     .theme-toggle {
@@ -203,6 +203,34 @@
       padding: 12px 16px;
       font-weight: 800;
       white-space: nowrap;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .theme-toggle-inner,
+    .tab-content {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .theme-icon,
+    .tab-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      width: 22px;
+      height: 22px;
+      opacity: 0.98;
+    }
+
+    .theme-icon svg,
+    .tab-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .view-tab {
@@ -210,18 +238,29 @@
         linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
         var(--bg-soft);
       border-radius: 999px;
-      padding: 8px 10px;
+      padding: 10px 14px;
       font-weight: 800;
       white-space: nowrap;
       flex: 0 0 auto;
       min-width: max-content;
-      font-size: .84rem;
+      font-size: .88rem;
       line-height: 1;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .view-tab:hover,
+    .theme-toggle:hover {
+      transform: translateY(-1px);
     }
 
     .view-tab.active {
-      background: var(--accent);
+      background: linear-gradient(180deg, var(--accent-2), var(--accent));
       border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(91, 173, 79, 0.22), inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+
+    .view-tab.active .tab-icon {
       color: #fff;
     }
 
@@ -1190,9 +1229,9 @@
       .view-tabs {
         justify-content: flex-start;
         flex-wrap: nowrap;
-        gap: 3px;
-        padding: 2px 32px 6px 0;
-        scroll-padding-right: 32px;
+        gap: 4px;
+        padding: 2px 26px 6px 0;
+        scroll-padding-right: 26px;
       }
       .controls-wrap,
       .panel {
@@ -1227,8 +1266,15 @@
         font-size: .86rem;
       }
       .view-tab {
-        padding: 7px 9px;
-        font-size: .80rem;
+        padding: 9px 12px;
+        font-size: .84rem;
+      }
+      .tab-content {
+        gap: 8px;
+      }
+      .tab-icon {
+        width: 20px;
+        height: 20px;
       }
       .results-grid {
         grid-template-columns: 1fr;
@@ -1769,12 +1815,66 @@
       <div class="hero-actions">
         <div class="view-tabs-shell">
           <div class="view-tabs" role="tablist" aria-label="App views">
-            <button id="tabBrowser" class="view-tab active" type="button" data-view="browser">Plant Browser</button>
-            <button id="tabFinder" class="view-tab" type="button" data-view="finder">Nursery Finder</button>
-            <button id="tabKiosk" class="view-tab" type="button" data-view="kiosk">Customer Kiosk</button>
+            <button id="tabBrowser" class="view-tab active" type="button" data-view="browser">
+              <span class="tab-content">
+                <span class="tab-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 21V11"/>
+                    <path d="M7 21c0-4 2-7 5-10"/>
+                    <path d="M17 21c0-4-2-7-5-10"/>
+                    <path d="M4 10c3 0 5 1 8 4"/>
+                    <path d="M20 10c-3 0-5 1-8 4"/>
+                  </svg>
+                </span>
+                <span class="tab-label">Plant Browser</span>
+              </span>
+            </button>
+            <button id="tabFinder" class="view-tab" type="button" data-view="finder">
+              <span class="tab-content">
+                <span class="tab-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6l7-2 4 2 7-2v14l-7 2-4-2-7 2V6z"/>
+                    <path d="M10 4v14"/>
+                    <path d="M14 6v14"/>
+                  </svg>
+                </span>
+                <span class="tab-label">Nursery Finder</span>
+              </span>
+            </button>
+            <button id="tabKiosk" class="view-tab" type="button" data-view="kiosk">
+              <span class="tab-content">
+                <span class="tab-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 10l8-6 8 6"/>
+                    <path d="M5 10h14v10H5z"/>
+                    <path d="M9 20v-4h6v4"/>
+                    <path d="M7.5 12.5h.01"/>
+                    <path d="M16.5 12.5h.01"/>
+                  </svg>
+                </span>
+                <span class="tab-label">Customer Kiosk</span>
+              </span>
+            </button>
           </div>
         </div>
-        <button id="themeToggle" class="theme-toggle" type="button">Dark / Light: Dark</button>
+        <button id="themeToggle" class="theme-toggle" type="button">
+          <span class="theme-toggle-inner">
+            <span class="theme-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2"/>
+                <path d="M12 20v2"/>
+                <path d="M4.93 4.93l1.41 1.41"/>
+                <path d="M17.66 17.66l1.41 1.41"/>
+                <path d="M2 12h2"/>
+                <path d="M20 12h2"/>
+                <path d="M4.93 19.07l1.41-1.41"/>
+                <path d="M17.66 6.34l1.41-1.41"/>
+              </svg>
+            </span>
+            <span>Dark / Light: Dark</span>
+          </span>
+        </button>
       </div>
     </section>
 
