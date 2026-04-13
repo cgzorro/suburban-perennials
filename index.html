@@ -715,6 +715,26 @@
       padding-right: 2px;
     }
 
+    .finder-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .finder-summary .pill.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .quick-links-label {
+      margin: 8px 0 10px;
+      font-size: .92rem;
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+
     .finder-card,
     .kiosk-card {
       border-radius: 22px;
@@ -763,6 +783,13 @@
       color: var(--text-muted);
       line-height: 1.4;
       font-size: .96rem;
+    }
+
+    .finder-card .details-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .map-shell {
@@ -1210,6 +1237,9 @@
       .kiosk-card .details-text,
       .def-card p {
         font-size: .9rem;
+      }
+      .finder-summary {
+        gap: 8px;
       }
       #reader { min-height: 280px; }
       .map-label { font-size: 17px; }
@@ -1945,12 +1975,13 @@
           </div>
 
           <div class="finder-actions">
-            <button id="finderClearBtn" class="btn" type="button">Clear</button>
+            <button id="finderClearBtn" class="btn" type="button">Reset finder</button>
             <a class="map-link" href="https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&amp;g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Open property in Google Maps</a>
           </div>
         </div>
 
         <div class="finder-chip-row" id="finderTraitChips"></div>
+        <div class="finder-summary" id="finderSummary"></div>
       </section>
 
       <div class="finder-layout">
@@ -1984,6 +2015,7 @@
 
             <p class="map-help mobile-swipe-note">Swipe the map horizontally on mobile. Use the quick jump buttons if you want to move straight to hoop houses or perennials.</p>
 
+            <p class="quick-links-label">Popular destination jumps</p>
             <div class="map-help-row quick-links">
               <button type="button" class="location-btn" data-zone-jump="house4">Azaleas / Rhododendron</button>
               <button type="button" class="location-btn" data-zone-jump="house5">Hydrangeas</button>
@@ -2421,6 +2453,7 @@
       finderSearch: document.getElementById("finderSearch"),
       finderCategory: document.getElementById("finderCategory"),
       finderTraitChips: document.getElementById("finderTraitChips"),
+      finderSummary: document.getElementById("finderSummary"),
       finderResults: document.getElementById("finderResults"),
       finderClearBtn: document.getElementById("finderClearBtn"),
       flagLegend: document.getElementById("flagLegend"),
@@ -3629,8 +3662,42 @@ function renderDefinitions() {
       });
     }
 
+    function updateFinderSummary() {
+      if (!els.finderSummary) return;
+      const pills = [];
+      const count = state.finderResults.length;
+      pills.push(`<span class="pill">${count} ${count === 1 ? "match" : "matches"}</span>`);
+
+      if (state.finderQuery) {
+        pills.push(`<span class="pill">Search: ${escapeHtml(els.finderSearch.value.trim() || "Active")}</span>`);
+      }
+      if (state.finderCategory) {
+        pills.push(`<span class="pill">${escapeHtml(state.finderCategory)}</span>`);
+      }
+      if (state.finderTraits.size) {
+        pills.push(`<span class="pill">${state.finderTraits.size} trait ${state.finderTraits.size === 1 ? "filter" : "filters"}</span>`);
+      }
+
+      const selectedItem = state.selectedFinderId ? NURSERY_ITEMS.find(entry => entry.id === state.selectedFinderId) : null;
+      if (selectedItem) {
+        pills.push(`<span class="pill active">Selected: ${escapeHtml(selectedItem.name)}</span>`);
+      } else if (state.selectedZoneIds.length === 1) {
+        pills.push(`<span class="pill active">Zone: ${escapeHtml(zoneTitle(state.selectedZoneIds[0]))}</span>`);
+      } else {
+        pills.push(`<span class="pill">Tap a result to highlight it</span>`);
+      }
+
+      els.finderSummary.innerHTML = pills.join("");
+    }
+
+    function nudgeFinderDetailsIntoView() {
+      if (window.innerWidth > 900 || !els.locationDetails) return;
+      els.locationDetails.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
     function renderFinderResults() {
       const results = state.finderResults;
+      updateFinderSummary();
       if (!results.length) {
         els.finderResults.innerHTML = `<div class="empty">No nursery matches found. Try a different plant name or clear a filter.</div>`;
         return;
@@ -3685,7 +3752,7 @@ function renderDefinitions() {
         ${extraNote}
         <div class="detail-actions">
           ${link}
-          <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Quick line</button>
+          <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy directions</button>
         </div>
       `;
     }
@@ -3697,10 +3764,10 @@ function renderDefinitions() {
           try {
             await navigator.clipboard.writeText(text);
             btn.textContent = "Copied";
-            setTimeout(() => { btn.textContent = "Quick line"; }, 1200);
+            setTimeout(() => { btn.textContent = "Copy directions"; }, 1200);
           } catch (_) {
             btn.textContent = "Copy failed";
-            setTimeout(() => { btn.textContent = "Quick line"; }, 1200);
+            setTimeout(() => { btn.textContent = "Copy directions"; }, 1200);
           }
         });
       });
@@ -3715,9 +3782,12 @@ function renderDefinitions() {
       renderFinderMaps(item.zoneIds, [item]);
       els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
       wireCopyButtons(els.locationDetails);
+      updateFinderSummary();
+      nudgeFinderDetailsIntoView();
     }
 
     function handleZoneClick(zoneId) {
+      state.selectedFinderId = "";
       state.selectedZoneIds = [zoneId];
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
       renderFinderMaps([zoneId], matches.slice(0, 6));
@@ -3727,6 +3797,8 @@ function renderDefinitions() {
           <h3>${escapeHtml(zoneName)}</h3>
           <p class="finder-note">No mapped plants are assigned to this zone yet, but the zone is available on the digital map.</p>
         `;
+        updateFinderSummary();
+        nudgeFinderDetailsIntoView();
         return;
       }
       els.locationDetails.innerHTML = `
@@ -3735,6 +3807,8 @@ function renderDefinitions() {
         <div class="detail-tag-row">${matches.slice(0, 14).map(item => `<span class="location-badge">${escapeHtml(item.name)}</span>`).join("")}</div>
         <p class="zone-directions">${escapeHtml(directionFromZone(matches[0]))}</p>
       `;
+      updateFinderSummary();
+      nudgeFinderDetailsIntoView();
     }
 
     function applyFinderFilters() {
@@ -3764,6 +3838,7 @@ function renderDefinitions() {
       applyFinderFilters();
       renderFinderMaps([], []);
       els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel shows the location, any flag cue from the sheets, and a short direction line you can use with customers on the floor.</p>`;
+      updateFinderSummary();
     }
 
     function renderKioskActions() {
