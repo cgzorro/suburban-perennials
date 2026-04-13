@@ -2512,6 +2512,7 @@
       selectedFinderId: "",
       selectedFlagId: "",
       selectedZoneIds: [],
+      finderZoneFilterId: "",
       kioskQuery: "",
       kioskTrait: "",
       kioskResults: [],
@@ -4072,12 +4073,12 @@ function renderDefinitions() {
     }
 
     function handleZoneClick(zoneId) {
+      state.finderZoneFilterId = zoneId;
       state.selectedFinderId = "";
       state.selectedFlagId = "";
       state.selectedZoneIds = [zoneId];
-      const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
-      renderFinderResults();
-      renderFinderMaps([zoneId], "");
+      applyFinderFilters();
+      const matches = state.finderResults;
       const zoneName = zoneTitle(zoneId);
       if (!matches.length) {
         els.locationDetails.innerHTML = `
@@ -4106,14 +4107,12 @@ function renderDefinitions() {
       if (!marker) return;
 
       const primaryZoneIds = uniqueValues([(marker.primaryZoneId || marker.zoneIds?.[0] || "")].filter(Boolean));
-      const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(primaryZoneIds[0])));
-
+      state.finderZoneFilterId = primaryZoneIds[0] || "";
       state.selectedFinderId = "";
       state.selectedFlagId = marker.id;
       state.selectedZoneIds = primaryZoneIds;
-
-      renderFinderResults();
-      renderFinderMaps(primaryZoneIds, marker.id);
+      applyFinderFilters();
+      const matches = state.finderResults;
 
       els.locationDetails.innerHTML = `
         <h3>${escapeHtml(titleCase(marker.color))} flag</h3>
@@ -4129,7 +4128,11 @@ function renderDefinitions() {
     function applyFinderFilters() {
       state.finderQuery = normalizeText(els.finderSearch.value);
       state.finderCategory = els.finderCategory.value;
-      state.finderResults = sortFinderItems(NURSERY_ITEMS.filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits)));
+      const filteredBase = NURSERY_ITEMS.filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits));
+      const zoneFiltered = state.finderZoneFilterId
+        ? filteredBase.filter(item => item.zoneIds.includes(state.finderZoneFilterId))
+        : filteredBase;
+      state.finderResults = sortFinderItems(zoneFiltered);
       if (state.selectedFinderId && !state.finderResults.some(item => item.id === state.selectedFinderId)) {
         state.selectedFinderId = "";
         state.selectedFlagId = "";
@@ -4148,6 +4151,7 @@ function renderDefinitions() {
       state.finderQuery = "";
       state.finderCategory = "";
       state.finderTraits.clear();
+      state.finderZoneFilterId = "";
       state.selectedFinderId = "";
       state.selectedFlagId = "";
       state.selectedZoneIds = [];
