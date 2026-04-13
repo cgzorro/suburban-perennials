@@ -692,6 +692,10 @@
       color: var(--text);
     }
 
+    button.flag-chip {
+      cursor: pointer;
+    }
+
     .flag-icon,
     .mini-flag {
       width: 0;
@@ -1381,6 +1385,7 @@
     .map-fixed-flag {
       opacity: .64;
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.14));
+      cursor: pointer;
     }
 
     .map-fixed-flag.active {
@@ -2283,19 +2288,19 @@
     ];
 
     const MAP_FLAG_MARKERS = [
-      { id: "flag-entry-magenta", color: "magenta", x: 180, y: 420, note: "Entry-side field flag shown on paper map" },
-      { id: "flag-top-black", color: "black", x: 414, y: 308, note: "Upper center flag shown on paper map" },
-      { id: "flag-container-brown", color: "brown", x: 415, y: 395, note: "Container tree row flag shown on paper map" },
-      { id: "flag-house8-purple", color: "purple", x: 730, y: 316, note: "Upper right hoop-house flag shown on paper map" },
-      { id: "flag-center-green", color: "green", x: 585, y: 405, note: "Center bed flag shown on paper map" },
-      { id: "flag-house6-yellow", color: "yellow", x: 726, y: 408, note: "Right-center flag shown on paper map" },
-      { id: "flag-evergreen-white", color: "white", x: 410, y: 494, note: "Evergreen strip flag shown on paper map" },
-      { id: "flag-evergreen-charcoal", color: "charcoal", x: 565, y: 494, note: "Evergreen strip dark flag shown on paper map" },
-      { id: "flag-lower-blue", color: "blue", x: 472, y: 598, note: "Lower left bed flag shown on paper map" },
-      { id: "flag-lower-pink", color: "pink", x: 592, y: 598, note: "Lower middle bed flag shown on paper map" },
-      { id: "flag-lower-orange", color: "orange", x: 732, y: 596, note: "Lower right bed flag shown on paper map" },
-      { id: "flag-lower-teal", color: "teal", x: 620, y: 704, note: "Curved lower bed flag shown on paper map" },
-      { id: "flag-roses-red", color: "red", x: 752, y: 682, note: "Roses and grasses flag shown on paper map" }
+      { id: "flag-entry-magenta", color: "magenta", x: 180, y: 420, zoneIds: ["field-tree", "d"], note: "Entry-side field flag shown on paper map" },
+      { id: "flag-top-black", color: "black", x: 414, y: 308, zoneIds: ["container", "d"], note: "Upper center flag shown on paper map" },
+      { id: "flag-container-brown", color: "brown", x: 415, y: 395, zoneIds: ["container", "d"], note: "Container tree row flag shown on paper map" },
+      { id: "flag-house8-purple", color: "purple", x: 730, y: 316, zoneIds: ["flowering", "house7", "house8"], note: "Upper right hoop-house flag shown on paper map" },
+      { id: "flag-center-green", color: "green", x: 585, y: 405, zoneIds: ["e"], note: "Center bed flag shown on paper map" },
+      { id: "flag-house6-yellow", color: "yellow", x: 726, y: 408, zoneIds: ["flowering", "house6"], note: "Right-center flag shown on paper map" },
+      { id: "flag-evergreen-white", color: "white", x: 410, y: 494, zoneIds: ["field-tree", "c"], note: "Evergreen strip flag shown on paper map" },
+      { id: "flag-evergreen-charcoal", color: "charcoal", x: 565, y: 494, zoneIds: ["field-shrub", "c"], note: "Evergreen strip dark flag shown on paper map" },
+      { id: "flag-lower-blue", color: "blue", x: 472, y: 598, zoneIds: ["field-shrub"], note: "Lower left bed flag shown on paper map" },
+      { id: "flag-lower-pink", color: "pink", x: 592, y: 598, zoneIds: ["field-shrub"], note: "Lower middle bed flag shown on paper map" },
+      { id: "flag-lower-orange", color: "orange", x: 732, y: 596, zoneIds: ["roses"], note: "Lower right bed flag shown on paper map" },
+      { id: "flag-lower-teal", color: "teal", x: 620, y: 704, zoneIds: ["shade-perennials", "sun-perennials"], note: "Curved lower bed flag shown on paper map" },
+      { id: "flag-roses-red", color: "red", x: 752, y: 682, zoneIds: ["roses"], note: "Roses and grasses flag shown on paper map" }
     ];
 
     const NURSERY_BASE = [
@@ -2413,6 +2418,7 @@
       finderTraits: new Set(),
       finderResults: [],
       selectedFinderId: "",
+      selectedFlagId: "",
       selectedZoneIds: [],
       kioskQuery: "",
       kioskTrait: "",
@@ -3358,20 +3364,24 @@ function renderDefinitions() {
     }
 
     function renderFlagLegend() {
-      const orderedColors = [];
+      const orderedMarkers = [];
       MAP_FLAG_MARKERS.forEach(marker => {
-        if (!orderedColors.includes(marker.color)) orderedColors.push(marker.color);
+        if (!orderedMarkers.some(entry => entry.color === marker.color)) orderedMarkers.push(marker);
       });
 
       els.flagLegend.innerHTML = `
-        <span class="flag-chip flag-chip-note">Approximate field-flag examples from the paper map.</span>
-        ${orderedColors.map(color => `
-          <span class="flag-chip">
-            <span class="mini-flag ${color === "white" ? "white" : ""}" style="--flag:${FLAG_COLORS[color] || color}"></span>
-            ${titleCase(color)} flag
-          </span>
+        <span class="flag-chip flag-chip-note">Approximate field-flag examples from the paper map. Tap a flag to highlight its mapped section.</span>
+        ${orderedMarkers.map(marker => `
+          <button type="button" class="flag-chip" data-flag-id="${marker.id}">
+            <span class="mini-flag ${marker.color === "white" ? "white" : ""}" style="--flag:${FLAG_COLORS[marker.color] || marker.color}"></span>
+            ${titleCase(marker.color)} flag
+          </button>
         `).join("")}
       `;
+
+      els.flagLegend.querySelectorAll("[data-flag-id]").forEach(btn => {
+        btn.addEventListener("click", () => handleFlagClick(btn.dataset.flagId));
+      });
     }
 
     function escapeHtml(value) {
@@ -3492,9 +3502,11 @@ function renderDefinitions() {
 
       const exampleFlags = MAP_FLAG_MARKERS.map(marker => {
         const color = FLAG_COLORS[marker.color] || marker.color || "#777";
-        const isActive = selectedColors.has(marker.color);
+        const markerZoneIds = Array.isArray(marker.zoneIds) ? marker.zoneIds : [];
+        const zoneActive = markerZoneIds.some(zoneId => active.has(zoneId));
+        const isActive = selectedColors.has(marker.color) || zoneActive;
         return `
-          <g class="map-fixed-flag${isActive ? " active" : ""}" aria-hidden="true" transform="translate(${marker.x} ${marker.y})">
+          <g class="map-fixed-flag${isActive ? " active" : ""}" data-flag-id="${marker.id}" data-flag-color="${marker.color}" role="button" tabindex="0" aria-label="${titleCase(marker.color)} flag marker" transform="translate(${marker.x} ${marker.y})">
             <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="28"></line>
             <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="0,0 -22,-12 -22,12" fill="${color}"></polygon>
           </g>
@@ -3554,6 +3566,15 @@ function renderDefinitions() {
       if (!scope) return;
       scope.querySelectorAll("[data-zone]").forEach(node => {
         node.addEventListener("click", () => handleZoneClick(node.dataset.zone));
+      });
+      scope.querySelectorAll("[data-flag-id]").forEach(node => {
+        node.addEventListener("click", () => handleFlagClick(node.dataset.flagId));
+        node.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleFlagClick(node.dataset.flagId);
+          }
+        });
       });
     }
 
@@ -3679,10 +3700,15 @@ function renderDefinitions() {
       }
 
       const selectedItem = state.selectedFinderId ? NURSERY_ITEMS.find(entry => entry.id === state.selectedFinderId) : null;
+      const selectedFlag = state.selectedFlagId ? MAP_FLAG_MARKERS.find(entry => entry.id === state.selectedFlagId) : null;
       if (selectedItem) {
         pills.push(`<span class="pill active">Selected: ${escapeHtml(selectedItem.name)}</span>`);
+      } else if (selectedFlag) {
+        pills.push(`<span class="pill active">Flag: ${escapeHtml(titleCase(selectedFlag.color))}</span>`);
       } else if (state.selectedZoneIds.length === 1) {
         pills.push(`<span class="pill active">Zone: ${escapeHtml(zoneTitle(state.selectedZoneIds[0]))}</span>`);
+      } else if (state.selectedZoneIds.length > 1) {
+        pills.push(`<span class="pill active">Zones: ${escapeHtml(state.selectedZoneIds.map(zoneTitle).join(" • "))}</span>`);
       } else {
         pills.push(`<span class="pill">Tap a result to highlight it</span>`);
       }
@@ -3777,6 +3803,7 @@ function renderDefinitions() {
       const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
       if (!item) return;
       state.selectedFinderId = item.id;
+      state.selectedFlagId = "";
       state.selectedZoneIds = item.zoneIds.slice();
       renderFinderResults();
       renderFinderMaps(item.zoneIds, [item]);
@@ -3788,6 +3815,7 @@ function renderDefinitions() {
 
     function handleZoneClick(zoneId) {
       state.selectedFinderId = "";
+      state.selectedFlagId = "";
       state.selectedZoneIds = [zoneId];
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
       renderFinderMaps([zoneId], matches.slice(0, 6));
@@ -3806,6 +3834,43 @@ function renderDefinitions() {
         <p class="finder-note">Mapped plants in this zone:</p>
         <div class="detail-tag-row">${matches.slice(0, 14).map(item => `<span class="location-badge">${escapeHtml(item.name)}</span>`).join("")}</div>
         <p class="zone-directions">${escapeHtml(directionFromZone(matches[0]))}</p>
+      `;
+      updateFinderSummary();
+      nudgeFinderDetailsIntoView();
+    }
+
+    function handleFlagClick(flagId) {
+      const marker = MAP_FLAG_MARKERS.find(entry => entry.id === flagId);
+      if (!marker) return;
+
+      const zoneIds = uniqueValues((marker.zoneIds || []).filter(Boolean));
+      const matches = sortFinderItems(NURSERY_ITEMS.filter(item => {
+        const zoneMatch = zoneIds.length ? item.zoneIds.some(zoneId => zoneIds.includes(zoneId)) : false;
+        return zoneMatch || item.flagColor === marker.color;
+      }));
+
+      state.selectedFinderId = "";
+      state.selectedFlagId = marker.id;
+      state.selectedZoneIds = zoneIds;
+
+      renderFinderMaps(zoneIds, matches.length ? matches.slice(0, 6) : [{ flagColor: marker.color, zoneIds }]);
+
+      const zoneBadges = zoneIds.length
+        ? `<div class="detail-tag-row">${zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("")}</div>`
+        : "";
+
+      const matchBadges = matches.length
+        ? `<div class="detail-tag-row">${matches.slice(0, 12).map(item => `<span class="location-badge">${escapeHtml(item.name)}</span>`).join("")}</div>`
+        : "";
+
+      const firstDirection = matches.length ? directionFromZone(matches[0]) : "";
+
+      els.locationDetails.innerHTML = `
+        <h3>${escapeHtml(titleCase(marker.color))} flag</h3>
+        <p class="finder-note">${escapeHtml(marker.note || "Approximate field-flag location from the paper map.")}</p>
+        ${zoneBadges}
+        ${matchBadges}
+        <p class="zone-directions">${escapeHtml(firstDirection || "Mapped section highlighted on the overview map and closer-look panel.")}</p>
       `;
       updateFinderSummary();
       nudgeFinderDetailsIntoView();
@@ -3833,6 +3898,7 @@ function renderDefinitions() {
       state.finderCategory = "";
       state.finderTraits.clear();
       state.selectedFinderId = "";
+      state.selectedFlagId = "";
       state.selectedZoneIds = [];
       renderFinderChips();
       applyFinderFilters();
