@@ -3413,6 +3413,131 @@
 
     const NURSERY_ITEMS = buildNurseryData();
 
+    const ZONE_FILTER_ALIASES = {
+      "container": ["d"],
+      "flowering": ["field-shrub", "house6", "house8"]
+    };
+
+    const ZONE_SPOTLIGHT_ITEMS = [
+      {
+        id: "zone-spotlight-container",
+        name: "Section: Container Trees",
+        category: "Tree",
+        zoneIds: ["container"],
+        locationLabel: "Center container tree row",
+        area: "Container Trees",
+        flagColor: "brown",
+        traits: [],
+        notes: "Container tree row shown on the map. Tree-level assignments are still being refined for this section.",
+        searchBlob: "section container trees center row"
+      },
+      {
+        id: "zone-spotlight-center-bed",
+        name: "Section: Center Bed",
+        category: "Plant",
+        zoneIds: ["e"],
+        locationLabel: "Center Bed",
+        area: "Center display bed",
+        flagColor: "green",
+        traits: [],
+        notes: "Central display zone shown on the map. Plant-level assignments are still being refined for this section.",
+        searchBlob: "section center bed display"
+      },
+      {
+        id: "zone-spotlight-shade-perennials",
+        name: "Section: Shade Perennials",
+        category: "Plant",
+        zoneIds: ["shade-perennials"],
+        locationLabel: "Shade Perennials",
+        area: "Shade perennial yard",
+        flagColor: "teal",
+        traits: ["shade"],
+        notes: "Shade perennial yard shown on the map.",
+        searchBlob: "section shade perennials"
+      },
+      {
+        id: "zone-spotlight-sun-perennials",
+        name: "Section: Sun Perennials",
+        category: "Plant",
+        zoneIds: ["sun-perennials"],
+        locationLabel: "Sun Perennials",
+        area: "Sun perennial yard",
+        flagColor: "orange",
+        traits: ["sun"],
+        notes: "Sun perennial yard shown on the map.",
+        searchBlob: "section sun perennials"
+      },
+      {
+        id: "zone-spotlight-tropicals",
+        name: "Section: Tropicals",
+        category: "Plant",
+        zoneIds: ["tropicals"],
+        locationLabel: "Tropicals",
+        area: "Tropicals section",
+        flagColor: "green",
+        traits: [],
+        notes: "Tropicals section shown on the map.",
+        searchBlob: "section tropicals"
+      },
+      {
+        id: "zone-spotlight-annuals",
+        name: "Section: Annuals",
+        category: "Plant",
+        zoneIds: ["annuals"],
+        locationLabel: "Annuals",
+        area: "Annuals section",
+        flagColor: "orange",
+        traits: [],
+        notes: "Annuals section shown on the map.",
+        searchBlob: "section annuals"
+      }
+    ];
+
+    function getFinderFilterZoneIds(zoneId = "") {
+      const aliases = ZONE_FILTER_ALIASES[zoneId] || [];
+      return uniqueValues([zoneId, ...aliases].filter(Boolean));
+    }
+
+    function getZoneSpotlightItems(zoneId = "", activeCategory = "") {
+      const allowedZoneIds = new Set(getFinderFilterZoneIds(zoneId));
+      return ZONE_SPOTLIGHT_ITEMS.filter(item => item.zoneIds.some(id => allowedZoneIds.has(id)))
+        .filter(item => {
+          if (!activeCategory) return true;
+          if (activeCategory === "Tree/Shrub") return ["Tree", "Shrub", "Tree/Shrub"].includes(item.category);
+          return item.category === activeCategory;
+        });
+    }
+
+    function resolveFinderZoneResults(filteredBase, zoneId) {
+      if (!zoneId) return sortFinderItems(filteredBase);
+
+      const directMatches = filteredBase.filter(item => item.zoneIds.includes(zoneId));
+      if (directMatches.length) return sortFinderItems(directMatches);
+
+      const relatedZoneIds = getFinderFilterZoneIds(zoneId).filter(id => id !== zoneId);
+      const relatedMatches = relatedZoneIds.length
+        ? filteredBase.filter(item => item.zoneIds.some(id => relatedZoneIds.includes(id)))
+        : [];
+
+      const spotlights = getZoneSpotlightItems(zoneId, state.finderCategory);
+
+      const merged = [];
+      const seen = new Set();
+      for (const item of [...spotlights, ...relatedMatches]) {
+        if (!item || seen.has(item.id)) continue;
+        seen.add(item.id);
+        merged.push(item);
+      }
+      return sortFinderItems(merged);
+    }
+
+    function getFinderItemById(itemId) {
+      return state.finderResults.find(entry => entry.id === itemId)
+        || NURSERY_ITEMS.find(entry => entry.id === itemId)
+        || ZONE_SPOTLIGHT_ITEMS.find(entry => entry.id === itemId)
+        || null;
+    }
+
     function kioskTraitsFromPlant(plant) {
       const traits = inferTraits(plant) || {};
       const list = [];
@@ -4056,7 +4181,7 @@ function renderDefinitions() {
     }
 
     function selectFinderItem(itemId) {
-      const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
+      const item = getFinderItemById(itemId);
       if (!item) return;
       const primaryZoneId = primaryZoneIdForItem(item);
       const focusedZones = getOrderedZoneIds(item.zoneIds || [], primaryZoneId).slice(0, 1);
@@ -4129,10 +4254,9 @@ function renderDefinitions() {
       state.finderQuery = normalizeText(els.finderSearch.value);
       state.finderCategory = els.finderCategory.value;
       const filteredBase = NURSERY_ITEMS.filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits));
-      const zoneFiltered = state.finderZoneFilterId
-        ? filteredBase.filter(item => item.zoneIds.includes(state.finderZoneFilterId))
-        : filteredBase;
-      state.finderResults = sortFinderItems(zoneFiltered);
+      state.finderResults = state.finderZoneFilterId
+        ? resolveFinderZoneResults(filteredBase, state.finderZoneFilterId)
+        : sortFinderItems(filteredBase);
       if (state.selectedFinderId && !state.finderResults.some(item => item.id === state.selectedFinderId)) {
         state.selectedFinderId = "";
         state.selectedFlagId = "";
