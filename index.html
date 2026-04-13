@@ -117,16 +117,17 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 10px;
-      padding: 6px 12px;
-      border: 1px solid rgba(123, 208, 95, 0.28);
+      margin-bottom: 12px;
+      padding: 8px 14px;
+      border: 1px solid rgba(123, 208, 95, 0.24);
       border-radius: 999px;
-      background: rgba(123, 208, 95, 0.10);
+      background: rgba(123, 208, 95, 0.08);
       color: var(--text);
-      font-size: 0.74rem;
+      font-size: 0.76rem;
       font-weight: 900;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
     .hero-copy h1 {
@@ -137,21 +138,21 @@
     }
 
     .hero-copy p {
-      margin: 10px 0 0;
+      margin: 12px 0 0;
       color: var(--text-muted);
       max-width: 820px;
-      line-height: 1.32;
+      line-height: 1.28;
       font-size: .98rem;
     }
 
     .hero-actions {
       display: flex;
       flex-direction: column;
+      align-items: stretch;
       gap: 12px;
-      width: 100%;
-      max-width: 470px;
       min-width: 0;
-      flex: 0 1 470px;
+      width: 100%;
+      max-width: 100%;
     }
 
     .view-tabs-shell {
@@ -164,15 +165,16 @@
       display: flex;
       flex-wrap: nowrap;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      justify-content: flex-start;
       width: 100%;
       overflow-x: auto;
       overflow-y: hidden;
-      padding: 2px 24px 6px 0;
+      padding: 2px 26px 6px 0;
       margin: 0;
-      scroll-padding-right: 24px;
-      -webkit-overflow-scrolling: touch;
+      scroll-padding-right: 26px;
       scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
 
     .view-tabs::-webkit-scrollbar {
@@ -195,73 +197,59 @@
     }
 
     .theme-toggle {
-      width: 100%;
       background:
         linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
         var(--bg-elev);
       border-radius: 999px;
-      padding: 12px 16px;
+      padding: 12px 18px;
       font-weight: 800;
       white-space: nowrap;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-    }
-
-    .theme-toggle-inner,
-    .tab-content {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .theme-icon,
-    .tab-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      width: 22px;
-      height: 22px;
-      opacity: 0.98;
-    }
-
-    .theme-icon svg,
-    .tab-icon svg {
-      width: 100%;
-      height: 100%;
-      display: block;
+      height: fit-content;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
     .view-tab {
       background:
-        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
-        var(--bg-soft);
+        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015)),
+        #142a4c;
+      border: 1px solid rgba(74, 107, 160, 0.52);
       border-radius: 999px;
       padding: 10px 14px;
       font-weight: 800;
+      font-size: .92rem;
+      line-height: 1;
       white-space: nowrap;
       flex: 0 0 auto;
-      min-width: max-content;
-      font-size: .88rem;
-      line-height: 1;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-    }
-
-    .view-tab:hover,
-    .theme-toggle:hover {
-      transform: translateY(-1px);
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 10px 24px rgba(0,0,0,0.12);
     }
 
     .view-tab.active {
-      background: linear-gradient(180deg, var(--accent-2), var(--accent));
-      border-color: var(--accent);
+      background: linear-gradient(180deg, #8bdd71, #72ce5c);
+      border-color: #7fd864;
       color: #fff;
-      box-shadow: 0 8px 18px rgba(91, 173, 79, 0.22), inset 0 1px 0 rgba(255,255,255,0.18);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.16),
+        0 12px 24px rgba(98, 184, 79, 0.22);
     }
 
-    .view-tab.active .tab-icon {
-      color: #fff;
+    .tab-icon {
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 22px;
+    }
+
+    .tab-icon svg {
+      width: 22px;
+      height: 22px;
+      display: block;
     }
 
     .app-view[hidden] { display: none !important; }
@@ -1209,29 +1197,23 @@
         padding: 12px 0 18px;
       }
       .hero {
-        flex-direction: column;
-        gap: 14px;
-        padding: 16px 14px 15px;
+        padding: 16px 14px;
         border-radius: 20px;
+        flex-direction: column;
       }
       .hero-copy h1 { font-size: 1.8rem; }
       .hero-copy p {
-        font-size: .92rem;
-        line-height: 1.26;
-        margin-top: 8px;
+        font-size: .9rem;
+        line-height: 1.22;
+        margin-top: 6px;
       }
       .hero-actions {
         width: 100%;
-        max-width: 100%;
-        flex-basis: auto;
-        gap: 10px;
+        align-items: stretch;
       }
       .view-tabs {
         justify-content: flex-start;
         flex-wrap: nowrap;
-        gap: 4px;
-        padding: 2px 26px 6px 0;
-        scroll-padding-right: 26px;
       }
       .controls-wrap,
       .panel {
@@ -1261,20 +1243,10 @@
       }
       .chip,
       .finder-chip,
-      .kiosk-btn {
-        padding: 9px 12px;
-        font-size: .86rem;
-      }
+      .kiosk-btn,
       .view-tab {
         padding: 9px 12px;
-        font-size: .84rem;
-      }
-      .tab-content {
-        gap: 8px;
-      }
-      .tab-icon {
-        width: 20px;
-        height: 20px;
+        font-size: .86rem;
       }
       .results-grid {
         grid-template-columns: 1fr;
@@ -1301,9 +1273,6 @@
       .map-static { font-size: 13px; }
       .detail-map-board {
         min-height: 220px;
-      }
-      .theme-toggle {
-        padding: 11px 14px;
       }
     }
 
@@ -1802,6 +1771,54 @@
     }
 
 
+
+
+    /* Header-only finish pass */
+    @media (max-width: 900px) {
+      .hero {
+        gap: 14px;
+        padding: 16px 14px 15px;
+      }
+
+      .hero-copy h1 {
+        font-size: 1.8rem;
+      }
+
+      .hero-copy p {
+        font-size: 0.92rem;
+        line-height: 1.26;
+        margin-top: 8px;
+      }
+
+      .hero-actions {
+        max-width: 100%;
+        gap: 10px;
+      }
+
+      .view-tabs {
+        gap: 5px;
+        padding: 2px 22px 6px 0;
+        scroll-padding-right: 22px;
+      }
+
+      .view-tab {
+        gap: 8px;
+        padding: 9px 12px;
+        font-size: 0.88rem;
+      }
+
+      .tab-icon {
+        width: 20px;
+        height: 20px;
+        flex-basis: 20px;
+      }
+
+      .tab-icon svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -1816,65 +1833,40 @@
         <div class="view-tabs-shell">
           <div class="view-tabs" role="tablist" aria-label="App views">
             <button id="tabBrowser" class="view-tab active" type="button" data-view="browser">
-              <span class="tab-content">
-                <span class="tab-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 21V11"/>
-                    <path d="M7 21c0-4 2-7 5-10"/>
-                    <path d="M17 21c0-4-2-7-5-10"/>
-                    <path d="M4 10c3 0 5 1 8 4"/>
-                    <path d="M20 10c-3 0-5 1-8 4"/>
-                  </svg>
-                </span>
-                <span class="tab-label">Plant Browser</span>
+              <span class="tab-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 20V11" />
+                  <path d="M12 11C12 7.5 14.5 5 18.5 5c0 4-2.5 6.5-6.5 6.5Z" />
+                  <path d="M12 14C12 10.5 9.5 8 5.5 8c0 4 2.5 6.5 6.5 6.5Z" />
+                </svg>
               </span>
+              <span>Plant Browser</span>
             </button>
             <button id="tabFinder" class="view-tab" type="button" data-view="finder">
-              <span class="tab-content">
-                <span class="tab-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 6l7-2 4 2 7-2v14l-7 2-4-2-7 2V6z"/>
-                    <path d="M10 4v14"/>
-                    <path d="M14 6v14"/>
-                  </svg>
-                </span>
-                <span class="tab-label">Nursery Finder</span>
+              <span class="tab-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 20V13" />
+                  <path d="M12 13C12 9.5 14.7 7 18.5 7c0 3.8-2.7 6.5-6.5 6.5Z" />
+                  <path d="M12 15C12 12 9.8 9.8 6.5 9.8c0 3.4 2.2 5.7 5.5 5.7Z" />
+                  <path d="M9.5 20h5" />
+                </svg>
               </span>
+              <span>Nursery Finder</span>
             </button>
             <button id="tabKiosk" class="view-tab" type="button" data-view="kiosk">
-              <span class="tab-content">
-                <span class="tab-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 10l8-6 8 6"/>
-                    <path d="M5 10h14v10H5z"/>
-                    <path d="M9 20v-4h6v4"/>
-                    <path d="M7.5 12.5h.01"/>
-                    <path d="M16.5 12.5h.01"/>
-                  </svg>
-                </span>
-                <span class="tab-label">Customer Kiosk</span>
+              <span class="tab-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 10.5 12 4l8 6.5" />
+                  <path d="M6.5 10.5V19h11v-8.5" />
+                  <path d="M9 19v-4.5h6V19" />
+                  <path d="M7 8.5h10" />
+                </svg>
               </span>
+              <span>Kiosk</span>
             </button>
           </div>
         </div>
-        <button id="themeToggle" class="theme-toggle" type="button">
-          <span class="theme-toggle-inner">
-            <span class="theme-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="4"/>
-                <path d="M12 2v2"/>
-                <path d="M12 20v2"/>
-                <path d="M4.93 4.93l1.41 1.41"/>
-                <path d="M17.66 17.66l1.41 1.41"/>
-                <path d="M2 12h2"/>
-                <path d="M20 12h2"/>
-                <path d="M4.93 19.07l1.41-1.41"/>
-                <path d="M17.66 6.34l1.41-1.41"/>
-              </svg>
-            </span>
-            <span>Dark / Light: Dark</span>
-          </span>
-        </button>
+        <button id="themeToggle" class="theme-toggle" type="button">Dark / Light: Dark</button>
       </div>
     </section>
 
