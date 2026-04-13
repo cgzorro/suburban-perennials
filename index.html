@@ -2288,19 +2288,19 @@
     ];
 
     const MAP_FLAG_MARKERS = [
-      { id: "flag-entry-magenta", color: "magenta", x: 180, y: 420, zoneIds: ["field-tree", "d"], note: "Entry-side field flag shown on paper map" },
-      { id: "flag-top-black", color: "black", x: 414, y: 308, zoneIds: ["container", "d"], note: "Upper center flag shown on paper map" },
-      { id: "flag-container-brown", color: "brown", x: 415, y: 395, zoneIds: ["container", "d"], note: "Container tree row flag shown on paper map" },
-      { id: "flag-house8-purple", color: "purple", x: 730, y: 316, zoneIds: ["flowering", "house7", "house8"], note: "Upper right hoop-house flag shown on paper map" },
-      { id: "flag-center-green", color: "green", x: 585, y: 405, zoneIds: ["e"], note: "Center bed flag shown on paper map" },
-      { id: "flag-house6-yellow", color: "yellow", x: 726, y: 408, zoneIds: ["flowering", "house6"], note: "Right-center flag shown on paper map" },
-      { id: "flag-evergreen-white", color: "white", x: 410, y: 494, zoneIds: ["field-tree", "c"], note: "Evergreen strip flag shown on paper map" },
-      { id: "flag-evergreen-charcoal", color: "charcoal", x: 565, y: 494, zoneIds: ["field-shrub", "c"], note: "Evergreen strip dark flag shown on paper map" },
-      { id: "flag-lower-blue", color: "blue", x: 472, y: 598, zoneIds: ["field-shrub"], note: "Lower left bed flag shown on paper map" },
-      { id: "flag-lower-pink", color: "pink", x: 592, y: 598, zoneIds: ["field-shrub"], note: "Lower middle bed flag shown on paper map" },
-      { id: "flag-lower-orange", color: "orange", x: 732, y: 596, zoneIds: ["roses"], note: "Lower right bed flag shown on paper map" },
-      { id: "flag-lower-teal", color: "teal", x: 620, y: 704, zoneIds: ["shade-perennials", "sun-perennials"], note: "Curved lower bed flag shown on paper map" },
-      { id: "flag-roses-red", color: "red", x: 752, y: 682, zoneIds: ["roses"], note: "Roses and grasses flag shown on paper map" }
+      { id: "flag-entry-magenta", color: "magenta", x: 180, y: 420, zoneIds: ["field-tree", "d"], primaryZoneId: "field-tree", note: "Entry-side field flag shown on paper map" },
+      { id: "flag-top-black", color: "black", x: 414, y: 308, zoneIds: ["container", "d"], primaryZoneId: "container", note: "Upper center flag shown on paper map" },
+      { id: "flag-container-brown", color: "brown", x: 415, y: 395, zoneIds: ["container", "d"], primaryZoneId: "container", note: "Container tree row flag shown on paper map" },
+      { id: "flag-house8-purple", color: "purple", x: 730, y: 316, zoneIds: ["flowering", "house7", "house8"], primaryZoneId: "house8", note: "Upper right hoop-house flag shown on paper map" },
+      { id: "flag-center-green", color: "green", x: 585, y: 405, zoneIds: ["e"], primaryZoneId: "e", note: "Center bed flag shown on paper map" },
+      { id: "flag-house6-yellow", color: "yellow", x: 726, y: 408, zoneIds: ["flowering", "house6"], primaryZoneId: "flowering", note: "Right-center flag shown on paper map" },
+      { id: "flag-evergreen-white", color: "white", x: 410, y: 494, zoneIds: ["field-tree", "c"], primaryZoneId: "c", note: "Evergreen strip flag shown on paper map" },
+      { id: "flag-evergreen-charcoal", color: "charcoal", x: 565, y: 494, zoneIds: ["field-shrub", "c"], primaryZoneId: "field-shrub", note: "Evergreen strip dark flag shown on paper map" },
+      { id: "flag-lower-blue", color: "blue", x: 472, y: 598, zoneIds: ["field-shrub"], primaryZoneId: "field-shrub", note: "Lower left bed flag shown on paper map" },
+      { id: "flag-lower-pink", color: "pink", x: 592, y: 598, zoneIds: ["field-shrub"], primaryZoneId: "field-shrub", note: "Lower middle bed flag shown on paper map" },
+      { id: "flag-lower-orange", color: "orange", x: 732, y: 596, zoneIds: ["roses"], primaryZoneId: "roses", note: "Lower right bed flag shown on paper map" },
+      { id: "flag-lower-teal", color: "teal", x: 620, y: 704, zoneIds: ["shade-perennials", "sun-perennials"], primaryZoneId: "shade-perennials", note: "Curved lower bed flag shown on paper map" },
+      { id: "flag-roses-red", color: "red", x: 752, y: 682, zoneIds: ["roses"], primaryZoneId: "roses", note: "Roses and grasses flag shown on paper map" }
     ];
 
     const NURSERY_BASE = [
@@ -2530,6 +2530,43 @@
       );
     }
 
+    function isTreeKioskItem(item) {
+      const joined = [
+        item?.name,
+        item?.category,
+        item?.browserGroup,
+        item?.locationLabel,
+        item?.area,
+        ...(Array.isArray(item?.aliases) ? item.aliases : [])
+      ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase();
+      const category = normalizeText(item?.category || "");
+      const group = normalizeText(item?.browserGroup || "");
+
+      if (group === "roses" || isRoseNurseryItem(item)) return false;
+      if (category === "tree") return true;
+      if (["conifers", "shade trees", "flowering trees", "ornamental trees", "fruit trees", "evergreen trees", "trees"].includes(group)) return true;
+      return /(trees?|conifers?|arborvitae|cedar|cypress|fir|hemlock|juniper|pine|spruce)/.test(joined);
+    }
+
+    function isShrubKioskItem(item) {
+      const joined = [
+        item?.name,
+        item?.category,
+        item?.browserGroup,
+        item?.locationLabel,
+        item?.area,
+        ...(Array.isArray(item?.aliases) ? item.aliases : [])
+      ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase();
+      const category = normalizeText(item?.category || "");
+      const group = normalizeText(item?.browserGroup || "");
+
+      if (group === "roses" || isRoseNurseryItem(item)) return false;
+      if (category === "shrub" || category === "tree/shrub") return true;
+      if (/shrubs?/.test(joined)) return true;
+      if (/(azalea|barberry|boxwood|burning bush|dogwood shrub|euonymus|holly|hydrangea|lilac|mockorange|ninebark|privet|pyracantha|quince|rhododendron|spirea|viburnum|weigela|winterberry|yew)/.test(joined)) return true;
+      return false;
+    }
+
     function withSatelliteView(url) {
       if (!url) return url;
       if (/[?&]t=k\b/i.test(url)) return url;
@@ -2648,10 +2685,27 @@
         .map(value => value.toLowerCase());
       const series = normalizeSpaces(plant.series).toLowerCase();
       const sku = normalizeSku(plant.sku || "");
+      const haystack = [
+        plant.name,
+        plant.common,
+        plant.genus,
+        plant.series,
+        plant.section,
+        plant.category,
+        plant.plant_group,
+        plant.source_department,
+        plant.source_subdepartment,
+        plant.category_path,
+        Array.isArray(plant.breadcrumbs) ? plant.breadcrumbs.join(" > ") : "",
+        plant.notes,
+        plant.description
+      ].map(normalizeSpaces).filter(Boolean).join(" | ").toLowerCase();
 
+      if (haystack.includes("rose of sharon")) return false;
       if (exactFields.some(value => value === "roses" || value === "rose")) return true;
       if (exactFields.includes("rosa") || normalizeText(plant.genus) === "rosa") return true;
       if (series.includes("knock out rose") || series.includes("drift rose") || series.includes("proven winner rose")) return true;
+      if (/(^|)(drift rose|knock out rose|hybrid tea rose|floribunda rose|grandiflora rose|climbing rose|shrub rose|rose bush|roses?)(|$)/i.test(haystack)) return true;
       if (sku.startsWith("ROSE")) return true;
       return false;
     }
@@ -3339,7 +3393,25 @@
           traits,
           notes: normalizeSpaces(plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || ""),
           searchBlob: [
-            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, group, exposure, meta.locationLabel, meta.area, traits.join(" ")
+            plant.name,
+            plant.common,
+            plant.genus,
+            plant.sku,
+            plant.series,
+            plant.plant_group,
+            plant.category,
+            plant.section,
+            plant.source_department,
+            plant.source_subdepartment,
+            plant.category_path,
+            Array.isArray(plant.breadcrumbs) ? plant.breadcrumbs.join(" > ") : "",
+            plant.description,
+            plant.notes,
+            group,
+            exposure,
+            meta.locationLabel,
+            meta.area,
+            traits.join(" ")
           ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase()
         };
         const dedupeKey = `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`;
@@ -3844,6 +3916,7 @@ function renderDefinitions() {
       if (!marker) return;
 
       const zoneIds = uniqueValues((marker.zoneIds || []).filter(Boolean));
+      const primaryZoneIds = uniqueValues([(marker.primaryZoneId || zoneIds[0] || "")].filter(Boolean));
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => {
         const zoneMatch = zoneIds.length ? item.zoneIds.some(zoneId => zoneIds.includes(zoneId)) : false;
         return zoneMatch || item.flagColor === marker.color;
@@ -3851,9 +3924,9 @@ function renderDefinitions() {
 
       state.selectedFinderId = "";
       state.selectedFlagId = marker.id;
-      state.selectedZoneIds = zoneIds;
+      state.selectedZoneIds = primaryZoneIds;
 
-      renderFinderMaps(zoneIds, matches.length ? matches.slice(0, 6) : [{ flagColor: marker.color, zoneIds }]);
+      renderFinderMaps(primaryZoneIds, matches.length ? matches.slice(0, 6) : [{ flagColor: marker.color, zoneIds: primaryZoneIds }]);
 
       const zoneBadges = zoneIds.length
         ? `<div class="detail-tag-row">${zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("")}</div>`
@@ -3870,7 +3943,7 @@ function renderDefinitions() {
         <p class="finder-note">${escapeHtml(marker.note || "Approximate field-flag location from the paper map.")}</p>
         ${zoneBadges}
         ${matchBadges}
-        <p class="zone-directions">${escapeHtml(firstDirection || "Mapped section highlighted on the overview map and closer-look panel.")}</p>
+        <p class="zone-directions">${escapeHtml(firstDirection || "Primary mapped section highlighted on the overview map and closer-look panel.")}</p>
       `;
       updateFinderSummary();
       nudgeFinderDetailsIntoView();
@@ -3909,7 +3982,6 @@ function renderDefinitions() {
 
     function renderKioskActions() {
       const actions = [
-        { label: "All Plants", value: "" },
         { label: "Trees", value: "Tree" },
         { label: "Shrubs", value: "Shrub" },
         { label: "Shade", value: "shade" },
@@ -3958,8 +4030,8 @@ function renderDefinitions() {
       const filtered = sortFinderItems(sourceItems.filter(item => {
         if (query && !item.searchBlob.includes(query)) return false;
         if (!picked) return true;
-        if (picked === "Tree") return item.category === "Tree";
-        if (picked === "Shrub") return item.category === "Shrub";
+        if (picked === "Tree") return isTreeKioskItem(item);
+        if (picked === "Shrub") return isShrubKioskItem(item);
         if (picked === "conifers") return item.browserGroup === "Conifers" || isConiferNurseryItem(item);
         if (picked === "roses") return item.browserGroup === "Roses" || isRoseNurseryItem(item);
         if (picked === "shade") return item.traits.includes("shade");
