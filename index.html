@@ -2449,6 +2449,41 @@
       { id: "flag-roses-red", color: "red", x: 752, y: 682, note: "Roses and grasses flag shown on paper map" }
     ];
 
+    const ZONE_PRIMARY_FLAG_COLORS = {
+      "container": "brown",
+      "e": "green",
+      "flowering": "yellow",
+      "field-shrub": "pink",
+      "field-tree": "blue",
+      "roses": "red",
+      "sun-perennials": "orange",
+      "tropicals": "teal",
+      "shade-perennials": "blue",
+      "annuals": "orange",
+      "house8": "purple",
+      "house7": "purple",
+      "house6": "yellow",
+      "house5": "yellow",
+      "house4": "yellow",
+      "house3": "charcoal",
+      "house2": "charcoal",
+      "house1": "teal",
+      "a": "white",
+      "b": "black",
+      "c": "white",
+      "d": "black",
+      "between123": "teal",
+      "playground": "yellow"
+    };
+
+    function primaryFlagColorForZones(zoneIds = []) {
+      for (const zoneId of zoneIds) {
+        if (ZONE_PRIMARY_FLAG_COLORS[zoneId]) return ZONE_PRIMARY_FLAG_COLORS[zoneId];
+      }
+      return "";
+    }
+
+
     const NURSERY_BASE = [
       { name: "Arborvitae Tree", category: "Tree", zoneIds: ["a"], locationLabel: "Ball & Burlap A", area: "Upright Arborvitae", flagColor: "black" },
       { name: "Aspen", category: "Tree", zoneIds: ["d"], locationLabel: "Ball & Burlap D", area: "Deciduous Trees", flagColor: "brown" },
@@ -3604,7 +3639,12 @@ function renderDefinitions() {
 
     function buildMapSvg(activeZoneIds = [], markerItems = [], viewBox = "0 0 1020 950") {
       const active = new Set(activeZoneIds || []);
-      const selectedColors = new Set((markerItems || []).map(item => item.flagColor).filter(Boolean));
+      const selectedColors = new Set(
+        [
+          ...(markerItems || []).map(item => item.flagColor).filter(Boolean),
+          ...Array.from(active).map(zoneId => primaryFlagColorForZones([zoneId])).filter(Boolean)
+        ]
+      );
 
       const staticText = `
         <text class="map-title-accent" x="458" y="158">Ball &amp; Burlap Trees</text>
@@ -3901,7 +3941,9 @@ function renderDefinitions() {
     function handleZoneClick(zoneId) {
       state.selectedZoneIds = [zoneId];
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
-      renderFinderMaps([zoneId], matches.slice(0, 6));
+      const cueColor = primaryFlagColorForZones([zoneId]);
+      const markerItems = matches.length ? matches.slice(0, 6) : (cueColor ? [{ flagColor: cueColor, zoneIds: [zoneId] }] : []);
+      renderFinderMaps([zoneId], markerItems);
       const zoneName = zoneTitle(zoneId);
       if (!matches.length) {
         els.locationDetails.innerHTML = `
