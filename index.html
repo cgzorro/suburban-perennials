@@ -1889,44 +1889,6 @@
       }
     }
 
-
-
-    .site-footer {
-      margin-top: 32px;
-      padding: 18px 16px 28px;
-      border-top: 1px solid var(--border);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)),
-        var(--bg-elev);
-    }
-
-    .site-footer-inner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-
-    .site-footer-copy {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .site-footer-title {
-      color: var(--text);
-      font-size: 0.92rem;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
-    .site-footer-sub {
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      font-weight: 600;
-      line-height: 1.2;
-    }
-
 </style>
 </head>
 <body>
@@ -1985,8 +1947,8 @@
       <section class="controls-wrap">
         <div class="controls-grid">
           <div class="field">
-            <label for="searchInput">Search plants</label>
-            <input id="searchInput" type="text" placeholder="Name, common name, genus, or SKU" />
+            <label for="searchInput">Search catalog</label>
+            <input id="searchInput" type="text" placeholder="Name, common name, genus, SKU" />
           </div>
 
           <div class="field">
@@ -1997,7 +1959,7 @@
           </div>
 
           <div class="field">
-            <label for="groupFilter">Plant category</label>
+            <label for="groupFilter">Plant group</label>
             <select id="groupFilter">
               <option value="">All groups</option>
             </select>
@@ -2022,7 +1984,7 @@
           </div>
 
           <div class="field">
-            <label for="showCount">Results shown</label>
+            <label for="showCount">Show</label>
             <select id="showCount">
               <option value="24">24 cards</option>
               <option value="48" selected>48 cards</option>
@@ -2035,7 +1997,7 @@
         <div class="chips" id="traitChips"></div>
 
         <div class="button-col">
-          <button id="clearFilters" class="btn" type="button">Reset filters</button>
+          <button id="clearFilters" class="btn" type="button">Clear filters</button>
         </div>
 
         <section class="scan-panel" id="scanPanel" data-open="false">
@@ -2047,8 +2009,8 @@
             aria-controls="scanPanelContent"
           >
             <div>
-              <strong>SKU lookup + scanner</strong>
-              <span>Open this panel when you want to search by SKU or scan a tag.</span>
+              <strong>SKU / Scanner tools</strong>
+              <span>Hidden by default so the browser lands on plants first.</span>
             </div>
             <span class="chevron">⌄</span>
           </button>
@@ -2122,7 +2084,7 @@
           </div>
 
           <div class="finder-actions">
-            <button id="finderClearBtn" class="btn" type="button">Reset finder</button>
+            <button id="finderClearBtn" class="btn" type="button">Clear</button>
             <a class="map-link" href="https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&amp;g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Open property in Google Maps</a>
           </div>
         </div>
@@ -2133,7 +2095,7 @@
       <div class="finder-layout">
         <section class="panel">
           <h2>Lookup results</h2>
-          <p class="panel-lead">Tap a result to highlight its section on the map and show the best cue flag.</p>
+          <p class="panel-lead">Tap a result to highlight its location on the map and show directions from the perennials/check-out side.</p>
           <div class="finder-results" id="finderResults"></div>
         </section>
 
@@ -2157,7 +2119,7 @@
               <div class="map-board" id="overviewMapBoard"></div>
             </div>
 
-            <p class="map-caption" id="overviewMapCaption">The highlighted section shows where to go. The active flag helps guide the next step.</p>
+            <p class="map-caption" id="overviewMapCaption">The full nursery stays visible while the selected destination stays highlighted.</p>
 
             <p class="map-help mobile-swipe-note">Swipe the map horizontally on mobile. Use the quick jump buttons if you want to move straight to hoop houses or perennials.</p>
 
@@ -2173,7 +2135,7 @@
 
           <section class="panel">
             <h2>Closer look</h2>
-            <p class="panel-lead">Use this zoomed view to confirm the destination before walking the nursery.</p>
+            <p class="panel-lead">The selected section zooms here so staff and customers can confirm the next move on a phone or kiosk.</p>
             <div class="map-board detail-map-board" id="detailMapBoard"></div>
             <p class="map-caption" id="detailMapCaption">Select a plant or tap a zone to zoom into that section.</p>
           </section>
@@ -2224,11 +2186,11 @@
           <div class="kiosk-side">
             <section class="panel" id="kioskDetailPanel">
               <h2>Directions</h2>
-              <p class="kiosk-lead">Search by plant name, browse a category, or use the map to help find the right area.</p>
+              <p class="kiosk-lead">Select a result to show a short polished direction you can repeat to a customer.</p>
             </section>
             <section class="panel" id="kioskMapPanel">
               <h2>Map view</h2>
-              <p class="kiosk-lead">Staff can use this view to guide customers quickly to the correct section.</p>
+              <p class="kiosk-lead">Selected plants show a cleaner preview map with a stronger highlighted destination before the customer walks away.</p>
               <div class="you-are-here-note">
                 <span class="you-are-here-pill">●</span>
                 <div><strong>Start here:</strong> customers usually begin at <strong>perennials / checkout</strong> near the bottom of the map. The red marker stays visible so the route makes sense at a glance.</div>
@@ -3157,14 +3119,7 @@
       return state.plants.filter(plant => normalizeSku(plant.sku).includes(wanted));
     }
 
-    async function trackEvent(name, data = {}) {
-      const payload = { name, ...data, ts: new Date().toISOString() };
-      window.__appAnalytics = window.__appAnalytics || [];
-      window.__appAnalytics.push(payload);
-      console.log("analytics", payload);
-    }
-
-    function clearFilters() {
+    async function clearFilters() {
       els.searchInput.value = "";
       els.scanSkuInput.value = "";
       els.exposureFilter.value = "";
@@ -3234,19 +3189,19 @@
       const sun = state.filtered.filter(p => getExposure(p) === "Sun").length;
       const shade = state.filtered.filter(p => getExposure(p) === "Shade").length;
       const activeTraits = state.activeTraits.size;
-      const visible = Math.min(state.visibleCount, showing);
       els.summaryBar.innerHTML = `
-        <span class="pill">Showing ${visible} of ${showing} plants</span>
+        <span class="pill">${total} loaded</span>
+        <span class="pill">${showing} showing</span>
         <span class="pill">${sun} sun</span>
         <span class="pill">${shade} shade</span>
-        <span class="pill">${activeTraits} active trait${activeTraits === 1 ? "" : "s"}</span>
+        <span class="pill">${activeTraits} active traits</span>
       `;
     }
 
     function renderResults() {
       els.results.innerHTML = "";
       if (!state.filtered.length) {
-        els.results.innerHTML = `<div class="empty">No plants match those filters. Reset filters or try a broader search.</div>`;
+        els.results.innerHTML = `<div class="empty">No plants match the current filters.</div>`;
         return;
       }
       const visiblePlants = state.filtered.slice(0, state.visibleCount);
@@ -3798,11 +3753,10 @@ function renderDefinitions() {
     function renderFinderResults() {
       const results = state.finderResults;
       if (!results.length) {
-        els.finderResults.innerHTML = `<div class="empty">No matching locations found. Try another plant name, category, or reset the finder.</div>`;
+        els.finderResults.innerHTML = `<div class="empty">No nursery matches found. Try a different plant name or clear a filter.</div>`;
         return;
       }
-      const finderSummary = `<p class="kiosk-result-summary">Showing ${results.length} match${results.length === 1 ? "" : "es"}${state.finderCategory ? ` in ${escapeHtml(state.finderCategory)}` : ""}.</p>`;
-      els.finderResults.innerHTML = finderSummary + results.map(item => {
+      els.finderResults.innerHTML = results.map(item => {
         const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
         const active = state.selectedFinderId === item.id;
         const tags = item.traits.slice(0, 4).map(trait => `<span class="trait-badge">${titleCase(trait.replace(/-/g, " "))}</span>`).join("");
@@ -3876,7 +3830,6 @@ function renderDefinitions() {
     function selectFinderItem(itemId) {
       const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
       if (!item) return;
-      trackEvent("finder_result_clicked", { item_name: item.name, category: item.category, zone_id: item.zoneIds?.[0] || "" });
       state.selectedFinderId = item.id;
       state.selectedZoneIds = item.zoneIds.slice();
       renderFinderResults();
@@ -3886,8 +3839,6 @@ function renderDefinitions() {
     }
 
     function handleZoneClick(zoneId) {
-      trackEvent("map_clicked", { zone_id: zoneId, zone_name: zoneTitle(zoneId), view: state.currentView || "finder" });
-      trackEvent("map_zone_clicked", { zone_id: zoneId, zone_name: zoneTitle(zoneId), view: state.currentView || "finder" });
       state.selectedZoneIds = [zoneId];
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
       renderFinderMaps([zoneId], matches.slice(0, 6));
@@ -3933,12 +3884,12 @@ function renderDefinitions() {
       renderFinderChips();
       applyFinderFilters();
       renderFinderMaps([], []);
-      els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel shows the location, the cue flag, and a short direction line you can use with customers on the floor.</p>`;
+      els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel shows the location, any flag cue from the sheets, and a short direction line you can use with customers on the floor.</p>`;
     }
 
     function renderKioskActions() {
       const actions = [
-        
+        { label: "All Plants", value: "" },
         { label: "Trees", value: "Tree" },
         { label: "Shrubs", value: "Shrub" },
         { label: "Shade", value: "shade" },
@@ -3964,21 +3915,18 @@ function renderDefinitions() {
       els.kioskActions.querySelectorAll("[data-kiosk-value]").forEach(btn => {
         btn.addEventListener("click", () => {
           const value = btn.dataset.kioskValue;
-          const label = btn.textContent.trim();
           if (value === "__clear__") {
             els.kioskSearch.value = "";
             state.kioskTrait = "";
             state.selectedKioskId = "";
             renderKioskActions();
             applyKioskFilters();
-            trackEvent("reset_filters", { view: "kiosk" });
             return;
           }
 
           state.kioskTrait = value;
           renderKioskActions();
           applyKioskFilters();
-          trackEvent("kiosk_category_clicked", { category_name: label, results_count: state.kioskMatchCount || 0 });
         });
       });
     }
@@ -4012,14 +3960,13 @@ function renderDefinitions() {
     function renderKioskResults() {
       const total = state.kioskMatchCount || 0;
       if (!state.kioskResults.length) {
-        els.kioskResults.innerHTML = `<div class="empty">Nothing matched that search. Try a broader term or tap a category below.</div>`;
+        els.kioskResults.innerHTML = `<div class="empty">No matches in kiosk mode. Try another search or clear a quick filter.</div>`;
         return;
       }
 
-      const pickedLabel = state.kioskTrait ? titleCase(String(state.kioskTrait).replace(/-/g, " ")) : "all categories";
       const summary = total > state.kioskResults.length
-        ? `<p class="kiosk-result-summary">Showing first ${state.kioskResults.length} of ${total} results for ${pickedLabel}.</p>`
-        : `<p class="kiosk-result-summary">Showing ${total} result${total === 1 ? "" : "s"} for ${pickedLabel}.</p>`;
+        ? `<p class="kiosk-result-summary">Showing first ${state.kioskResults.length} of ${total} matches.</p>`
+        : `<p class="kiosk-result-summary">${total} match${total === 1 ? "" : "es"}.</p>`;
 
       els.kioskResults.innerHTML = summary + state.kioskResults.map(item => {
         const active = state.selectedKioskId === item.id;
@@ -4065,7 +4012,7 @@ function renderDefinitions() {
       if (!item) {
         els.kioskDetailPanel.innerHTML = `
           <h2>Directions</h2>
-          <p class="kiosk-lead">Search by plant name, browse a category, or use the map to help find the right area.</p>
+          <p class="kiosk-lead">Select a result to show a short polished direction you can repeat to a customer.</p>
           <p class="zone-directions">The map preview keeps the full nursery in view and always shows the red starting marker at perennials / checkout.</p>
         `;
         renderKioskMap(null);
@@ -4092,7 +4039,6 @@ function renderDefinitions() {
     function selectKioskItem(itemId) {
       const item = getKioskItems().find(entry => entry.id === itemId);
       if (!item) return;
-      trackEvent("kiosk_result_clicked", { item_name: item.name, category: item.category, zone_id: item.zoneIds?.[0] || "" });
       state.selectedKioskId = item.id;
       renderKioskResults();
       renderKioskDetail(item);
@@ -4136,32 +4082,14 @@ function renderDefinitions() {
         await setScanPanelOpen(!state.scanPanelOpen);
       });
 
-      els.searchInput.addEventListener("input", () => {
-        applyFilters();
-        trackEvent("search_plants", { query: els.searchInput.value.trim(), results_count: state.filtered.length, view: "browser" });
-      });
-      els.exposureFilter.addEventListener("change", () => {
-        applyFilters();
-        trackEvent("filter_changed", { filter_name: "Exposure", filter_value: els.exposureFilter.value || "All", results_count: state.filtered.length });
-      });
-      els.groupFilter.addEventListener("change", () => {
-        applyFilters();
-        trackEvent("filter_changed", { filter_name: "Plant category", filter_value: els.groupFilter.value || "All", results_count: state.filtered.length });
-      });
-      els.colorFilter.addEventListener("change", () => {
-        applyFilters();
-        trackEvent("filter_changed", { filter_name: "Color", filter_value: els.colorFilter.value || "All", results_count: state.filtered.length });
-      });
-      els.heightFilter.addEventListener("change", () => {
-        applyFilters();
-        trackEvent("filter_changed", { filter_name: "Height", filter_value: els.heightFilter.value || "All", results_count: state.filtered.length });
-      });
-      els.showCount.addEventListener("change", () => {
-        applyFilters();
-        trackEvent("filter_changed", { filter_name: "Results shown", filter_value: els.showCount.value, results_count: state.filtered.length });
-      });
+      els.searchInput.addEventListener("input", applyFilters);
+      els.exposureFilter.addEventListener("change", applyFilters);
+      els.groupFilter.addEventListener("change", applyFilters);
+      els.colorFilter.addEventListener("change", applyFilters);
+      els.heightFilter.addEventListener("change", applyFilters);
+      els.showCount.addEventListener("change", applyFilters);
 
-      els.clearFilters.addEventListener("click", () => { clearFilters(); trackEvent("reset_filters", { view: "browser" }); });
+      els.clearFilters.addEventListener("click", () => { clearFilters(); });
       els.findSkuBtn.addEventListener("click", () => { runSkuLookup(els.scanSkuInput.value, "manual"); });
       els.startScannerBtn.addEventListener("click", () => { startLiveScanner(); });
       els.stopScannerBtn.addEventListener("click", () => { stopLiveScanner(false); });
@@ -4175,20 +4103,11 @@ function renderDefinitions() {
         }
       });
 
-      els.finderSearch.addEventListener("input", () => {
-        applyFinderFilters();
-        trackEvent("search_plants", { query: els.finderSearch.value.trim(), results_count: state.finderResults.length, view: "finder" });
-      });
-      els.finderCategory.addEventListener("change", () => {
-        applyFinderFilters();
-        trackEvent("filter_changed", { filter_name: "Finder category", filter_value: els.finderCategory.value || "All", results_count: state.finderResults.length });
-      });
-      els.finderClearBtn.addEventListener("click", () => { clearFinder(); trackEvent("reset_filters", { view: "finder" }); });
+      els.finderSearch.addEventListener("input", applyFinderFilters);
+      els.finderCategory.addEventListener("change", applyFinderFilters);
+      els.finderClearBtn.addEventListener("click", clearFinder);
       els.zoneJumpButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-          trackEvent("map_zone_clicked", { zone_id: btn.dataset.zoneJump, zone_name: btn.textContent.trim(), view: "finder" });
-          handleZoneClick(btn.dataset.zoneJump);
-        });
+        btn.addEventListener("click", () => handleZoneClick(btn.dataset.zoneJump));
       });
 
       els.mobileMapTools?.querySelectorAll("[data-map-focus]").forEach(btn => {
@@ -4197,11 +4116,7 @@ function renderDefinitions() {
 
       window.addEventListener("resize", syncMobileMapUi);
 
-      els.kioskSearch.addEventListener("input", () => {
-        renderKioskActions();
-        applyKioskFilters();
-        trackEvent("kiosk_search", { query: els.kioskSearch.value.trim(), results_count: state.kioskMatchCount || 0 });
-      });
+      els.kioskSearch.addEventListener("input", () => { renderKioskActions(); applyKioskFilters(); });
       els.kioskOpenLargeMap?.addEventListener("click", () => {
         const item = getKioskItems().find(entry => entry.id === state.selectedKioskId);
         if (!item) return;
@@ -4237,15 +4152,5 @@ function renderDefinitions() {
     showView("browser");
     loadPlants();
   </script>
-
-  <footer class="site-footer">
-    <div class="site-footer-inner">
-      <div class="site-footer-copy">
-        <div class="site-footer-title">Designed and developed by C.G. Fox</div>
-        <div class="site-footer-sub">Foxfield Studio</div>
-      </div>
-    </div>
-  </footer>
-
 </body>
 </html>
