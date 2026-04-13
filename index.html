@@ -898,7 +898,9 @@
 
     .map-zone-shape.active {
       fill: var(--map-zone-active);
-      stroke-width: 4;
+      stroke: #f3fbf7;
+      stroke-width: 5;
+      filter: drop-shadow(0 8px 20px rgba(92, 168, 109, 0.30));
     }
 
     .map-label,
@@ -1343,7 +1345,9 @@
 
     .map-zone-shape.active {
       fill: var(--map-zone-active);
-      stroke-width: 4;
+      stroke: #f3fbf7;
+      stroke-width: 5;
+      filter: drop-shadow(0 8px 20px rgba(92, 168, 109, 0.30));
     }
 
     .map-label {
@@ -1818,6 +1822,28 @@
       }
     }
 
+
+
+
+    /* Focused map interaction fixes */
+    .map-zone-group,
+    .map-fixed-flag {
+      cursor: pointer;
+    }
+
+    .map-zone-group text,
+    .map-title-accent,
+    .map-heading-note,
+    .map-yard-label,
+    .map-yard-item,
+    .map-static,
+    .map-you-line,
+    .map-you-ring,
+    .map-you-dot,
+    .map-you-badge,
+    .map-you-text {
+      pointer-events: none;
+    }
 
 </style>
 </head>
@@ -3463,6 +3489,14 @@ function renderDefinitions() {
         .replace(/\"/g, "&quot;");
     }
 
+
+    function primaryZoneIdForItem(item) {
+      if (!item) return "";
+      if (item.primaryZoneId) return item.primaryZoneId;
+      if (Array.isArray(item.zoneIds) && item.zoneIds.length) return item.zoneIds[0];
+      return "";
+    }
+
     function zoneTitle(zoneId) {
       const zone = MAP_ZONES.find(z => z.id === zoneId);
       if (!zone) return zoneId;
@@ -3538,6 +3572,7 @@ function renderDefinitions() {
     function buildMapSvg(activeZoneIds = [], markerItems = [], viewBox = "0 0 1020 950") {
       const active = new Set(activeZoneIds || []);
       const selectedColors = new Set((markerItems || []).map(item => item.flagColor).filter(Boolean));
+      const selectedFlagIds = new Set((markerItems || []).map(item => item.id).filter(Boolean));
 
       const staticText = `
         <text class="map-title-accent" x="458" y="158">Ball &amp; Burlap Trees</text>
@@ -3573,9 +3608,7 @@ function renderDefinitions() {
 
       const exampleFlags = MAP_FLAG_MARKERS.map(marker => {
         const color = FLAG_COLORS[marker.color] || marker.color || "#777";
-        const markerZoneIds = Array.isArray(marker.zoneIds) ? marker.zoneIds : [];
-        const zoneActive = markerZoneIds.some(zoneId => active.has(zoneId));
-        const isActive = selectedColors.has(marker.color) || zoneActive;
+        const isActive = selectedFlagIds.has(marker.id) || selectedColors.has(marker.color);
         return `
           <g class="map-fixed-flag${isActive ? " active" : ""}" data-flag-id="${marker.id}" data-flag-color="${marker.color}" role="button" tabindex="0" aria-label="${titleCase(marker.color)} flag marker" transform="translate(${marker.x} ${marker.y})">
             <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="28"></line>
@@ -3635,11 +3668,14 @@ function renderDefinitions() {
 
     function wireMapClicks(scope) {
       if (!scope) return;
-      scope.querySelectorAll("[data-zone]").forEach(node => {
-        node.addEventListener("click", () => handleZoneClick(node.dataset.zone));
+      scope.querySelectorAll("[data-zone-group]").forEach(node => {
+        node.addEventListener("click", () => handleZoneClick(node.dataset.zoneGroup));
       });
       scope.querySelectorAll("[data-flag-id]").forEach(node => {
-        node.addEventListener("click", () => handleFlagClick(node.dataset.flagId));
+        node.addEventListener("click", event => {
+          event.stopPropagation();
+          handleFlagClick(node.dataset.flagId);
+        });
         node.addEventListener("keydown", event => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
@@ -3873,11 +3909,13 @@ function renderDefinitions() {
     function selectFinderItem(itemId) {
       const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
       if (!item) return;
+      const primaryZoneId = primaryZoneIdForItem(item);
+      const focusedZones = primaryZoneId ? [primaryZoneId] : (Array.isArray(item.zoneIds) ? item.zoneIds.slice(0, 1) : []);
       state.selectedFinderId = item.id;
       state.selectedFlagId = "";
-      state.selectedZoneIds = item.zoneIds.slice();
+      state.selectedZoneIds = focusedZones;
       renderFinderResults();
-      renderFinderMaps(item.zoneIds, [item]);
+      renderFinderMaps(focusedZones, [item]);
       els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
       wireCopyButtons(els.locationDetails);
       updateFinderSummary();
@@ -3930,7 +3968,7 @@ function renderDefinitions() {
 
       renderFinderMaps(
         primaryZoneIds,
-        [{ flagColor: marker.color, zoneIds: primaryZoneIds, name: `${titleCase(marker.color)} flag` }]
+        [{ id: marker.id, flagColor: marker.color, zoneIds: primaryZoneIds, name: `${titleCase(marker.color)} flag` }]
       );
 
       const zoneBadges = primaryZoneIds.length
