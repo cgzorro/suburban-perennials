@@ -692,6 +692,12 @@
       color: var(--text);
     }
 
+    .flag-chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
     button.flag-chip {
       cursor: pointer;
     }
@@ -1387,14 +1393,44 @@
     }
 
     .map-fixed-flag {
-      opacity: .64;
+      opacity: .66;
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.14));
       cursor: pointer;
     }
 
     .map-fixed-flag.active {
       opacity: 1;
-      filter: drop-shadow(0 0 7px rgba(123, 208, 95, 0.52));
+      filter: drop-shadow(0 0 10px rgba(123, 208, 95, 0.54));
+    }
+
+    .map-fixed-flag-hit {
+      fill: transparent;
+    }
+
+    .map-fixed-flag-inner {
+      transition: transform .18s ease, filter .18s ease, opacity .18s ease;
+      transform-box: fill-box;
+      transform-origin: center;
+      pointer-events: none;
+    }
+
+    .map-fixed-flag.active .map-fixed-flag-inner {
+      animation: mapFlagWave 1.45s ease-in-out infinite;
+    }
+
+    .map-fixed-flag.active .map-flag-stick {
+      stroke-width: 2.4;
+    }
+
+    .map-fixed-flag.active .map-flag-base {
+      stroke-width: 2.4;
+    }
+
+    @keyframes mapFlagWave {
+      0%, 100% { transform: translateY(0) scale(1); }
+      22% { transform: translateY(-1px) scale(1.16) rotate(-3deg); }
+      50% { transform: translateY(-2px) scale(1.2) rotate(0deg); }
+      78% { transform: translateY(-1px) scale(1.16) rotate(3deg); }
     }
 
     .map-flag-stick {
@@ -1579,12 +1615,22 @@
       stroke-width: 5px;
       stroke-linejoin: round;
       letter-spacing: 0.01em;
+      pointer-events: none;
+      user-select: none;
     }
 
     .map-small,
     .map-heading-note,
     .map-yard-item {
       stroke-width: 4px;
+    }
+
+    .map-zone-group {
+      cursor: pointer;
+    }
+
+    .map-zone-hit {
+      fill: transparent;
     }
 
     .map-zone-group.active .map-label,
@@ -3467,9 +3513,9 @@ function renderDefinitions() {
       });
 
       els.flagLegend.innerHTML = `
-        <span class="flag-chip flag-chip-note">Approximate field-flag examples from the paper map. Tap a flag to highlight its primary mapped section.</span>
+        <span class="flag-chip flag-chip-note">Approximate field-flag examples from the paper map. Tap a flag to highlight its mapped section.</span>
         ${orderedMarkers.map(marker => `
-          <button type="button" class="flag-chip" data-flag-id="${marker.id}">
+          <button type="button" class="flag-chip${state.selectedFlagId === marker.id ? " active" : ""}" data-flag-id="${marker.id}">
             <span class="mini-flag ${marker.color === "white" ? "white" : ""}" style="--flag:${FLAG_COLORS[marker.color] || marker.color}"></span>
             ${titleCase(marker.color)} flag
           </button>
@@ -3495,6 +3541,68 @@ function renderDefinitions() {
       if (item.primaryZoneId) return item.primaryZoneId;
       if (Array.isArray(item.zoneIds) && item.zoneIds.length) return item.zoneIds[0];
       return "";
+    }
+
+    function getOrderedZoneIds(zoneIds = [], primaryZoneId = "") {
+      return uniqueValues([primaryZoneId, ...(Array.isArray(zoneIds) ? zoneIds : [])].filter(Boolean));
+    }
+
+    function resolveFlagForZones(zoneIds = [], preferredColor = "") {
+      const orderedZoneIds = uniqueValues((zoneIds || []).filter(Boolean));
+      const primaryZoneId = orderedZoneIds[0] || "";
+      const primaryMarkers = MAP_FLAG_MARKERS.filter(marker => marker.primaryZoneId === primaryZoneId);
+      const relatedMarkers = MAP_FLAG_MARKERS.filter(marker => (marker.zoneIds || []).some(zoneId => orderedZoneIds.includes(zoneId)));
+      const colorPrimary = preferredColor ? primaryMarkers.find(marker => marker.color === preferredColor) : null;
+      const colorRelated = preferredColor ? relatedMarkers.find(marker => marker.color === preferredColor) : null;
+      return colorPrimary
+        || colorRelated
+        || primaryMarkers[0]
+        || relatedMarkers[0]
+        || (preferredColor ? MAP_FLAG_MARKERS.find(marker => marker.color === preferredColor) : null)
+        || null;
+    }
+
+    function resolveFlagForItem(item) {
+      if (!item) return null;
+      const orderedZoneIds = getOrderedZoneIds(item.zoneIds || [], primaryZoneIdForItem(item));
+      if (item.cueFlagId) {
+        return MAP_FLAG_MARKERS.find(marker => marker.id === item.cueFlagId) || resolveFlagForZones(orderedZoneIds, item.flagColor || "");
+      }
+      return resolveFlagForZones(orderedZoneIds, item.flagColor || "");
+    }
+
+    function displayFlagColorForItem(item) {
+      const marker = resolveFlagForItem(item);
+      return marker?.color || item?.flagColor || "";
+    }
+
+    function displayFlagLabelForItem(item) {
+      const color = displayFlagColorForItem(item);
+      return color ? `${titleCase(color)} flag` : "Map cue";
+    }
+
+    function buildZoneCueBadges(zoneId) {
+      const markers = MAP_FLAG_MARKERS.filter(marker => marker.primaryZoneId === zoneId || (marker.zoneIds || []).includes(zoneId));
+      if (!markers.length) return "";
+      return `<div class="detail-tag-row">${markers.map(marker => `<span class="location-badge">${escapeHtml(titleCase(marker.color))} flag</span>`).join("")}</div>`;
+    }
+
+    function zoneGuidanceLine(zoneId) {
+      const marker = resolveFlagForZones([zoneId]);
+      return marker
+        ? `${zoneTitle(zoneId)} is highlighted. Use the ${titleCase(marker.color)} flag as the directional cue inside that section.`
+        : `${zoneTitle(zoneId)} is highlighted on the overview map and closer-look panel.`;
+    }
+
+    function zoneBadgeHtml(zoneIds = []) {
+      const list = uniqueValues((zoneIds || []).filter(Boolean));
+      if (!list.length) return "";
+      return `<div class="detail-tag-row">${list.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("")}</div>`;
+    }
+
+    function zoneMatchBadges(items = [], limit = 12) {
+      if (!items.length) return "";
+      return `<div class="detail-tag-row">${items.slice(0, limit).map(item => `<span class="location-badge">${escapeHtml(item.name)}</span>`).join("")}</div>`;
     }
 
     function zoneTitle(zoneId) {
@@ -3569,10 +3677,9 @@ function renderDefinitions() {
       });
     }
 
-    function buildMapSvg(activeZoneIds = [], markerItems = [], viewBox = "0 0 1020 950") {
+    function buildMapSvg(activeZoneIds = [], activeFlagId = "", viewBox = "0 0 1020 950") {
       const active = new Set(activeZoneIds || []);
-      const selectedColors = new Set((markerItems || []).map(item => item.flagColor).filter(Boolean));
-      const selectedFlagIds = new Set((markerItems || []).map(item => item.id).filter(Boolean));
+      const activeFlagMarker = activeFlagId ? MAP_FLAG_MARKERS.find(marker => marker.id === activeFlagId) : null;
 
       const staticText = `
         <text class="map-title-accent" x="458" y="158">Ball &amp; Burlap Trees</text>
@@ -3600,6 +3707,7 @@ function renderDefinitions() {
         return `
           <g class="map-zone-group${active.has(zone.id) ? " active" : ""}" data-zone-group="${zone.id}" data-active="${active.has(zone.id) ? "true" : "false"}">
             <rect class="map-zone-shape${active.has(zone.id) ? " active" : ""}" data-zone="${zone.id}" x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${rx}" ry="${rx}"></rect>
+            <rect class="map-zone-hit" data-zone-hit="${zone.id}" x="${zone.x}" y="${zone.y}" width="${zone.w}" height="${zone.h}" rx="${rx}" ry="${rx}"></rect>
             <text class="${titleClass}${active.has(zone.id) ? " active" : ""}" x="${zone.centerX}" y="${titleY}">${zone.title}</text>
             ${zone.subtitle ? `<text class="${subtitleClass}${active.has(zone.id) ? " active" : ""}" x="${zone.centerX}" y="${subtitleY}">${zone.subtitle}</text>` : ""}
           </g>
@@ -3608,11 +3716,14 @@ function renderDefinitions() {
 
       const exampleFlags = MAP_FLAG_MARKERS.map(marker => {
         const color = FLAG_COLORS[marker.color] || marker.color || "#777";
-        const isActive = selectedFlagIds.has(marker.id) || selectedColors.has(marker.color);
+        const isActive = activeFlagMarker?.id === marker.id;
         return `
           <g class="map-fixed-flag${isActive ? " active" : ""}" data-flag-id="${marker.id}" data-flag-color="${marker.color}" role="button" tabindex="0" aria-label="${titleCase(marker.color)} flag marker" transform="translate(${marker.x} ${marker.y})">
-            <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="28"></line>
-            <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="0,0 -22,-12 -22,12" fill="${color}"></polygon>
+            <circle class="map-fixed-flag-hit" cx="-8" cy="10" r="26"></circle>
+            <g class="map-fixed-flag-inner${isActive ? " active" : ""}">
+              <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="28"></line>
+              <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="0,0 -22,-12 -22,12" fill="${color}"></polygon>
+            </g>
           </g>
         `;
       }).join("");
@@ -3685,29 +3796,30 @@ function renderDefinitions() {
       });
     }
 
-    function renderFinderMaps(activeZoneIds = [], markerItems = []) {
+    function renderFinderMaps(activeZoneIds = [], activeFlagId = "") {
       const active = Array.isArray(activeZoneIds) ? activeZoneIds.filter(Boolean) : [];
-      const primaryZoneId = active[0] || markerItems?.[0]?.zoneIds?.[0] || "";
+      const primaryZoneId = active[0] || "";
       const primaryZone = MAP_ZONES.find(z => z.id === primaryZoneId);
+      const activeFlagMarker = activeFlagId ? MAP_FLAG_MARKERS.find(marker => marker.id === activeFlagId) : null;
       const detailBox = primaryZone ? getZoneZoomBox(primaryZone.id) : { x: 300, y: 700, w: 620, h: 230 };
 
-      els.overviewMapBoard.innerHTML = buildMapSvg(active, markerItems, "0 0 1020 950");
+      els.overviewMapBoard.innerHTML = buildMapSvg(active, activeFlagId, "0 0 1020 950");
       wireMapClicks(els.overviewMapBoard);
 
-      els.detailMapBoard.innerHTML = buildMapSvg(primaryZone ? [primaryZone.id] : active, markerItems, `${detailBox.x} ${detailBox.y} ${detailBox.w} ${detailBox.h}`);
+      els.detailMapBoard.innerHTML = buildMapSvg(primaryZone ? [primaryZone.id] : active, activeFlagId, `${detailBox.x} ${detailBox.y} ${detailBox.w} ${detailBox.h}`);
       wireMapClicks(els.detailMapBoard);
 
-      const flagSummary = uniqueValues((markerItems || []).map(item => item.flagColor).filter(Boolean))
-        .map(color => `${titleCase(color)} flag`)
-        .join(" • ");
+      const flagSummary = activeFlagMarker ? `${titleCase(activeFlagMarker.color)} flag` : "";
 
       els.overviewMapCaption.textContent = primaryZone
-        ? `${zoneTitle(primaryZone.id)} stays highlighted on the full map so the rest of the nursery remains visible.${flagSummary ? ` Matching cue: ${flagSummary}.` : ""}`
+        ? `${zoneTitle(primaryZone.id)} stays highlighted on the full map so the rest of the nursery remains visible.${flagSummary ? ` Cue: ${flagSummary}.` : ""}`
         : "The full nursery stays visible while each section uses darker blocks and reverse type for faster reading. Tap a result or any zone to highlight it.";
 
       els.detailMapCaption.textContent = primaryZone
-        ? `Closer look: ${zoneTitle(primaryZone.id)}.${flagSummary ? ` Look for ${flagSummary.toLowerCase()}.` : ""}`
+        ? `Closer look: ${zoneTitle(primaryZone.id)}.${flagSummary ? ` Look for the ${flagSummary.toLowerCase()}.` : ""}`
         : "Closer look starts near perennials / checkout until you choose a plant or map section.";
+
+      renderFlagLegend();
     }
 
     function syncMobileMapUi() {
@@ -3836,7 +3948,8 @@ function renderDefinitions() {
         return;
       }
       els.finderResults.innerHTML = results.map(item => {
-        const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+        const displayFlagColor = displayFlagColorForItem(item);
+        const flagColor = FLAG_COLORS[displayFlagColor] || displayFlagColor || "#666";
         const active = state.selectedFinderId === item.id;
         const tags = item.traits.slice(0, 4).map(trait => `<span class="trait-badge">${titleCase(trait.replace(/-/g, " "))}</span>`).join("");
         return `
@@ -3846,7 +3959,7 @@ function renderDefinitions() {
                 <h3>${escapeHtml(item.name)}</h3>
                 <div class="finder-meta">${escapeHtml(item.locationLabel)} · ${escapeHtml(item.area)}</div>
               </div>
-              <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")}</span>
+              <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${displayFlagLabelForItem(item)}</span>
             </div>
             <div class="finder-tag-row">
               <span class="location-badge">${escapeHtml(item.category)}</span>
@@ -3863,7 +3976,8 @@ function renderDefinitions() {
     }
 
     function buildDetailHtml(item, mode = "finder") {
-      const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+      const displayFlagColor = displayFlagColorForItem(item);
+      const flagColor = FLAG_COLORS[displayFlagColor] || displayFlagColor || "#666";
       const traits = item.traits.length
         ? item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, " "))}</span>`).join("")
         : `<span class="trait-badge">No brochure traits listed</span>`;
@@ -3876,7 +3990,7 @@ function renderDefinitions() {
         <h3>${escapeHtml(item.name)}</h3>
         <p class="finder-note"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
         <div class="detail-tag-row">
-          <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")} flag</span>
+          <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${displayFlagLabelForItem(item)}</span>
           <span class="location-badge">${escapeHtml(item.category)}</span>
         </div>
         <div class="detail-tag-row">${zones}</div>
@@ -3910,12 +4024,13 @@ function renderDefinitions() {
       const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
       if (!item) return;
       const primaryZoneId = primaryZoneIdForItem(item);
-      const focusedZones = primaryZoneId ? [primaryZoneId] : (Array.isArray(item.zoneIds) ? item.zoneIds.slice(0, 1) : []);
+      const focusedZones = getOrderedZoneIds(item.zoneIds || [], primaryZoneId).slice(0, 1);
+      const cueFlag = resolveFlagForItem(item);
       state.selectedFinderId = item.id;
-      state.selectedFlagId = "";
+      state.selectedFlagId = cueFlag?.id || "";
       state.selectedZoneIds = focusedZones;
       renderFinderResults();
-      renderFinderMaps(focusedZones, [item]);
+      renderFinderMaps(focusedZones, state.selectedFlagId);
       els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
       wireCopyButtons(els.locationDetails);
       updateFinderSummary();
@@ -3927,12 +4042,15 @@ function renderDefinitions() {
       state.selectedFlagId = "";
       state.selectedZoneIds = [zoneId];
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
-      renderFinderMaps([zoneId], []);
+      renderFinderResults();
+      renderFinderMaps([zoneId], "");
       const zoneName = zoneTitle(zoneId);
       if (!matches.length) {
         els.locationDetails.innerHTML = `
           <h3>${escapeHtml(zoneName)}</h3>
           <p class="finder-note">No mapped plants are assigned to this zone yet, but the zone is available on the digital map.</p>
+          ${buildZoneCueBadges(zoneId)}
+          <p class="zone-directions">${escapeHtml(zoneGuidanceLine(zoneId))}</p>
         `;
         updateFinderSummary();
         nudgeFinderDetailsIntoView();
@@ -3941,8 +4059,9 @@ function renderDefinitions() {
       els.locationDetails.innerHTML = `
         <h3>${escapeHtml(zoneName)}</h3>
         <p class="finder-note">Mapped plants in this zone:</p>
-        <div class="detail-tag-row">${matches.slice(0, 14).map(item => `<span class="location-badge">${escapeHtml(item.name)}</span>`).join("")}</div>
-        <p class="zone-directions">${escapeHtml(directionFromZone(matches[0]))}</p>
+        ${zoneMatchBadges(matches, 14)}
+        ${buildZoneCueBadges(zoneId)}
+        <p class="zone-directions">${escapeHtml(zoneGuidanceLine(zoneId))}</p>
       `;
       updateFinderSummary();
       nudgeFinderDetailsIntoView();
@@ -3952,42 +4071,22 @@ function renderDefinitions() {
       const marker = MAP_FLAG_MARKERS.find(entry => entry.id === flagId);
       if (!marker) return;
 
-      const zoneIds = uniqueValues((marker.zoneIds || []).filter(Boolean));
-      const primaryZoneIds = uniqueValues([(marker.primaryZoneId || zoneIds[0] || "")].filter(Boolean));
-      const primaryZoneId = primaryZoneIds[0] || "";
-      const matches = sortFinderItems(NURSERY_ITEMS.filter(item => {
-        const primaryZoneMatch = primaryZoneId ? item.zoneIds.includes(primaryZoneId) : false;
-        const relatedZoneMatch = zoneIds.length ? item.zoneIds.some(zoneId => zoneIds.includes(zoneId)) : false;
-        const colorMatch = item.flagColor === marker.color;
-        return primaryZoneMatch || (colorMatch && relatedZoneMatch);
-      }));
+      const primaryZoneIds = uniqueValues([(marker.primaryZoneId || marker.zoneIds?.[0] || "")].filter(Boolean));
+      const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(primaryZoneIds[0])));
 
       state.selectedFinderId = "";
       state.selectedFlagId = marker.id;
       state.selectedZoneIds = primaryZoneIds;
 
-      renderFinderMaps(
-        primaryZoneIds,
-        [{ id: marker.id, flagColor: marker.color, zoneIds: primaryZoneIds, name: `${titleCase(marker.color)} flag` }]
-      );
-
-      const zoneBadges = primaryZoneIds.length
-        ? `<div class="detail-tag-row">${primaryZoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("")}</div>`
-        : "";
-
-      const matchBadges = matches.length
-        ? `<div class="detail-tag-row">${matches.slice(0, 12).map(item => `<span class="location-badge">${escapeHtml(item.name)}</span>`).join("")}</div>`
-        : "";
-
-      const firstDirection = matches.length ? directionFromZone(matches[0]) : "";
+      renderFinderResults();
+      renderFinderMaps(primaryZoneIds, marker.id);
 
       els.locationDetails.innerHTML = `
         <h3>${escapeHtml(titleCase(marker.color))} flag</h3>
         <p class="finder-note">${escapeHtml(marker.note || "Approximate field-flag location from the paper map.")}</p>
-        <p class="finder-note">Primary mapped section highlighted first. Cards keep the flag cue for faster customer guidance.</p>
-        ${zoneBadges}
-        ${matchBadges}
-        <p class="zone-directions">${escapeHtml(firstDirection || "Primary mapped section highlighted on the overview map and closer-look panel.")}</p>
+        ${zoneBadgeHtml(primaryZoneIds)}
+        ${zoneMatchBadges(matches, 12)}
+        <p class="zone-directions">${escapeHtml(zoneGuidanceLine(primaryZoneIds[0]))}</p>
       `;
       updateFinderSummary();
       nudgeFinderDetailsIntoView();
@@ -3999,12 +4098,13 @@ function renderDefinitions() {
       state.finderResults = sortFinderItems(NURSERY_ITEMS.filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits)));
       if (state.selectedFinderId && !state.finderResults.some(item => item.id === state.selectedFinderId)) {
         state.selectedFinderId = "";
+        state.selectedFlagId = "";
       }
       renderFinderResults();
       if (state.selectedFinderId) {
         selectFinderItem(state.selectedFinderId);
       } else {
-        renderFinderMaps(state.selectedZoneIds, []);
+        renderFinderMaps(state.selectedZoneIds, state.selectedFlagId);
       }
     }
 
@@ -4019,7 +4119,7 @@ function renderDefinitions() {
       state.selectedZoneIds = [];
       renderFinderChips();
       applyFinderFilters();
-      renderFinderMaps([], []);
+      renderFinderMaps([], "");
       els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel shows the location, any flag cue from the sheets, and a short direction line you can use with customers on the floor.</p>`;
       updateFinderSummary();
     }
@@ -4106,7 +4206,8 @@ function renderDefinitions() {
 
       els.kioskResults.innerHTML = summary + state.kioskResults.map(item => {
         const active = state.selectedKioskId === item.id;
-        const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+        const displayFlagColor = displayFlagColorForItem(item);
+        const flagColor = FLAG_COLORS[displayFlagColor] || displayFlagColor || "#666";
         return `
           <button type="button" class="kiosk-card${active ? " active" : ""}" data-kiosk-id="${item.id}">
             <div class="topline">
@@ -4127,12 +4228,12 @@ function renderDefinitions() {
 
     function renderKioskMap(item = null) {
       if (!els.kioskMapBoard || !els.kioskMapCaption) return;
-      const activeZoneIds = item?.zoneIds?.length ? item.zoneIds : [];
-      const markerItems = item ? [item] : [];
-      els.kioskMapBoard.innerHTML = buildMapSvg(activeZoneIds, markerItems, "0 0 1020 950");
+      const activeZoneIds = item?.zoneIds?.length ? getOrderedZoneIds(item.zoneIds, primaryZoneIdForItem(item)) : [];
+      const cueFlag = item ? resolveFlagForItem(item) : null;
+      els.kioskMapBoard.innerHTML = buildMapSvg(activeZoneIds, cueFlag?.id || "", "0 0 1020 950");
 
       if (item) {
-        const flagText = item.flagColor ? ` Look for the ${titleCase(item.flagColor)} flag.` : "";
+        const flagText = cueFlag ? ` Look for the ${titleCase(cueFlag.color)} flag.` : "";
         els.kioskMapCaption.textContent = `Start at the red marker near perennials / checkout, then head to ${item.locationLabel}.${flagText}`;
       } else {
         els.kioskMapCaption.textContent = "The full nursery stays visible, with the red start marker showing the perennials / checkout side.";
@@ -4159,7 +4260,7 @@ function renderDefinitions() {
         <h2>${escapeHtml(item.name)}</h2>
         <p class="kiosk-lead"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
         <div class="detail-tag-row">
-          <span class="flag-inline"><span class="mini-flag" style="--flag:${FLAG_COLORS[item.flagColor] || item.flagColor || '#666'}"></span>${titleCase(item.flagColor || 'field')} flag</span>
+          <span class="flag-inline"><span class="mini-flag" style="--flag:${FLAG_COLORS[displayFlagColorForItem(item)] || displayFlagColorForItem(item) || '#666'}"></span>${displayFlagLabelForItem(item)}</span>
         </div>
         <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
         <div class="detail-tag-row">${item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
@@ -4264,7 +4365,7 @@ function renderDefinitions() {
         if (mappedFinder) {
           selectFinderItem(mappedFinder.id);
         } else {
-          renderFinderMaps(item.zoneIds || [], [item]);
+          renderFinderMaps(getOrderedZoneIds(item.zoneIds || [], primaryZoneIdForItem(item)), resolveFlagForItem(item)?.id || "");
           els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
           wireCopyButtons(els.locationDetails);
         }
@@ -4276,7 +4377,7 @@ function renderDefinitions() {
       renderDefinitions();
       renderFlagLegend();
       renderFinderChips();
-      renderFinderMaps([], []);
+      renderFinderMaps([], "");
       applyFinderFilters();
       renderKioskActions();
       renderKioskMap(null);
