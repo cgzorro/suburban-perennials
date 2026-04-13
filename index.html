@@ -1470,10 +1470,23 @@
     }
 
     .map-fixed-flag {
-      opacity: .64;
+      opacity: .66;
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.14));
       transform-box: fill-box;
       transform-origin: center bottom;
+    }
+
+    .map-flag-glow {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+      pointer-events: none;
+    }
+
+    .map-fixed-flag-inner {
+      transform-box: fill-box;
+      transform-origin: center bottom;
+      will-change: transform;
     }
 
     .map-fixed-flag.active {
@@ -1481,6 +1494,14 @@
       filter:
         drop-shadow(0 0 7px rgba(123, 208, 95, 0.52))
         drop-shadow(0 0 14px rgba(123, 208, 95, 0.22));
+    }
+
+    .map-fixed-flag.active .map-flag-glow {
+      opacity: .22;
+      animation: flagGlow 1.9s ease-in-out infinite;
+    }
+
+    .map-fixed-flag.active .map-fixed-flag-inner {
       animation: flagWave 1.9s ease-in-out infinite;
     }
 
@@ -1500,6 +1521,11 @@
       50% { transform: rotate(2.1deg) scale(1.08); }
       75% { transform: rotate(-1.5deg) scale(1.05); }
       100% { transform: rotate(0deg) scale(1); }
+    }
+
+    @keyframes flagGlow {
+      0%, 100% { opacity: .16; transform: scale(1); }
+      50% { opacity: .28; transform: scale(1.12); }
     }
 
     .map-flag-stick {
@@ -3683,8 +3709,11 @@ function renderDefinitions() {
         const isActive = selectedColors.has(marker.color);
         return `
           <g class="map-fixed-flag${isActive ? " active" : ""}" aria-hidden="true" transform="translate(${marker.x} ${marker.y})">
-            <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="28"></line>
-            <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="0,0 -22,-12 -22,12" fill="${color}"></polygon>
+            <circle class="map-flag-glow" cx="-10" cy="2" r="18" fill="${color}"></circle>
+            <g class="map-fixed-flag-inner">
+              <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="28"></line>
+              <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="0,0 -22,-12 -22,12" fill="${color}"></polygon>
+            </g>
           </g>
         `;
       }).join("");
