@@ -1562,6 +1562,33 @@
       .map-static.section {
         font-size: 15px;
       }
+
+      .map-fixed-flag {
+        transform: scale(1.08);
+      }
+
+      .map-fixed-flag.active {
+        filter:
+          drop-shadow(0 0 10px rgba(123, 208, 95, 0.65))
+          drop-shadow(0 0 22px rgba(123, 208, 95, 0.34));
+        animation: flagWaveMobile 1.55s ease-in-out infinite;
+      }
+
+      .map-fixed-flag.active .map-flag-base {
+        stroke-width: 2.4;
+      }
+
+      .map-fixed-flag.active .map-flag-stick {
+        stroke-width: 2.2;
+      }
+    }
+
+    @keyframes flagWaveMobile {
+      0% { transform: rotate(0deg) scale(1.08); }
+      25% { transform: rotate(-3.3deg) scale(1.16); }
+      50% { transform: rotate(3deg) scale(1.2); }
+      75% { transform: rotate(-2.2deg) scale(1.16); }
+      100% { transform: rotate(0deg) scale(1.08); }
     }
 
     .map-title-accent {
@@ -2138,6 +2165,7 @@
               <option value="">All categories</option>
               <option value="Tree">Trees</option>
               <option value="Shrub">Shrubs</option>
+              <option value="Plant">Plants</option>
               <option value="Tree/Shrub">Tree & shrub form</option>
               <option value="Other">Other</option>
             </select>
@@ -3462,7 +3490,10 @@
       const category = normalizeText(plant.category);
 
       if (group === "Roses") {
-        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right rose section", flagColor: "red", topCategory: "Shrub" };
+        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right roses and ornamental grasses section", flagColor: "red", topCategory: "Plant" };
+      }
+      if (group === "Perennial Grasses" || group === "Bamboo") {
+        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right roses and ornamental grasses section", flagColor: "red", topCategory: "Plant" };
       }
       if (group === "Conifers") {
         return { zoneIds: ["b", "c"], locationLabel: "Ball & Burlap B / C", area: "Conifers & evergreens", flagColor: "blue", topCategory: "Tree" };
@@ -3512,7 +3543,13 @@
           area: meta.area,
           flagColor: meta.flagColor,
           traits,
-          notes: normalizeSpaces(plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || ""),
+          image: plant.image || "",
+          link: plant.link || plant.url || "",
+          notes: normalizeSpaces(
+            plant.notes ||
+            plant.description ||
+            (plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || "")
+          ),
           searchBlob: [
             plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, group, exposure, meta.locationLabel, meta.area, traits.join(" ")
           ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase()
@@ -3527,6 +3564,21 @@
     function getKioskItems() {
       if (Array.isArray(state.kioskCatalogItems) && state.kioskCatalogItems.length) return state.kioskCatalogItems;
       return NURSERY_ITEMS;
+    }
+
+    function getFinderItems() {
+      const combined = [...NURSERY_ITEMS];
+      const seen = new Set(combined.map(item => `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`));
+
+      getKioskItems().forEach(item => {
+        if (!item || !Array.isArray(item.zoneIds) || !item.zoneIds.length) return;
+        const key = `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        combined.push(item);
+      });
+
+      return combined;
     }
 
 function renderDefinitions() {
@@ -3926,7 +3978,7 @@ function renderDefinitions() {
     }
 
     function selectFinderItem(itemId) {
-      const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
+      const item = getFinderItems().find(entry => entry.id === itemId);
       if (!item) return;
       state.selectedFinderId = item.id;
       state.selectedZoneIds = item.zoneIds.slice();
@@ -3938,7 +3990,7 @@ function renderDefinitions() {
 
     function handleZoneClick(zoneId) {
       state.selectedZoneIds = [zoneId];
-      const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
+      const matches = sortFinderItems(getFinderItems().filter(item => item.zoneIds.includes(zoneId)));
       const cueColor = primaryFlagColorForZones([zoneId]);
       const markerItems = matches.length ? matches.slice(0, 6) : (cueColor ? [{ flagColor: cueColor, zoneIds: [zoneId] }] : []);
       renderFinderMaps([zoneId], markerItems);
@@ -3961,7 +4013,7 @@ function renderDefinitions() {
     function applyFinderFilters() {
       state.finderQuery = normalizeText(els.finderSearch.value);
       state.finderCategory = els.finderCategory.value;
-      state.finderResults = sortFinderItems(NURSERY_ITEMS.filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits)));
+      state.finderResults = sortFinderItems(getFinderItems().filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits)));
       if (state.selectedFinderId && !state.finderResults.some(item => item.id === state.selectedFinderId)) {
         state.selectedFinderId = "";
       }
@@ -3992,6 +4044,9 @@ function renderDefinitions() {
         { label: "All Plants", value: "" },
         { label: "Trees", value: "Tree" },
         { label: "Shrubs", value: "Shrub" },
+        { label: "Plants", value: "Plant" },
+        { label: "Grasses", value: "grasses" },
+        { label: "Bamboo", value: "bamboo" },
         { label: "Shade", value: "shade" },
         { label: "Conifers", value: "conifers" },
         { label: "Roses", value: "roses" },
@@ -4040,6 +4095,9 @@ function renderDefinitions() {
         if (!picked) return true;
         if (picked === "Tree") return item.category === "Tree";
         if (picked === "Shrub") return item.category === "Shrub";
+        if (picked === "Plant") return item.category === "Plant";
+        if (picked === "grasses") return item.browserGroup === "Perennial Grasses";
+        if (picked === "bamboo") return item.browserGroup === "Bamboo";
         if (picked === "conifers") return item.browserGroup === "Conifers" || isConiferNurseryItem(item);
         if (picked === "roses") return item.browserGroup === "Roses" || isRoseNurseryItem(item);
         if (picked === "shade") return item.traits.includes("shade");
