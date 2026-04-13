@@ -130,11 +130,32 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
-    .hero-copy h1 {
+    .hero-copy h1,
+    .hero-title {
       margin: 0;
       font-size: clamp(2.05rem, 3vw, 2.95rem);
       line-height: 1.02;
       letter-spacing: -0.02em;
+    }
+
+    .hero-title {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 860px;
+    }
+
+    .hero-title-line {
+      display: block;
+      color: var(--text);
+    }
+
+    .hero-title-line-accent {
+      color: var(--accent-2);
+    }
+
+    html[data-theme="light"] .hero-title-line-accent {
+      color: #58b641;
     }
 
     .hero-copy p {
@@ -1824,8 +1845,13 @@
         padding: 16px 14px 15px;
       }
 
-      .hero-copy h1 {
+      .hero-copy h1,
+      .hero-title {
         font-size: 1.8rem;
+      }
+
+      .hero-title {
+        gap: 4px;
       }
 
       .hero-copy p {
@@ -1870,7 +1896,10 @@
     <section class="hero">
       <div class="hero-copy">
         <div class="hero-kicker">Nursery wayfinding + plant discovery</div>
-        <h1>Suburban Perennials</h1>
+        <h1 class="hero-title">
+          <span class="hero-title-line">Suburban Plant Discovery</span>
+          <span class="hero-title-line hero-title-line-accent">+ Nursery Wayfinder</span>
+        </h1>
         <p>Perennial browser, nursery finder, and customer kiosk in one app. The plant browser stays intact, while the new Finder adds a full nursery map and a zoomed detail view for trees, shrubs, hoop houses, and field-flag lookups.</p>
       </div>
       <div class="hero-actions">
