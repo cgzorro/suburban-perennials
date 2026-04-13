@@ -1502,6 +1502,14 @@
       100% { transform: rotate(0deg) scale(1); }
     }
 
+    @keyframes flagWaveMobile {
+      0% { transform: rotate(0deg) scale(1.02); }
+      25% { transform: rotate(-3.8deg) scale(1.09); }
+      50% { transform: rotate(3.2deg) scale(1.13); }
+      75% { transform: rotate(-2.6deg) scale(1.09); }
+      100% { transform: rotate(0deg) scale(1.02); }
+    }
+
     .map-flag-stick {
       stroke: #667384;
       stroke-width: 1.5;
@@ -1561,6 +1569,13 @@
 
       .map-static.section {
         font-size: 15px;
+      }
+
+      .map-fixed-flag.active {
+        animation: flagWaveMobile 1.55s ease-in-out infinite;
+        filter:
+          drop-shadow(0 0 10px rgba(123, 208, 95, 0.58))
+          drop-shadow(0 0 18px rgba(123, 208, 95, 0.28));
       }
     }
 
@@ -2026,9 +2041,9 @@
           </div>
 
           <div class="field">
-            <label for="colorFilter">Color</label>
+            <label for="colorFilter">Family</label>
             <select id="colorFilter">
-              <option value="">All colors</option>
+              <option value="">All families</option>
             </select>
           </div>
 
@@ -2609,6 +2624,8 @@
     };
 
     const TRAITS = ["sun", "shade", "pollinator", "drought", "deer resistant"];
+    const PRIMARY_CATALOG_URL = "./suburban_grasses_bamboo_roses_app_ready.json";
+    const FALLBACK_CATALOG_URL = "./plants.json";
 
     const els = {
       html: document.documentElement,
@@ -2874,7 +2891,104 @@
       return rawGroup || "Trees";
     }
 
+
+    function browserFamilyFor(plant) {
+      const direct = normalizeSpaces(
+        plant?.root_group ||
+        plant?.browser_family ||
+        plant?.browserGroup ||
+        plant?.source_department ||
+        plant?.category
+      );
+
+      if (direct) {
+        const normalized = normalizeText(direct);
+        if (normalized.includes("bamboo")) return "Bamboo";
+        if (normalized.includes("rose")) return "Roses";
+        if (normalized.includes("grass") || normalized.includes("liriope") || normalized.includes("yucca")) return "Perennial Grasses";
+        return direct;
+      }
+
+      const groupish = normalizeSpaces([
+        plant?.plant_group,
+        plant?.section,
+        plant?.source_subdepartment
+      ].filter(Boolean).join(" | "));
+
+      if (/bamboo/i.test(groupish)) return "Bamboo";
+      if (/rose/i.test(groupish)) return "Roses";
+      if (/grass|liriope|yucca/i.test(groupish)) return "Perennial Grasses";
+      return "";
+    }
+
+    function normalizeAppReadyExposure(value) {
+      const text = normalizeSpaces(value).toLowerCase();
+      if (!text) return "";
+      if (text === "full sun" || text === "sun") return "Sun";
+      if (text === "shade" || text === "full shade" || text === "partial shade") return "Shade";
+      if (text.includes("sun") && text.includes("shade")) return "Mixed";
+      if (text.includes("sun")) return "Sun";
+      if (text.includes("shade")) return "Shade";
+      return normalizeSpaces(value);
+    }
+
+    function adaptAppReadyRecord(record) {
+      const rootGroup = normalizeSpaces(record?.root_group);
+      const plantGroup = normalizeSpaces(record?.plant_group) || rootGroup || "Perennials";
+      const tags = Array.isArray(record?.tags) ? record.tags.map(normalizeSpaces).filter(Boolean) : [];
+      const sourceCategories = Array.isArray(record?.source_categories) ? record.source_categories.map(normalizeSpaces).filter(Boolean) : [];
+      const description = normalizeSpaces(record?.description);
+      const family = browserFamilyFor({ root_group: rootGroup, plant_group: plantGroup, source_subdepartment: plantGroup });
+      const exposure = normalizeAppReadyExposure(record?.exposure || record?.light);
+
+      return {
+        ...record,
+        id: record?.id || "",
+        name: normalizeSpaces(record?.name || record?.sku || "Plant"),
+        common: normalizeSpaces(record?.common || ""),
+        genus: normalizeSpaces(record?.genus || ""),
+        species: normalizeSpaces(record?.species || ""),
+        series: normalizeSpaces(record?.series || ""),
+        sku: normalizeSpaces(record?.sku || ""),
+        size: normalizeSpaces(record?.size || ""),
+        light: exposure,
+        exposure,
+        description,
+        notes: description,
+        image: normalizeSpaces(record?.image || ""),
+        link: normalizeSpaces(record?.product_url || record?.link || ""),
+        price: normalizeSpaces(record?.price_display || record?.price || ""),
+        price_display: normalizeSpaces(record?.price_display || record?.price || ""),
+        plant_group: plantGroup,
+        section: rootGroup || plantGroup,
+        category: rootGroup || plantGroup,
+        root_group: rootGroup || family,
+        browser_family: family || rootGroup || plantGroup,
+        source_department: rootGroup || family || plantGroup,
+        source_subdepartment: plantGroup,
+        source_categories: sourceCategories,
+        tags,
+        color: normalizeSpaces(record?.color || rootGroup || ""),
+        height: normalizeSpaces(record?.height || ""),
+        width: normalizeSpaces(record?.width || ""),
+        availability_total: Number(record?.availability_total || 0) || 0
+      };
+    }
+
+    function normalizeIncomingCatalog(data) {
+      const rows = Array.isArray(data) ? data : [];
+      const hasAppReadyShape = rows.some(item => item && (item.root_group || item.product_url || item.search_text));
+      return hasAppReadyShape ? rows.map(adaptAppReadyRecord) : rows;
+    }
+
     function derivePlantGroup(plant) {
+      const explicitFamily = browserFamilyFor(plant);
+      const explicitGroup = normalizeSpaces(plant?.plant_group || plant?.source_subdepartment || plant?.section);
+
+      if (explicitFamily === "Roses") return explicitGroup || "Roses";
+      if (explicitFamily === "Bamboo") return explicitGroup || "Bamboo";
+      if (explicitFamily === "Perennial Grasses") return explicitGroup || "Perennial Grasses";
+
       const rawSources = [
         plant.source_department,
         plant.source_subdepartment,
@@ -2924,11 +3038,12 @@
       if (joined.includes("peonies") || /\bpeony\b/.test(joined)) return "Peonies";
       if (joined.includes("perennials - shade") || /\bshade perennials?\b/.test(joined)) return "Perennials - Shade";
       if (joined.includes("perennials - sun") || /\bsun perennials?\b/.test(joined)) return "Perennials - Sun";
+      if (joined.includes("bamboo")) return "Bamboo";
       if (joined.includes("grasses") || joined.includes("grass") || joined.includes("liriope") || joined.includes("yucca")) {
         return "Perennial Grasses";
       }
 
-      return rawGroup || "Perennials";
+      return rawGroup || explicitFamily || "Perennials";
     }
 
     function deriveExposure(plant) {
@@ -2980,10 +3095,11 @@
 
     function normalizePlantRecord(plant) {
       const copy = { ...(plant || {}) };
+      copy.__family = browserFamilyFor(copy);
       copy.__group = derivePlantGroup(copy);
       copy.__exposure = deriveExposure(copy);
       copy.__traits = deriveTraits(copy);
-      copy.__color = normalizeSpaces(copy.color);
+      copy.__color = normalizeSpaces(copy.color || copy.__family);
       return copy;
     }
 
@@ -3028,7 +3144,7 @@
     }
 
     function inferColor(plant) {
-      return plant?.__color || normalizeSpaces(plant?.color);
+      return plant?.__family || plant?.__color || browserFamilyFor(plant) || normalizeSpaces(plant?.color);
     }
 
     function parseHeightToInches(heightText) {
@@ -3131,7 +3247,7 @@
         .sort((a, b) => exposureOrder.indexOf(a) - exposureOrder.indexOf(b));
 
       els.groupFilter.innerHTML = `<option value="">All groups</option>`;
-      els.colorFilter.innerHTML = `<option value="">All colors</option>`;
+      els.colorFilter.innerHTML = `<option value="">All families</option>`;
       els.exposureFilter.innerHTML = `<option value="">All exposures</option>`;
 
       groups.forEach(group => {
@@ -3186,10 +3302,16 @@
         plant.category,
         plant.plant_group,
         plant.section,
+        plant.root_group,
+        plant.browser_family,
         plant.light,
         plant.height,
         plant.width,
-        plant.color
+        plant.color,
+        plant.description,
+        plant.notes,
+        Array.isArray(plant.tags) ? plant.tags.join(" ") : "",
+        Array.isArray(plant.source_categories) ? plant.source_categories.join(" ") : ""
       ].join(" ").toLowerCase();
       return haystack.includes(q);
     }
@@ -3301,39 +3423,56 @@
       visiblePlants.forEach(plant => {
         const traits = inferTraits(plant);
         const exposure = getExposure(plant);
+        const group = getPlantGroup(plant);
+        const family = browserFamilyFor(plant) || inferColor(plant);
         const img = imageFor(plant);
         const extraTags = [];
         if (traits.pollinator) extraTags.push("Pollinator");
         if (traits.drought) extraTags.push("Drought");
         if (traits["deer resistant"]) extraTags.push("Deer Resistant");
+        if (Array.isArray(plant.tags)) {
+          plant.tags.forEach(tag => {
+            const label = titleCase(String(tag).replace(/-/g, " "));
+            if (label && !extraTags.includes(label)) extraTags.push(label);
+          });
+        }
+        const detailLines = [];
+        if (plant.size) detailLines.push(`Size: ${escapeHtml(plant.size)}`);
+        if (plant.height || plant.width) {
+          detailLines.push(`Mature size: ${escapeHtml(plant.height || "—")} × ${escapeHtml(plant.width || "—")}`);
+        } else if (plant.description) {
+          const trimmed = normalizeSpaces(plant.description);
+          detailLines.push(escapeHtml(trimmed.length > 140 ? `${trimmed.slice(0, 140)}…` : trimmed));
+        }
+
         const card = document.createElement("article");
         card.className = "card";
         card.innerHTML = `
           <div class="card-image">
             ${
               img
-                ? `<img src="${img}" alt="${plant.name || "Plant"}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>'">`
+                ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(plant.name || "Plant")}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>'">`
                 : `<div class="no-image">No image available</div>`
             }
           </div>
           <div class="card-body">
-            <h3 class="card-title">${plant.name || "Unnamed Plant"}</h3>
-            <div class="subline">${(plant.common || "")}${plant.common && plant.genus ? " • " : ""}${plant.genus || ""}</div>
+            <h3 class="card-title">${escapeHtml(plant.name || "Unnamed Plant")}</h3>
+            <div class="subline">${escapeHtml([plant.common || "", plant.genus || ""].filter(Boolean).join(" • ") || [family, group].filter(Boolean).join(" • "))}</div>
             <div class="tag-row">
-              <span class="tag green">${exposure}</span>
-              <span class="tag">${getPlantGroup(plant)}</span>
-              ${plant.size ? `<span class="tag">${plant.size}</span>` : ""}
+              <span class="tag green">${escapeHtml(exposure)}</span>
+              ${family ? `<span class="tag">${escapeHtml(family)}</span>` : ""}
+              ${group ? `<span class="tag">${escapeHtml(group)}</span>` : ""}
+              ${plant.size ? `<span class="tag">${escapeHtml(plant.size)}</span>` : ""}
             </div>
             <div class="details">
-              ${plant.size ? `Size: ${plant.size}<br>` : ""}
-              ${(plant.height || plant.width) ? `Mature size: ${plant.height || "—"} × ${plant.width || "—"}` : ""}
+              ${detailLines.join("<br>")}
             </div>
-            ${extraTags.length ? `<div class="tag-row">${extraTags.map(t => `<span class="tag">${t}</span>`).join("")}</div>` : ""}
+            ${extraTags.length ? `<div class="tag-row">${extraTags.slice(0, 5).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
             <div class="price-row">
-              <div class="price">${plant.price || ""}</div>
-              <div class="sku">SKU: ${plant.sku || "—"}</div>
+              <div class="price">${escapeHtml(plant.price || "")}</div>
+              <div class="sku">SKU: ${escapeHtml(plant.sku || "—")}</div>
             </div>
-            ${plant.link ? `<a class="btn product-btn" href="${plant.link}" target="_blank" rel="noopener noreferrer">View Product</a>` : ""}
+            ${plant.link ? `<a class="btn product-btn" href="${escapeHtml(plant.link)}" target="_blank" rel="noopener noreferrer">View Product</a>` : ""}
           </div>
         `;
         els.results.appendChild(card);
@@ -3458,11 +3597,18 @@
 
     function kioskZoneMetaForPlant(plant) {
       const group = getPlantGroup(plant);
+      const family = browserFamilyFor(plant) || group;
       const exposure = getExposure(plant);
       const category = normalizeText(plant.category);
 
-      if (group === "Roses") {
+      if (family === "Roses") {
         return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right rose section", flagColor: "red", topCategory: "Shrub" };
+      }
+      if (family === "Bamboo") {
+        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right ornamental grasses / bamboo section", flagColor: "red", topCategory: "Plant" };
+      }
+      if (family === "Perennial Grasses" || /grass|liriope|yucca/i.test(group)) {
+        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right grasses section", flagColor: "red", topCategory: "Plant" };
       }
       if (group === "Conifers") {
         return { zoneIds: ["b", "c"], locationLabel: "Ball & Burlap B / C", area: "Conifers & evergreens", flagColor: "blue", topCategory: "Tree" };
@@ -3507,6 +3653,7 @@
           name: normalizeSpaces(plant.name || plant.common || plant.sku || `Plant ${index + 1}`),
           category: meta.topCategory,
           browserGroup: group,
+          browserFamily: browserFamilyFor(plant) || group,
           zoneIds: meta.zoneIds,
           locationLabel: meta.locationLabel,
           area: meta.area,
@@ -3514,7 +3661,7 @@
           traits,
           notes: normalizeSpaces(plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || ""),
           searchBlob: [
-            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, group, exposure, meta.locationLabel, meta.area, traits.join(" ")
+            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, plant.root_group, browserFamilyFor(plant), group, exposure, meta.locationLabel, meta.area, traits.join(" "), Array.isArray(plant.tags) ? plant.tags.join(" ") : ""
           ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase()
         };
         const dedupeKey = `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`;
@@ -3990,11 +4137,10 @@ function renderDefinitions() {
     function renderKioskActions() {
       const actions = [
         { label: "All Plants", value: "" },
-        { label: "Trees", value: "Tree" },
-        { label: "Shrubs", value: "Shrub" },
+        { label: "Perennial Grasses", value: "Perennial Grasses" },
+        { label: "Bamboo", value: "Bamboo" },
+        { label: "Roses", value: "Roses" },
         { label: "Shade", value: "shade" },
-        { label: "Conifers", value: "conifers" },
-        { label: "Roses", value: "roses" },
         { label: "Pollinator", value: "pollinator-friendly" }
       ];
       const hasQuery = !!normalizeText(els.kioskSearch?.value || "");
@@ -4038,10 +4184,9 @@ function renderDefinitions() {
       const filtered = sortFinderItems(sourceItems.filter(item => {
         if (query && !item.searchBlob.includes(query)) return false;
         if (!picked) return true;
-        if (picked === "Tree") return item.category === "Tree";
-        if (picked === "Shrub") return item.category === "Shrub";
-        if (picked === "conifers") return item.browserGroup === "Conifers" || isConiferNurseryItem(item);
-        if (picked === "roses") return item.browserGroup === "Roses" || isRoseNurseryItem(item);
+        if (picked === "Perennial Grasses") return item.browserFamily === "Perennial Grasses" || item.browserGroup === "Perennial Grasses";
+        if (picked === "Bamboo") return item.browserFamily === "Bamboo" || item.browserGroup === "Bamboo";
+        if (picked === "Roses") return item.browserFamily === "Roses" || item.browserGroup === "Roses" || isRoseNurseryItem(item);
         if (picked === "shade") return item.traits.includes("shade");
         if (picked === "pollinator-friendly") return item.traits.includes("pollinator-friendly");
         return item.traits.includes(picked);
@@ -4151,22 +4296,31 @@ function renderDefinitions() {
 
 
     async function loadPlants() {
-      try {
-        const res = await fetch("./plants.json", { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        state.plants = normalizePlantsData(Array.isArray(data) ? data : []);
-        state.kioskCatalogItems = buildKioskCatalogItems(state.plants);
-        populateFilters(state.plants);
-        renderTraitChips();
-        applyFilters();
-        applyKioskFilters();
-      } catch (err) {
-        els.summaryBar.innerHTML = `<span class="pill">Failed to load plants</span>`;
-        els.results.innerHTML = `<div class="empty">Could not load <code>plants.json</code>. ${err.message}</div>`;
-        state.kioskCatalogItems = [];
-        applyKioskFilters();
+      const errors = [];
+      const sources = [PRIMARY_CATALOG_URL, FALLBACK_CATALOG_URL];
+
+      for (const source of sources) {
+        try {
+          const res = await fetch(source, { cache: "no-store" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          const normalizedInput = normalizeIncomingCatalog(data);
+          state.plants = normalizePlantsData(Array.isArray(normalizedInput) ? normalizedInput : []);
+          state.kioskCatalogItems = buildKioskCatalogItems(state.plants);
+          populateFilters(state.plants);
+          renderTraitChips();
+          applyFilters();
+          applyKioskFilters();
+          return;
+        } catch (err) {
+          errors.push(`${source}: ${err.message}`);
+        }
       }
+
+      els.summaryBar.innerHTML = `<span class="pill">Failed to load plants</span>`;
+      els.results.innerHTML = `<div class="empty">Could not load <code>${escapeHtml(PRIMARY_CATALOG_URL)}</code> or <code>${escapeHtml(FALLBACK_CATALOG_URL)}</code>. ${escapeHtml(errors.join(" | "))}</div>`;
+      state.kioskCatalogItems = [];
+      applyKioskFilters();
     }
 
     function wireEvents() {
