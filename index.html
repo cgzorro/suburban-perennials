@@ -2531,40 +2531,14 @@
     }
 
     function isTreeKioskItem(item) {
-      const joined = [
-        item?.name,
-        item?.category,
-        item?.browserGroup,
-        item?.locationLabel,
-        item?.area,
-        ...(Array.isArray(item?.aliases) ? item.aliases : [])
-      ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase();
       const category = normalizeText(item?.category || "");
       const group = normalizeText(item?.browserGroup || "");
-
-      if (group === "roses" || isRoseNurseryItem(item)) return false;
-      if (category === "tree") return true;
-      if (["conifers", "shade trees", "flowering trees", "ornamental trees", "fruit trees", "evergreen trees", "trees"].includes(group)) return true;
-      return /(trees?|conifers?|arborvitae|cedar|cypress|fir|hemlock|juniper|pine|spruce)/.test(joined);
+      return category === "tree" || ["conifers", "shade trees", "flowering trees", "ornamental trees", "fruit trees", "evergreen trees", "trees"].includes(group);
     }
 
     function isShrubKioskItem(item) {
-      const joined = [
-        item?.name,
-        item?.category,
-        item?.browserGroup,
-        item?.locationLabel,
-        item?.area,
-        ...(Array.isArray(item?.aliases) ? item.aliases : [])
-      ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase();
       const category = normalizeText(item?.category || "");
-      const group = normalizeText(item?.browserGroup || "");
-
-      if (group === "roses" || isRoseNurseryItem(item)) return false;
-      if (category === "shrub" || category === "tree/shrub") return true;
-      if (/shrubs?/.test(joined)) return true;
-      if (/(azalea|barberry|boxwood|burning bush|dogwood shrub|euonymus|holly|hydrangea|lilac|mockorange|ninebark|privet|pyracantha|quince|rhododendron|spirea|viburnum|weigela|winterberry|yew)/.test(joined)) return true;
-      return false;
+      return category === "shrub" || category === "tree/shrub";
     }
 
     function withSatelliteView(url) {
@@ -2678,14 +2652,8 @@
       return "Unknown";
     }
 
-    function isRosePlant(plant) {
-      const exactFields = [plant.section, plant.category, plant.plant_group, plant.common, plant.genus]
-        .map(normalizeSpaces)
-        .filter(Boolean)
-        .map(value => value.toLowerCase());
-      const series = normalizeSpaces(plant.series).toLowerCase();
-      const sku = normalizeSku(plant.sku || "");
-      const haystack = [
+    function roseHaystack(plant) {
+      return [
         plant.name,
         plant.common,
         plant.genus,
@@ -2700,12 +2668,40 @@
         plant.notes,
         plant.description
       ].map(normalizeSpaces).filter(Boolean).join(" | ").toLowerCase();
+    }
+
+    function isLikelyTreePlant(plant) {
+      const group = normalizeText(derivePlantGroup(plant));
+      const category = normalizeText(plant.category || plant.item_type || plant.source_department || "");
+      if (group === "roses") return false;
+      if (["conifers", "shade trees", "flowering trees", "ornamental trees", "fruit trees", "evergreen trees", "trees"].includes(group)) return true;
+      return category === "tree";
+    }
+
+    function isLikelyShrubPlant(plant) {
+      if (isRosePlant(plant)) return true;
+      const haystack = roseHaystack(plant);
+      const category = normalizeText(plant.category || plant.item_type || "");
+      const group = normalizeText(derivePlantGroup(plant));
+      if (["conifers", "shade trees", "flowering trees", "ornamental trees", "fruit trees", "evergreen trees", "trees"].includes(group)) return false;
+      if (category === "shrub" || category === "tree/shrub") return true;
+      return /(azalea|barberry|boxwood|burning bush|euonymus|holly|hydrangea|lilac|mockorange|ninebark|privet|pyracantha|quince|rhododendron|spirea|viburnum|weigela|winterberry|yew|rose)/i.test(haystack);
+    }
+
+    function isRosePlant(plant) {
+      const exactFields = [plant.section, plant.category, plant.plant_group, plant.common, plant.genus, plant.source_subdepartment]
+        .map(normalizeSpaces)
+        .filter(Boolean)
+        .map(value => value.toLowerCase());
+      const series = normalizeSpaces(plant.series).toLowerCase();
+      const sku = normalizeSku(plant.sku || "");
+      const haystack = roseHaystack(plant);
 
       if (haystack.includes("rose of sharon")) return false;
       if (exactFields.some(value => value === "roses" || value === "rose")) return true;
       if (exactFields.includes("rosa") || normalizeText(plant.genus) === "rosa") return true;
       if (series.includes("knock out rose") || series.includes("drift rose") || series.includes("proven winner rose")) return true;
-      if (/(^|)(drift rose|knock out rose|hybrid tea rose|floribunda rose|grandiflora rose|climbing rose|shrub rose|rose bush|roses?)(|$)/i.test(haystack)) return true;
+      if (/(^|\b)(drift rose|knock out rose|hybrid tea rose|floribunda rose|grandiflora rose|climbing rose|shrub rose|rose bush|roses?)(\b|$)/i.test(haystack)) return true;
       if (sku.startsWith("ROSE")) return true;
       return false;
     }
@@ -3367,8 +3363,11 @@
       if (group === "Ground Covers" || group === "Hardy Vining Plants" || group === "Grapes & Berries" || group === "Clematis") {
         return { zoneIds: ["house1"], locationLabel: "Hoop House 1", area: "Groundcovers / vines / berries", flagColor: "yellow", topCategory: "Plant" };
       }
-      if (category === "tree/shrub") {
-        return { zoneIds: ["field-shrub"], locationLabel: "Shrub Field", area: "Tree / shrub forms", flagColor: "green", topCategory: "Shrub" };
+      if (isLikelyTreePlant(plant)) {
+        return { zoneIds: ["field-tree"], locationLabel: "Tree Field", area: "General tree stock", flagColor: "magenta", topCategory: "Tree" };
+      }
+      if (isLikelyShrubPlant(plant) || category === "tree/shrub") {
+        return { zoneIds: ["field-shrub"], locationLabel: "Shrub Field", area: "General shrub stock", flagColor: "green", topCategory: "Shrub" };
       }
       return { zoneIds: ["field-shrub"], locationLabel: "Shrub Field", area: "General nursery stock", flagColor: "green", topCategory: "Plant" };
     }
@@ -3442,7 +3441,7 @@ function renderDefinitions() {
       });
 
       els.flagLegend.innerHTML = `
-        <span class="flag-chip flag-chip-note">Approximate field-flag examples from the paper map. Tap a flag to highlight its mapped section.</span>
+        <span class="flag-chip flag-chip-note">Approximate field-flag examples from the paper map. Tap a flag to highlight its primary mapped section.</span>
         ${orderedMarkers.map(marker => `
           <button type="button" class="flag-chip" data-flag-id="${marker.id}">
             <span class="mini-flag ${marker.color === "white" ? "white" : ""}" style="--flag:${FLAG_COLORS[marker.color] || marker.color}"></span>
@@ -3890,7 +3889,7 @@ function renderDefinitions() {
       state.selectedFlagId = "";
       state.selectedZoneIds = [zoneId];
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
-      renderFinderMaps([zoneId], matches.slice(0, 6));
+      renderFinderMaps([zoneId], []);
       const zoneName = zoneTitle(zoneId);
       if (!matches.length) {
         els.locationDetails.innerHTML = `
@@ -3917,19 +3916,25 @@ function renderDefinitions() {
 
       const zoneIds = uniqueValues((marker.zoneIds || []).filter(Boolean));
       const primaryZoneIds = uniqueValues([(marker.primaryZoneId || zoneIds[0] || "")].filter(Boolean));
+      const primaryZoneId = primaryZoneIds[0] || "";
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => {
-        const zoneMatch = zoneIds.length ? item.zoneIds.some(zoneId => zoneIds.includes(zoneId)) : false;
-        return zoneMatch || item.flagColor === marker.color;
+        const primaryZoneMatch = primaryZoneId ? item.zoneIds.includes(primaryZoneId) : false;
+        const relatedZoneMatch = zoneIds.length ? item.zoneIds.some(zoneId => zoneIds.includes(zoneId)) : false;
+        const colorMatch = item.flagColor === marker.color;
+        return primaryZoneMatch || (colorMatch && relatedZoneMatch);
       }));
 
       state.selectedFinderId = "";
       state.selectedFlagId = marker.id;
       state.selectedZoneIds = primaryZoneIds;
 
-      renderFinderMaps(primaryZoneIds, matches.length ? matches.slice(0, 6) : [{ flagColor: marker.color, zoneIds: primaryZoneIds }]);
+      renderFinderMaps(
+        primaryZoneIds,
+        [{ flagColor: marker.color, zoneIds: primaryZoneIds, name: `${titleCase(marker.color)} flag` }]
+      );
 
-      const zoneBadges = zoneIds.length
-        ? `<div class="detail-tag-row">${zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("")}</div>`
+      const zoneBadges = primaryZoneIds.length
+        ? `<div class="detail-tag-row">${primaryZoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("")}</div>`
         : "";
 
       const matchBadges = matches.length
@@ -3941,6 +3946,7 @@ function renderDefinitions() {
       els.locationDetails.innerHTML = `
         <h3>${escapeHtml(titleCase(marker.color))} flag</h3>
         <p class="finder-note">${escapeHtml(marker.note || "Approximate field-flag location from the paper map.")}</p>
+        <p class="finder-note">Primary mapped section highlighted first. Cards keep the flag cue for faster customer guidance.</p>
         ${zoneBadges}
         ${matchBadges}
         <p class="zone-directions">${escapeHtml(firstDirection || "Primary mapped section highlighted on the overview map and closer-look panel.")}</p>
@@ -4030,8 +4036,8 @@ function renderDefinitions() {
       const filtered = sortFinderItems(sourceItems.filter(item => {
         if (query && !item.searchBlob.includes(query)) return false;
         if (!picked) return true;
-        if (picked === "Tree") return isTreeKioskItem(item);
-        if (picked === "Shrub") return isShrubKioskItem(item);
+        if (picked === "Tree") return item.category === "Tree";
+        if (picked === "Shrub") return item.category === "Shrub";
         if (picked === "conifers") return item.browserGroup === "Conifers" || isConiferNurseryItem(item);
         if (picked === "roses") return item.browserGroup === "Roses" || isRoseNurseryItem(item);
         if (picked === "shade") return item.traits.includes("shade");
