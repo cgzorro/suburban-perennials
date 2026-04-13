@@ -3585,23 +3585,10 @@ function renderDefinitions() {
     function resolveFlagForItem(item) {
       if (!item) return null;
       const orderedZoneIds = getOrderedZoneIds(item.zoneIds || [], primaryZoneIdForItem(item));
-      const primaryZoneId = orderedZoneIds[0] || "";
       if (item.cueFlagId) {
-        return MAP_FLAG_MARKERS.find(marker => marker.id === item.cueFlagId) || null;
+        return MAP_FLAG_MARKERS.find(marker => marker.id === item.cueFlagId) || resolveFlagForZones(orderedZoneIds, item.flagColor || "");
       }
-      const preferredColor = item.flagColor || "";
-      if (!preferredColor || !primaryZoneId) return null;
-
-      const primaryExact = MAP_FLAG_MARKERS.find(marker => marker.primaryZoneId === primaryZoneId && marker.color === preferredColor);
-      if (primaryExact) return primaryExact;
-
-      const primaryRelatedExact = MAP_FLAG_MARKERS.filter(marker => (marker.zoneIds || []).includes(primaryZoneId) && marker.color === preferredColor);
-      if (primaryRelatedExact.length === 1) return primaryRelatedExact[0];
-
-      const orderedExact = MAP_FLAG_MARKERS.filter(marker => (marker.zoneIds || []).some(zoneId => orderedZoneIds.includes(zoneId)) && marker.color === preferredColor);
-      if (orderedExact.length === 1) return orderedExact[0];
-
-      return null;
+      return resolveFlagForZones(orderedZoneIds, item.flagColor || "");
     }
 
     function displayFlagColorForItem(item) {
@@ -4072,12 +4059,13 @@ function renderDefinitions() {
     }
 
     function handleZoneClick(zoneId) {
+      const zoneCueFlag = resolveFlagForZones([zoneId]);
       state.selectedFinderId = "";
-      state.selectedFlagId = "";
+      state.selectedFlagId = zoneCueFlag?.id || "";
       state.selectedZoneIds = [zoneId];
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
       renderFinderResults();
-      renderFinderMaps([zoneId], "");
+      renderFinderMaps([zoneId], state.selectedFlagId);
       const zoneName = zoneTitle(zoneId);
       if (!matches.length) {
         els.locationDetails.innerHTML = `
