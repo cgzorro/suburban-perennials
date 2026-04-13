@@ -1400,11 +1400,20 @@
 
     .map-fixed-flag.active {
       opacity: 1;
-      filter: drop-shadow(0 0 10px rgba(123, 208, 95, 0.54));
+      filter: drop-shadow(0 0 8px rgba(123, 208, 95, 0.20));
     }
 
     .map-fixed-flag-hit {
       fill: transparent;
+    }
+
+    .map-flag-glow {
+      opacity: 0;
+      filter: blur(5px);
+      transform-box: fill-box;
+      transform-origin: center;
+      transition: opacity .18s ease, transform .18s ease;
+      pointer-events: none;
     }
 
     .map-fixed-flag-inner {
@@ -1414,8 +1423,14 @@
       pointer-events: none;
     }
 
+    .map-fixed-flag.active .map-flag-glow {
+      opacity: .24;
+      animation: mapFlagGlow 1.45s ease-in-out infinite;
+    }
+
     .map-fixed-flag.active .map-fixed-flag-inner {
       animation: mapFlagWave 1.45s ease-in-out infinite;
+      filter: drop-shadow(0 0 4px rgba(255,255,255,0.18));
     }
 
     .map-fixed-flag.active .map-flag-stick {
@@ -1431,6 +1446,11 @@
       22% { transform: translateY(-1px) scale(1.16) rotate(-3deg); }
       50% { transform: translateY(-2px) scale(1.2) rotate(0deg); }
       78% { transform: translateY(-1px) scale(1.16) rotate(3deg); }
+    }
+
+    @keyframes mapFlagGlow {
+      0%, 100% { opacity: .18; transform: scale(1); }
+      50% { opacity: .28; transform: scale(1.12); }
     }
 
     .map-flag-stick {
@@ -3565,10 +3585,23 @@ function renderDefinitions() {
     function resolveFlagForItem(item) {
       if (!item) return null;
       const orderedZoneIds = getOrderedZoneIds(item.zoneIds || [], primaryZoneIdForItem(item));
+      const primaryZoneId = orderedZoneIds[0] || "";
       if (item.cueFlagId) {
-        return MAP_FLAG_MARKERS.find(marker => marker.id === item.cueFlagId) || resolveFlagForZones(orderedZoneIds, item.flagColor || "");
+        return MAP_FLAG_MARKERS.find(marker => marker.id === item.cueFlagId) || null;
       }
-      return resolveFlagForZones(orderedZoneIds, item.flagColor || "");
+      const preferredColor = item.flagColor || "";
+      if (!preferredColor || !primaryZoneId) return null;
+
+      const primaryExact = MAP_FLAG_MARKERS.find(marker => marker.primaryZoneId === primaryZoneId && marker.color === preferredColor);
+      if (primaryExact) return primaryExact;
+
+      const primaryRelatedExact = MAP_FLAG_MARKERS.filter(marker => (marker.zoneIds || []).includes(primaryZoneId) && marker.color === preferredColor);
+      if (primaryRelatedExact.length === 1) return primaryRelatedExact[0];
+
+      const orderedExact = MAP_FLAG_MARKERS.filter(marker => (marker.zoneIds || []).some(zoneId => orderedZoneIds.includes(zoneId)) && marker.color === preferredColor);
+      if (orderedExact.length === 1) return orderedExact[0];
+
+      return null;
     }
 
     function displayFlagColorForItem(item) {
@@ -3720,6 +3753,7 @@ function renderDefinitions() {
         return `
           <g class="map-fixed-flag${isActive ? " active" : ""}" data-flag-id="${marker.id}" data-flag-color="${marker.color}" role="button" tabindex="0" aria-label="${titleCase(marker.color)} flag marker" transform="translate(${marker.x} ${marker.y})">
             <circle class="map-fixed-flag-hit" cx="-8" cy="10" r="26"></circle>
+            <circle class="map-flag-glow" cx="-10" cy="2" r="18" fill="${color}"></circle>
             <g class="map-fixed-flag-inner${isActive ? " active" : ""}">
               <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="28"></line>
               <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="0,0 -22,-12 -22,12" fill="${color}"></polygon>
