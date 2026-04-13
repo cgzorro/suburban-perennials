@@ -300,9 +300,16 @@
     .finder-actions {
       display: flex;
       gap: 10px;
-      align-items: end;
+      align-items: center;
+      justify-content: space-between;
       flex-wrap: wrap;
       margin-top: 14px;
+    }
+
+    .button-note {
+      color: var(--text-muted);
+      font-size: .9rem;
+      font-weight: 700;
     }
 
     .btn,
@@ -1149,6 +1156,14 @@
         padding: 14px;
         border-radius: 20px;
       }
+      .button-col {
+        align-items: stretch;
+      }
+
+      .button-note {
+        width: 100%;
+        font-size: .84rem;
+      }
       .controls-grid,
       .scan-grid,
       .finder-toolbar,
@@ -1763,7 +1778,9 @@
         font-size: .9rem;
       }
 
-      .site-footer-sub,
+      .site-footer-sub {
+        font-size: .82rem;
+      }
     }
 
 
@@ -1841,6 +1858,7 @@
 
         <div class="button-col">
           <button id="clearFilters" class="btn" type="button">Clear filters</button>
+          <div class="button-note">Scanner tools stay tucked away until needed.</div>
         </div>
 
         <section class="scan-panel" id="scanPanel" data-open="false">
@@ -2852,6 +2870,7 @@
         !!els.groupFilter.value ||
         !!els.colorFilter.value ||
         !!els.heightFilter.value ||
+        String(els.showCount?.value || "48") !== "48" ||
         state.activeTraits.size > 0;
       els.clearFilters.classList.toggle("clear-active", hasAnythingToClear);
     }
@@ -2966,6 +2985,7 @@
       els.groupFilter.value = "";
       els.colorFilter.value = "";
       els.heightFilter.value = "";
+      els.showCount.value = "48";
       state.activeTraits.clear();
       renderTraitChips();
     }
