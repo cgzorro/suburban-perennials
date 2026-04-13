@@ -1472,11 +1472,34 @@
     .map-fixed-flag {
       opacity: .64;
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.14));
+      transform-box: fill-box;
+      transform-origin: center bottom;
     }
 
     .map-fixed-flag.active {
       opacity: 1;
-      filter: drop-shadow(0 0 7px rgba(123, 208, 95, 0.52));
+      filter:
+        drop-shadow(0 0 7px rgba(123, 208, 95, 0.52))
+        drop-shadow(0 0 14px rgba(123, 208, 95, 0.22));
+      animation: flagWave 1.9s ease-in-out infinite;
+    }
+
+    .map-fixed-flag.active .map-flag-base {
+      stroke: #eef8ea;
+      stroke-width: 1.8;
+    }
+
+    .map-fixed-flag.active .map-flag-stick {
+      stroke: #b7c8d9;
+      stroke-width: 1.8;
+    }
+
+    @keyframes flagWave {
+      0% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-2.4deg) scale(1.05); }
+      50% { transform: rotate(2.1deg) scale(1.08); }
+      75% { transform: rotate(-1.5deg) scale(1.05); }
+      100% { transform: rotate(0deg) scale(1); }
     }
 
     .map-flag-stick {
