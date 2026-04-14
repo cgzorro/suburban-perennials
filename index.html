@@ -4292,6 +4292,354 @@ function renderDefinitions() {
       </div>
     </div>
   </footer>
+<script>
+(function () {
+  function safeNormalize(v) {
+    try {
+      if (typeof normalizeText === "function") return normalizeText(v);
+    } catch (_) {}
+    return String(v || "").trim().toLowerCase();
+  }
 
+  function safeSpaces(v) {
+    try {
+      if (typeof normalizeSpaces === "function") return normalizeSpaces(v);
+    } catch (_) {}
+    return String(v || "").replace(/\s+/g, " ").trim();
+  }
+
+  function roseLike(item) {
+    const parts = [
+      item?.browserGroup,
+      item?.category,
+      item?.section,
+      item?.plant_group,
+      item?.name,
+      item?.common,
+      item?.genus,
+      item?.series,
+      item?.searchBlob,
+      item?.notes
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    if (safeNormalize(item?.browserGroup) === "roses") return true;
+    if (safeNormalize(item?.category) === "roses") return true;
+    if (safeNormalize(item?.section) === "roses") return true;
+    if (safeNormalize(item?.plant_group) === "roses") return true;
+    if (/\brosa\b/.test(parts)) return true;
+    if (/\b(drift|knock out|knockout|floribunda|grandiflora|hybrid tea|climbing|shrub)\b/.test(parts) && /\brose\b/.test(parts)) return true;
+    return false;
+  }
+
+  function deriveBrowserGroup(plant) {
+    const section = safeNormalize(plant?.section);
+    const category = safeNormalize(plant?.category);
+    const group = safeNormalize(plant?.plant_group);
+    const name = safeNormalize(plant?.name);
+
+    if (section === "roses" || category === "roses" || group === "roses" || /\brose\b/.test(name)) return "Roses";
+    if (group.includes("bamboo") || category.includes("bamboo") || section.includes("bamboo")) return "Bamboo";
+    if (group.includes("grass") || category.includes("grass") || section.includes("grass") || group.includes("yucca")) return "Perennial Grasses";
+    if (category === "tree") return "Trees";
+    if (category === "shrub") return "Shrubs";
+    return safeSpaces(plant?.plant_group || plant?.category || plant?.section || "");
+  }
+
+  function imageForKiosk(item) {
+    if (item?.image) return item.image;
+    const sku = safeNormalize(item?.sku);
+    if (!sku || !state?.plants?.length) return "";
+    const match = state.plants.find(p => safeNormalize(p?.sku) === sku);
+    return match?.image || "";
+  }
+
+  function linkForKiosk(item) {
+    if (item?.link) return item.link;
+    if (item?.url) return item.url;
+    const sku = safeNormalize(item?.sku);
+    if (!sku || !state?.plants?.length) return "";
+    const match = state.plants.find(p => safeNormalize(p?.sku) === sku);
+    return match?.link || match?.url || "";
+  }
+
+  function buildTargetedKioskCatalogItems(plants) {
+    const list = [];
+    (plants || []).forEach((plant, index) => {
+      const meta = typeof kioskZoneMetaForPlant === "function"
+        ? kioskZoneMetaForPlant(plant)
+        : {
+            zoneIds: [],
+            locationLabel: "",
+            area: "",
+            flagColor: "",
+            topCategory: safeNormalize(plant?.category) === "tree" ? "Tree" : safeNormalize(plant?.category) === "shrub" ? "Shrub" : "Plant"
+          };
+
+      const traits = typeof kioskTraitsFromPlant === "function" ? kioskTraitsFromPlant(plant) : [];
+      const browserGroup = deriveBrowserGroup(plant);
+      const name = safeSpaces(plant?.name || plant?.common || plant?.sku || `Plant ${index + 1}`);
+      const item = {
+        id: `k-${safeSpaces(plant?.sku || index + 1)}`,
+        sku: plant?.sku || "",
+        name,
+        category: meta.topCategory || plant?.category || "",
+        browserGroup,
+        zoneIds: Array.isArray(meta.zoneIds) ? meta.zoneIds : [],
+        locationLabel: meta.locationLabel || "",
+        area: meta.area || "",
+        flagColor: meta.flagColor || "",
+        traits: Array.from(new Set((traits || []).filter(Boolean))),
+        image: plant?.image || "",
+        link: plant?.link || plant?.url || "",
+        notes: safeSpaces(plant?.notes || plant?.description || (plant?.size ? `${plant.size}${plant?.price ? ` · ${plant.price}` : ""}` : plant?.price || "")),
+        searchBlob: [
+          plant?.name, plant?.common, plant?.genus, plant?.sku, plant?.series,
+          plant?.plant_group, plant?.category, plant?.section, browserGroup,
+          plant?.light, meta.locationLabel, meta.area, (traits || []).join(" "),
+          plant?.notes, plant?.description
+        ].map(safeSpaces).filter(Boolean).join(" ").toLowerCase()
+      };
+      list.push(item);
+    });
+    return list;
+  }
+
+  function installKioskCss() {
+    if (document.getElementById("targeted-kiosk-rose-fix-css")) return;
+    const style = document.createElement("style");
+    style.id = "targeted-kiosk-rose-fix-css";
+    style.textContent = `
+      .kiosk-result-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .kiosk-result-main {
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+      .kiosk-thumb {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        flex: 0 0 48px;
+      }
+      .kiosk-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .kiosk-detail-image-wrap {
+        width: 100%;
+        max-width: 220px;
+        margin: 0 0 12px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg-soft);
+      }
+      .kiosk-detail-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+      }
+      @media (max-width: 900px) {
+        .kiosk-thumb {
+          width: 44px;
+          height: 44px;
+          flex-basis: 44px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  window.isRoseNurseryItem = function (item) {
+    return roseLike(item);
+  };
+
+  window.renderKioskActions = function () {
+    const actions = [
+      { label: "All Plants", value: "" },
+      { label: "Trees", value: "Tree" },
+      { label: "Shrubs", value: "Shrub" },
+      { label: "Shade", value: "shade" },
+      { label: "Conifers", value: "conifers" },
+      { label: "Roses", value: "roses" },
+      { label: "Pollinator", value: "pollinator-friendly" }
+    ];
+    const hasQuery = !!safeNormalize(els?.kioskSearch?.value || "");
+    const hasActiveFilter = !!state?.kioskTrait;
+
+    if (hasQuery || hasActiveFilter) {
+      actions.push({ label: "Clear Search", value: "__clear__" });
+    }
+
+    els.kioskActions.innerHTML = actions.map(action => `
+      <button
+        type="button"
+        class="kiosk-btn${state.kioskTrait === action.value || (action.value === "__clear__" && (hasQuery || hasActiveFilter)) ? " active" : ""}"
+        data-kiosk-value="${action.value}"
+      >${action.label}</button>
+    `).join("");
+
+    els.kioskActions.querySelectorAll("[data-kiosk-value]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const value = btn.dataset.kioskValue;
+        if (value === "__clear__") {
+          els.kioskSearch.value = "";
+          state.kioskTrait = "";
+          state.selectedKioskId = "";
+          renderKioskActions();
+          applyKioskFilters();
+          return;
+        }
+        state.kioskTrait = value;
+        renderKioskActions();
+        applyKioskFilters();
+      });
+    });
+  };
+
+  window.applyKioskFilters = function () {
+    const query = safeNormalize(els.kioskSearch.value);
+    const picked = state.kioskTrait;
+    const sourceItems = typeof getKioskItems === "function" ? getKioskItems() : [];
+
+    const filtered = sortFinderItems(sourceItems.filter(item => {
+      if (query) {
+        if ((query === "rose" || query === "roses") && !roseLike(item)) return false;
+        if (!["rose", "roses"].includes(query) && !safeNormalize(item.searchBlob).includes(query)) return false;
+      }
+
+      if (!picked) return true;
+      if (picked === "Tree") return item.category === "Tree";
+      if (picked === "Shrub") return item.category === "Shrub" && !roseLike(item);
+      if (picked === "conifers") return item.browserGroup === "Conifers" || (typeof isConiferNurseryItem === "function" && isConiferNurseryItem(item));
+      if (picked === "roses") return roseLike(item);
+      if (picked === "shade") return Array.isArray(item.traits) && item.traits.includes("shade");
+      if (picked === "pollinator-friendly") return Array.isArray(item.traits) && item.traits.includes("pollinator-friendly");
+      return Array.isArray(item.traits) && item.traits.includes(picked);
+    }));
+
+    state.kioskMatchCount = filtered.length;
+    state.kioskResults = filtered.slice(0, 120);
+
+    const selected = state.kioskResults.find(item => item.id === state.selectedKioskId) || null;
+    if (!selected) state.selectedKioskId = "";
+
+    renderKioskResults();
+    renderKioskDetail(selected);
+  };
+
+  window.renderKioskResults = function () {
+    const total = state.kioskMatchCount || 0;
+    if (!state.kioskResults.length) {
+      els.kioskResults.innerHTML = `<div class="empty">No matches in kiosk mode. Try another search or clear a quick filter.</div>`;
+      return;
+    }
+
+    const summary = total > state.kioskResults.length
+      ? `<p class="kiosk-result-summary">Showing first ${state.kioskResults.length} of ${total} matches.</p>`
+      : `<p class="kiosk-result-summary">${total} match${total === 1 ? "" : "es"}.</p>`;
+
+    els.kioskResults.innerHTML = summary + state.kioskResults.map(item => {
+      const active = state.selectedKioskId === item.id;
+      const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+      const image = imageForKiosk(item);
+      const thumb = image
+        ? `<span class="kiosk-thumb"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></span>`
+        : "";
+      return `
+        <button type="button" class="kiosk-card${active ? " active" : ""}" data-kiosk-id="${item.id}">
+          <div class="kiosk-result-row">
+            ${thumb}
+            <div class="kiosk-result-main">
+              <div class="topline">
+                <div>
+                  <h3>${escapeHtml(item.name)}</h3>
+                  <div class="kiosk-meta">Go to ${escapeHtml(item.locationLabel)}</div>
+                </div>
+                <span class="mini-flag" style="--flag:${flagColor}"></span>
+              </div>
+              <div class="details-text">${escapeHtml(item.traits.slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area || item.browserGroup || item.category)}</div>
+            </div>
+          </div>
+        </button>
+      `;
+    }).join("");
+
+    els.kioskResults.querySelectorAll("[data-kiosk-id]").forEach(btn => {
+      btn.addEventListener("click", () => selectKioskItem(btn.dataset.kioskId));
+    });
+  };
+
+  window.renderKioskDetail = function (item = null) {
+    if (!item) {
+      els.kioskDetailPanel.innerHTML = `
+        <h2>Directions</h2>
+        <p class="kiosk-lead">Select a result to show a short polished direction you can repeat to a customer.</p>
+        <p class="zone-directions">The map preview keeps the full nursery in view and always shows the red starting marker at perennials / checkout.</p>
+      `;
+      renderKioskMap(null);
+      return;
+    }
+
+    const image = imageForKiosk(item);
+    const link = linkForKiosk(item);
+    const imageHtml = image
+      ? `<div class="kiosk-detail-image-wrap"><img class="kiosk-detail-image" src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+      : "";
+    const productLink = link
+      ? `<a class="map-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">Open Product Page</a>`
+      : "";
+
+    els.kioskDetailPanel.innerHTML = `
+      ${imageHtml}
+      <h2>${escapeHtml(item.name)}</h2>
+      <p class="kiosk-lead"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
+      <div class="detail-tag-row">
+        <span class="flag-inline"><span class="mini-flag" style="--flag:${FLAG_COLORS[item.flagColor] || item.flagColor || '#666'}"></span>${titleCase(item.flagColor || 'field')} flag</span>
+      </div>
+      <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
+      <div class="detail-tag-row">${item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
+      <div class="detail-actions">
+        ${productLink}
+        <a class="map-link" href="${withSatelliteView(NURSERY_MAPS_LINK)}" target="_blank" rel="noopener noreferrer">Open Satellite Map</a>
+        <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy quick line</button>
+      </div>
+    `;
+    wireCopyButtons(els.kioskDetailPanel);
+    renderKioskMap(item);
+  };
+
+  function applyPatchWhenReady(attempts) {
+    installKioskCss();
+    if (typeof state === "undefined" || typeof els === "undefined" || !els?.kioskResults) {
+      if (attempts > 0) return setTimeout(() => applyPatchWhenReady(attempts - 1), 150);
+      return;
+    }
+
+    if (Array.isArray(state.plants) && state.plants.length) {
+      window.buildKioskCatalogItems = buildTargetedKioskCatalogItems;
+      state.kioskCatalogItems = buildTargetedKioskCatalogItems(state.plants);
+      renderKioskActions();
+      applyKioskFilters();
+      return;
+    }
+
+    if (attempts > 0) {
+      setTimeout(() => applyPatchWhenReady(attempts - 1), 150);
+    }
+  }
+
+  applyPatchWhenReady(40);
+})();
+</script>
 </body>
 </html>
