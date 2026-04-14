@@ -1975,97 +1975,6 @@
       line-height: 1.2;
     }
 
-    .footer-badge {
-      width: 54px;
-      height: 54px;
-      object-fit: contain;
-      margin-right: 14px;
-      border-radius: 12px;
-      flex: 0 0 auto;
-      display: block;
-    }
-
-    .finder-result-row,
-    .kiosk-result-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .finder-result-main,
-    .kiosk-result-main {
-      min-width: 0;
-      flex: 1 1 auto;
-    }
-
-    .finder-thumb,
-    .kiosk-thumb {
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--bg-soft);
-      border: 1px solid var(--border);
-      flex: 0 0 auto;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .finder-thumb {
-      width: 54px;
-      height: 54px;
-      flex-basis: 54px;
-    }
-
-    .kiosk-thumb {
-      width: 48px;
-      height: 48px;
-      flex-basis: 48px;
-    }
-
-    .finder-thumb img,
-    .kiosk-thumb img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-    }
-
-    .detail-image-wrap,
-    .kiosk-detail-image-wrap {
-      width: 100%;
-      max-width: 220px;
-      margin: 0 0 12px;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: var(--bg-soft);
-    }
-
-    .detail-image,
-    .kiosk-detail-image {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: cover;
-    }
-
-    @media (max-width: 900px) {
-      .footer-badge {
-        width: 44px;
-        height: 44px;
-      }
-      .finder-thumb {
-        width: 46px;
-        height: 46px;
-        flex-basis: 46px;
-      }
-      .kiosk-thumb {
-        width: 44px;
-        height: 44px;
-        flex-basis: 44px;
-      }
-    }
-
 </style>
 </head>
 <body>
@@ -3607,16 +3516,13 @@
       if (group === "Ground Covers" || group === "Hardy Vining Plants" || group === "Grapes & Berries" || group === "Clematis") {
         return { zoneIds: ["house1"], locationLabel: "Hoop House 1", area: "Groundcovers / vines / berries", flagColor: "yellow", topCategory: "Plant" };
       }
-      if (category === "shrub") {
-        return { zoneIds: ["field-shrub"], locationLabel: "Shrub Field", area: "Flowering / evergreen shrubs", flagColor: "green", topCategory: "Shrub" };
-      }
       if (category === "tree/shrub") {
-        return { zoneIds: ["field-shrub"], locationLabel: "Shrub Field", area: "Tree / shrub forms", flagColor: "green", topCategory: "Tree/Shrub" };
+        return { zoneIds: ["field-shrub"], locationLabel: "Shrub Field", area: "Tree / shrub forms", flagColor: "green", topCategory: "Shrub" };
       }
       return { zoneIds: ["field-shrub"], locationLabel: "Shrub Field", area: "General nursery stock", flagColor: "green", topCategory: "Plant" };
     }
 
-    function buildKioskCatalogItems(    function buildKioskCatalogItems(plants) {
+    function buildKioskCatalogItems(plants) {
       const seen = new Set();
       return (Array.isArray(plants) ? plants : []).map((plant, index) => {
         const meta = kioskZoneMetaForPlant(plant);
@@ -3626,7 +3532,6 @@
         const id = `k-${normalizeSpaces(plant.sku || plant.name || index).replace(/[^a-zA-Z0-9_-]/g, "-")}-${index}`;
         const item = {
           id,
-          sku: plant.sku || "",
           name: normalizeSpaces(plant.name || plant.common || plant.sku || `Plant ${index + 1}`),
           category: meta.topCategory,
           browserGroup: group,
@@ -3635,21 +3540,19 @@
           area: meta.area,
           flagColor: meta.flagColor,
           traits,
-          image: plant.image || "",
-          link: plant.link || plant.url || "",
-          notes: normalizeSpaces(plant.notes || plant.description || (plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || "")),
+          notes: normalizeSpaces(plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || ""),
           searchBlob: [
-            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, group, exposure, meta.locationLabel, meta.area, traits.join(" "), plant.notes, plant.description
+            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, group, exposure, meta.locationLabel, meta.area, traits.join(" ")
           ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase()
         };
-        const dedupeKey = normalizeText(item.sku) || `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`;
+        const dedupeKey = `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`;
         if (seen.has(dedupeKey)) return null;
         seen.add(dedupeKey);
         return item;
       }).filter(Boolean);
     }
 
-    function getKioskItems()    function getKioskItems() {
+    function getKioskItems() {
       if (Array.isArray(state.kioskCatalogItems) && state.kioskCatalogItems.length) return state.kioskCatalogItems;
       return NURSERY_ITEMS;
     }
@@ -3976,78 +3879,6 @@ function renderDefinitions() {
       });
     }
 
-    const ROSE_REMOTE_IMAGE_BY_SKU = {"ROSEAPDR2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85760", "ROSEBD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85767", "ROSECD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85765", "ROSELD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85769", "ROSEPED2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85771", "ROSEPID2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85773", "ROSEPOPD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85777", "ROSERD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85779", "ROSEWD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85855", "ROSEKOC": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85781", "ROSEDKO": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85783", "ROSEDKOP": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85785", "ROSEKOEB": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85787", "ROSEKOOG": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85789", "ROSEPKO": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85795", "ROSEKOS": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85791", "ROSEKOW": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85793", "ROSEAL2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85799"};
-    const ROSE_REMOTE_IMAGE_BY_NAME = {"Apricot Drift® Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85760", "Blushing Drift® Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85767", "Coral Drift® Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85765", "Lemon Drift® Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85769", "Peach Drift® Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85771", "Pink Drift® Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85773", "Popcorn Drift® Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85777", "Red Drift® Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85779", "White Drift® Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85855", "Coral Knock Out Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85781", "Double Knock Out Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85783", "Double Pink Knock Out Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85785", "Easy Bee-zy Knock Out Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85787", "Orange Glow Knock Out Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85789", "Petite Knock Out Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85795", "Sunny Knock Out Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85791", "White Knock Out Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85793", "At Last® Rose 2G": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85799"};
-    const GENERIC_ROSE_IMAGE = "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85760";
-
-    function isRoseLikeItem(item) {
-      const joined = [
-        item?.browserGroup,
-        item?.category,
-        item?.section,
-        item?.plant_group,
-        item?.name,
-        item?.common,
-        item?.genus,
-        item?.series,
-        item?.searchBlob,
-        item?.notes
-      ].map(v => normalizeSpaces(v || "")).filter(Boolean).join(" ").toLowerCase();
-
-      if (normalizeText(item?.browserGroup) === "roses") return true;
-      if (normalizeText(item?.category) === "roses") return true;
-      if (normalizeText(item?.section) === "roses") return true;
-      if (normalizeText(item?.plant_group) === "roses") return true;
-      if (normalizeText(item?.name) === "roses") return true;
-      if (/\brosa\b/.test(joined)) return true;
-      if (/\brose\b/.test(joined) && /\b(drift|knock out|knockout|floribunda|grandiflora|hybrid tea|climbing|shrub)\b/.test(joined)) return true;
-      return false;
-    }
-
-    function getCatalogPlantMatch(item) {
-      if (!Array.isArray(state.plants) || !state.plants.length) return null;
-      const sku = normalizeText(item?.sku || "");
-      const name = normalizeText(item?.name || "");
-      if (sku) {
-        const bySku = state.plants.find(p => normalizeText(p?.sku || "") === sku);
-        if (bySku) return bySku;
-      }
-      if (name) {
-        const byExactName = state.plants.find(p => normalizeText(p?.name || "") === name);
-        if (byExactName) return byExactName;
-        if (name === "roses") {
-          const anyRose = state.plants.find(p => normalizeText(p?.section || "") === "roses" || normalizeText(p?.category || "") === "roses" || normalizeText(p?.plant_group || "") === "roses");
-          if (anyRose) return anyRose;
-        }
-      }
-      return null;
-    }
-
-    function resolveDisplayImage(item) {
-      if (item?.image && !String(item.image).includes("mail-link.png")) return item.image;
-      const match = getCatalogPlantMatch(item);
-      if (match?.image && !String(match.image).includes("mail-link.png")) {
-        if (isRoseLikeItem(item)) {
-          const sku = match?.sku || item?.sku || "";
-          const roseRemote = ROSE_REMOTE_IMAGE_BY_SKU[sku] || ROSE_REMOTE_IMAGE_BY_NAME[match?.name] || ROSE_REMOTE_IMAGE_BY_NAME[item?.name];
-          if (roseRemote) return roseRemote;
-        }
-        return match.image;
-      }
-      if (isRoseLikeItem(item)) {
-        const sku = item?.sku || "";
-        return ROSE_REMOTE_IMAGE_BY_SKU[sku] || ROSE_REMOTE_IMAGE_BY_NAME[item?.name] || GENERIC_ROSE_IMAGE || "";
-      }
-      return "";
-    }
-
-    function resolveDisplayLink(item) {
-      if (item?.link) return item.link;
-      if (item?.url) return item.url;
-      const match = getCatalogPlantMatch(item);
-      return match?.link || match?.url || "";
-    }
-
     function renderFinderResults() {
       const results = state.finderResults;
       if (!results.length) {
@@ -4058,29 +3889,20 @@ function renderDefinitions() {
         const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
         const active = state.selectedFinderId === item.id;
         const tags = item.traits.slice(0, 4).map(trait => `<span class="trait-badge">${titleCase(trait.replace(/-/g, " "))}</span>`).join("");
-        const image = resolveDisplayImage(item);
-        const thumb = image
-          ? `<span class="finder-thumb"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></span>`
-          : "";
         return `
           <button type="button" class="finder-card${active ? " active" : ""}" data-item-id="${item.id}">
-            <div class="finder-result-row">
-              ${thumb}
-              <div class="finder-result-main">
-                <div class="topline">
-                  <div>
-                    <h3>${escapeHtml(item.name)}</h3>
-                    <div class="finder-meta">${escapeHtml(item.locationLabel)} · ${escapeHtml(item.area)}</div>
-                  </div>
-                  <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")}</span>
-                </div>
-                <div class="finder-tag-row">
-                  <span class="location-badge">${escapeHtml(item.category)}</span>
-                  ${tags}
-                </div>
-                <div class="details-text">${escapeHtml(item.notes || directionFromZone(item))}</div>
+            <div class="topline">
+              <div>
+                <h3>${escapeHtml(item.name)}</h3>
+                <div class="finder-meta">${escapeHtml(item.locationLabel)} · ${escapeHtml(item.area)}</div>
               </div>
+              <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")}</span>
             </div>
+            <div class="finder-tag-row">
+              <span class="location-badge">${escapeHtml(item.category)}</span>
+              ${tags}
+            </div>
+            <div class="details-text">${escapeHtml(item.notes || directionFromZone(item))}</div>
           </button>
         `;
       }).join("");
@@ -4090,26 +3912,17 @@ function renderDefinitions() {
       });
     }
 
-    function buildDetailHtml(    function buildDetailHtml(item, mode = "finder") {
+    function buildDetailHtml(item, mode = "finder") {
       const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
       const traits = item.traits.length
         ? item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, " "))}</span>`).join("")
         : `<span class="trait-badge">No brochure traits listed</span>`;
       const extraNote = item.notes ? `<p class="finder-note">${escapeHtml(item.notes)}</p>` : "";
       const zones = item.zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("");
-      const image = resolveDisplayImage(item);
-      const imageHtml = image
-        ? `<div class="detail-image-wrap"><img class="detail-image" src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
-        : "";
-      const resolvedLink = resolveDisplayLink(item);
-      const productLink = resolvedLink
-        ? `<a class="map-link" href="${escapeHtml(resolvedLink)}" target="_blank" rel="noopener noreferrer">Open product page</a>`
-        : "";
       const link = mode === "finder"
         ? `<a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open property in Google Maps</a>`
         : "";
       return `
-        ${imageHtml}
         <h3>${escapeHtml(item.name)}</h3>
         <p class="finder-note"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
         <div class="detail-tag-row">
@@ -4121,14 +3934,13 @@ function renderDefinitions() {
         <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
         ${extraNote}
         <div class="detail-actions">
-          ${productLink}
           ${link}
           <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Quick line</button>
         </div>
       `;
     }
 
-    function wireCopyButtons(    function wireCopyButtons(scope) {
+    function wireCopyButtons(scope) {
       scope.querySelectorAll("[data-copy-line]").forEach(btn => {
         btn.addEventListener("click", async () => {
           const text = btn.getAttribute("data-copy-line").replace(/&quot;/g, '"').replace(/&amp;/g, '&');
@@ -4211,7 +4023,6 @@ function renderDefinitions() {
         { label: "All Plants", value: "" },
         { label: "Trees", value: "Tree" },
         { label: "Shrubs", value: "Shrub" },
-        { label: "Tree & Shrub Form", value: "Tree/Shrub" },
         { label: "Shade", value: "shade" },
         { label: "Conifers", value: "conifers" },
         { label: "Roses", value: "roses" },
@@ -4251,7 +4062,7 @@ function renderDefinitions() {
       });
     }
 
-    function applyKioskFilters(    function applyKioskFilters() {
+    function applyKioskFilters() {
       const query = normalizeText(els.kioskSearch.value);
       const picked = state.kioskTrait;
       const sourceItems = getKioskItems();
@@ -4259,10 +4070,9 @@ function renderDefinitions() {
         if (query && !item.searchBlob.includes(query)) return false;
         if (!picked) return true;
         if (picked === "Tree") return item.category === "Tree";
-        if (picked === "Shrub") return item.category === "Shrub" && !isRoseLikeItem(item);
-        if (picked === "Tree/Shrub") return item.category === "Tree/Shrub";
+        if (picked === "Shrub") return item.category === "Shrub";
         if (picked === "conifers") return item.browserGroup === "Conifers" || isConiferNurseryItem(item);
-        if (picked === "roses") return item.browserGroup === "Roses" || isRoseLikeItem(item);
+        if (picked === "roses") return item.browserGroup === "Roses" || isRoseNurseryItem(item);
         if (picked === "shade") return item.traits.includes("shade");
         if (picked === "pollinator-friendly") return item.traits.includes("pollinator-friendly");
         return item.traits.includes(picked);
@@ -4278,7 +4088,7 @@ function renderDefinitions() {
       renderKioskDetail(selected);
     }
 
-    function renderKioskResults(    function renderKioskResults() {
+    function renderKioskResults() {
       const total = state.kioskMatchCount || 0;
       if (!state.kioskResults.length) {
         els.kioskResults.innerHTML = `<div class="empty">No matches in kiosk mode. Try another search or clear a quick filter.</div>`;
@@ -4292,25 +4102,16 @@ function renderDefinitions() {
       els.kioskResults.innerHTML = summary + state.kioskResults.map(item => {
         const active = state.selectedKioskId === item.id;
         const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
-        const image = resolveDisplayImage(item);
-        const thumb = image
-          ? `<span class="kiosk-thumb"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></span>`
-          : "";
         return `
           <button type="button" class="kiosk-card${active ? " active" : ""}" data-kiosk-id="${item.id}">
-            <div class="kiosk-result-row">
-              ${thumb}
-              <div class="kiosk-result-main">
-                <div class="topline">
-                  <div>
-                    <h3>${escapeHtml(item.name)}</h3>
-                    <div class="kiosk-meta">Go to ${escapeHtml(item.locationLabel)}</div>
-                  </div>
-                  <span class="mini-flag" style="--flag:${flagColor}"></span>
-                </div>
-                <div class="details-text">${escapeHtml(item.traits.slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area || item.browserGroup || item.category)}</div>
+            <div class="topline">
+              <div>
+                <h3>${escapeHtml(item.name)}</h3>
+                <div class="kiosk-meta">Go to ${escapeHtml(item.locationLabel)}</div>
               </div>
+              <span class="mini-flag" style="--flag:${flagColor}"></span>
             </div>
+            <div class="details-text">${escapeHtml(item.traits.slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area || item.browserGroup || item.category)}</div>
           </button>
         `;
       }).join("");
@@ -4319,7 +4120,7 @@ function renderDefinitions() {
       });
     }
 
-    function renderKioskMap(    function renderKioskMap(item = null) {
+    function renderKioskMap(item = null) {
       if (!els.kioskMapBoard || !els.kioskMapCaption) return;
       const activeZoneIds = item?.zoneIds?.length ? item.zoneIds : [];
       const markerItems = item ? [item] : [];
@@ -4349,17 +4150,7 @@ function renderDefinitions() {
         return;
       }
 
-      const image = resolveDisplayImage(item);
-      const resolvedLink = resolveDisplayLink(item);
-      const productLink = resolvedLink
-        ? `<a class="map-link" href="${escapeHtml(resolvedLink)}" target="_blank" rel="noopener noreferrer">Open Product Page</a>`
-        : "";
-      const imageHtml = image
-        ? `<div class="kiosk-detail-image-wrap"><img class="kiosk-detail-image" src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
-        : "";
-
       els.kioskDetailPanel.innerHTML = `
-        ${imageHtml}
         <h2>${escapeHtml(item.name)}</h2>
         <p class="kiosk-lead"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
         <div class="detail-tag-row">
@@ -4368,7 +4159,6 @@ function renderDefinitions() {
         <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
         <div class="detail-tag-row">${item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
         <div class="detail-actions">
-          ${productLink}
           <a class="map-link" href="${withSatelliteView(NURSERY_MAPS_LINK)}" target="_blank" rel="noopener noreferrer">Open Satellite Map</a>
           <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy quick line</button>
         </div>
@@ -4377,7 +4167,7 @@ function renderDefinitions() {
       renderKioskMap(item);
     }
 
-    function selectKioskItem(    function selectKioskItem(itemId) {
+    function selectKioskItem(itemId) {
       const item = getKioskItems().find(entry => entry.id === itemId);
       if (!item) return;
       state.selectedKioskId = item.id;
@@ -4496,17 +4286,568 @@ function renderDefinitions() {
 
   <footer class="site-footer">
     <div class="site-footer-inner">
-      <img
-        class="footer-badge"
-        src="./images/cg-fox-badge.png"
-        alt="C.G. Fox badge"
-        onerror="this.style.display='none'"
-      />
       <div class="site-footer-copy">
         <div class="site-footer-title">Designed and developed by C.G. Fox</div>
         <div class="site-footer-sub">Foxfield Studio</div>
       </div>
     </div>
   </footer>
+
+<script>
+(function () {
+  const APP_READY_BY_SKU = {"BAMFR2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95721", "link": "https://store.suburbanlg.com/products/fargesia-rufa-bamboo-2g-3113.html", "root_group": "Bamboo", "plant_group": "Bamboo"}, "BAMFR5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95723", "link": "https://store.suburbanlg.com/products/fargesia-rufa-bamboo-3-5g-6502.html", "root_group": "Bamboo", "plant_group": "Bamboo"}, "BAMYG10": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95725", "link": "https://store.suburbanlg.com/products/yellow-groove-bamboo-10g-14609.html", "root_group": "Bamboo", "plant_group": "Bamboo"}, "BAMYG5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95727", "link": "https://store.suburbanlg.com/products/yellow-groove-bamboo-3-5g-6571.html", "root_group": "Bamboo", "plant_group": "Bamboo"}, "GBHBB5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95735", "link": "https://store.suburbanlg.com/products/blackhawk-big-bluestem-5g-15416.html", "root_group": "Perennial Grasses", "plant_group": "Bluestem Grasses"}, "GSO1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95737", "link": "https://store.suburbanlg.com/products/standing-ovation-grass-1g-16033.html", "root_group": "Perennial Grasses", "plant_group": "Bluestem Grasses"}, "GSO2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95741", "link": "https://store.suburbanlg.com/products/standing-ovation-grass-2g-14626.html", "root_group": "Perennial Grasses", "plant_group": "Bluestem Grasses"}, "GKFFR1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95745", "link": "https://store.suburbanlg.com/products/-karl-foerster--feather-reed-grass-1g-2170.html", "root_group": "Perennial Grasses", "plant_group": "Feather Reed Grass"}, "GKFFR2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95747", "link": "https://store.suburbanlg.com/products/-karl-foerster--feather-reed-grass-2g-2171.html", "root_group": "Perennial Grasses", "plant_group": "Feather Reed Grass"}, "GKFFR5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95749", "link": "https://store.suburbanlg.com/products/-karl-foerster--feather-reed-grass-3-5g-2172.html", "root_group": "Perennial Grasses", "plant_group": "Feather Reed Grass"}, "GODF2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95751", "link": "https://store.suburbanlg.com/products/overdam-feather-reed-grass-2g-2175.html", "root_group": "Perennial Grasses", "plant_group": "Feather Reed Grass"}, "GODF5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95753", "link": "https://store.suburbanlg.com/products/overdam-feather-reed-grass-3-5g-2176.html", "root_group": "Perennial Grasses", "plant_group": "Feather Reed Grass"}, "GODF8": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95755", "link": "https://store.suburbanlg.com/products/overdam-feather-reed-grass-8--14624.html", "root_group": "Perennial Grasses", "plant_group": "Feather Reed Grass"}, "GCAIF1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95763", "link": "https://store.suburbanlg.com/products/cool-as-ice-fescue-grass-1g-16919.html", "root_group": "Perennial Grasses", "plant_group": "Liriope & Border Grasses"}, "GBF1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95757", "link": "https://store.suburbanlg.com/products/elijah-blue-fescue-grass-1g-2642.html", "root_group": "Perennial Grasses", "plant_group": "Liriope & Border Grasses"}, "GBFQT": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95761", "link": "https://store.suburbanlg.com/products/elijah-blue-fescue-grass-1qt-16261.html", "root_group": "Perennial Grasses", "plant_group": "Liriope & Border Grasses"}, "LIRS1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95773", "link": "https://store.suburbanlg.com/products/liriope-spicata-grass-1g-12506.html", "root_group": "Perennial Grasses", "plant_group": "Liriope & Border Grasses"}, "LIR1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95769", "link": "https://store.suburbanlg.com/products/liriopen-grass-1g-6523.html", "root_group": "Perennial Grasses", "plant_group": "Liriope & Border Grasses"}, "GMO1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95765", "link": "https://store.suburbanlg.com/products/mondo-grass-1g-3353.html", "root_group": "Perennial Grasses", "plant_group": "Liriope & Border Grasses"}, "GMOQT": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95767", "link": "https://store.suburbanlg.com/products/mondo-grass-1qt-3355.html", "root_group": "Perennial Grasses", "plant_group": "Liriope & Border Grasses"}, "LIRPE1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95771", "link": "https://store.suburbanlg.com/products/purple-explosion-liriope-grass-1g-2928.html", "root_group": "Perennial Grasses", "plant_group": "Liriope & Border Grasses"}, "LIRV1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95775", "link": "https://store.suburbanlg.com/products/variegated-liriope-grass-1g-2931.html", "root_group": "Perennial Grasses", "plant_group": "Liriope & Border Grasses"}, "GAD2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95777", "link": "https://store.suburbanlg.com/products/adagio-dwarf-silver-grass-2g-3128.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GAD5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95779", "link": "https://store.suburbanlg.com/products/adagio-dwarf-silver-grass-3-5g---3129.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GAL2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95783", "link": "https://store.suburbanlg.com/products/autumn-light-grass-2g-23239.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GAL5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95785", "link": "https://store.suburbanlg.com/products/autumn-light-grass-3-5g-23240.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GDMY1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95787", "link": "https://store.suburbanlg.com/products/dwarf-yakushima-maiden-grass-1g-6649.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GDMY2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95789", "link": "https://store.suburbanlg.com/products/dwarf-yakushima-maiden-grass-2g-6650.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GDMY5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95791", "link": "https://store.suburbanlg.com/products/dwarf-yakushima-maiden-grass-3-5g-6651.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GFL2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95793", "link": "https://store.suburbanlg.com/products/flame-grass-2g-6509.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GGM5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95795", "link": "https://store.suburbanlg.com/products/giant-maiden-grass-3-5g-10079.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GHSU2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95797", "link": "https://store.suburbanlg.com/products/huron-sunrise-grass-2g-3133.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GM2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95799", "link": "https://store.suburbanlg.com/products/maiden-grass-2g-2648.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GM5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95801", "link": "https://store.suburbanlg.com/products/maiden-grass-3-5g-2649.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GMML1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95803", "link": "https://store.suburbanlg.com/products/morning-light-maiden-grass-1g-5709.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GMML2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95805", "link": "https://store.suburbanlg.com/products/morning-light-maiden-grass-2g-5710.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GMML5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95807", "link": "https://store.suburbanlg.com/products/morning-light-maiden-grass-3-5g-5711.html", "root_group": "Perennial Grasses", "plant_group": "Maiden Grasses"}, "GBBF1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95811", "link": "https://store.suburbanlg.com/products/beyond-blue-fescue-grass-1g-12931.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GBAM1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95809", "link": "https://store.suburbanlg.com/products/blond-ambition-grass-1g-16259.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GLBSJ2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95821", "link": "https://store.suburbanlg.com/products/jazz-little-bluestem-grass-2g-16461.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GLBC1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95813", "link": "https://store.suburbanlg.com/products/little-bluestem-chameleon-grass-1g-27811.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GLBC2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95815", "link": "https://store.suburbanlg.com/products/little-bluestem-chameleon-grass-2g-24368.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GLBS1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95817", "link": "https://store.suburbanlg.com/products/little-bluestem-grass-1g-6598.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GLBS2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95819", "link": "https://store.suburbanlg.com/products/little-bluestem-grass-2g-6599.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GLBSS2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95827", "link": "https://store.suburbanlg.com/products/little-bluestem-sandhill-grass-2g-23900.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GPDS1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95833", "link": "https://store.suburbanlg.com/products/prairie-dropseed-grass-1g-3363.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GPDS8": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95835", "link": "https://store.suburbanlg.com/products/prairie-dropseed-grass-8--16264.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GLBSPM1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95823", "link": "https://store.suburbanlg.com/products/prairie-munchkin-bluestem-grass-1g-16462.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GPB1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95829", "link": "https://store.suburbanlg.com/products/prairies-blues-little-bluestem-grass-1g-3362.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GRO5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95837", "link": "https://store.suburbanlg.com/products/red-october-grass-3-5g-12460.html", "root_group": "Perennial Grasses", "plant_group": "Native & Prairie Grasses"}, "GBD2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95839", "link": "https://store.suburbanlg.com/products/blue-dart-grass-2g-16260.html", "root_group": "Perennial Grasses", "plant_group": "Naturalizing Grasses"}, "GBDL2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95841", "link": "https://store.suburbanlg.com/products/blue-dune-lyme-grass-2g-2640.html", "root_group": "Perennial Grasses", "plant_group": "Naturalizing Grasses"}, "GBZ8": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95843", "link": "https://store.suburbanlg.com/products/blue-zinger-grass-8--14623.html", "root_group": "Perennial Grasses", "plant_group": "Naturalizing Grasses"}, "GLS1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95865", "link": "https://store.suburbanlg.com/products/-lemon-squeeze--fountain-grass-1g-23461.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Fountain Grasses"}, "GHDF1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95847", "link": "https://store.suburbanlg.com/products/hameln-dwarf-fountain-grass-1g-3338.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Fountain Grasses"}, "GHDFQT": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95853", "link": "https://store.suburbanlg.com/products/hameln-dwarf-fountain-grass-1qt-3340.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Fountain Grasses"}, "GHDF2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95855", "link": "https://store.suburbanlg.com/products/hameln-dwarf-fountain-grass-2g-5232.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Fountain Grasses"}, "GHDF5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95849", "link": "https://store.suburbanlg.com/products/hameln-dwarf-fountain-grass-3-5g-3339.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Fountain Grasses"}, "GHDF8": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95851", "link": "https://store.suburbanlg.com/products/hameln-dwarf-fountain-grass-8--14672.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Fountain Grasses"}, "GLB1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95857", "link": "https://store.suburbanlg.com/products/little-bunny-grass-1g-6512.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Fountain Grasses"}, "GLB1Q": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95859", "link": "https://store.suburbanlg.com/products/little-bunny-grass-1qt-16031.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Fountain Grasses"}, "GLB8": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95861", "link": "https://store.suburbanlg.com/products/little-bunny-grass-8--20225.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Fountain Grasses"}, "GPIG1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95867", "link": "https://store.suburbanlg.com/products/piglet-grass-1g-12936.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Fountain Grasses"}, "GHP5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95845", "link": "https://store.suburbanlg.com/products/hardy-pampas-grass-3-5g-3346.html", "root_group": "Perennial Grasses", "plant_group": "Perennial Grasses"}, "GAGJF1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95869", "link": "https://store.suburbanlg.com/products/all-gold-japanese-forest-grass-1g-2638.html", "root_group": "Perennial Grasses", "plant_group": "Shade Grasses"}, "GISO1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95873", "link": "https://store.suburbanlg.com/products/inland-sea-oats-grass-1g-2896.html", "root_group": "Perennial Grasses", "plant_group": "Shade Grasses"}, "GISO5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95875", "link": "https://store.suburbanlg.com/products/inland-sea-oats-grass-1g-2897.html", "root_group": "Perennial Grasses", "plant_group": "Shade Grasses"}, "GAR2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95877", "link": "https://store.suburbanlg.com/products/apache-rose-grass-2g-6595.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GCHS2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95879", "link": "https://store.suburbanlg.com/products/cheyenne-sky-grass-2g-6648.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GHM1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95881", "link": "https://store.suburbanlg.com/products/heavy-metal-grass-1g-3341.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GHM2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95883", "link": "https://store.suburbanlg.com/products/heavy-metal-grass-2g-3342.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GHM5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95885", "link": "https://store.suburbanlg.com/products/heavy-metal-grass-3-5g-3343.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GNS1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95887", "link": "https://store.suburbanlg.com/products/northwind-switch-grass-1g-3356.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GNS2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95893", "link": "https://store.suburbanlg.com/products/northwind-switch-grass-2g-3357.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GNS5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95889", "link": "https://store.suburbanlg.com/products/northwind-switch-grass-3-5g-3358.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GNS8": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95891", "link": "https://store.suburbanlg.com/products/northwind-switch-grass-8--16263.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GSS1": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95895", "link": "https://store.suburbanlg.com/products/shenandoah-switch-grass-1g-3376.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GSS2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=91037", "link": "https://store.suburbanlg.com/products/shenandoah-switch-grass-2g-3377.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GSS8": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95897", "link": "https://store.suburbanlg.com/products/shenandoah-switch-grass-8--14627.html", "root_group": "Perennial Grasses", "plant_group": "Switch Grasses"}, "GBAM1G": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95899", "link": "https://store.suburbanlg.com/products/bandwidth-maiden-grass-1g-16459.html", "root_group": "Perennial Grasses", "plant_group": "Variegated Perennial Grasses"}, "GBAM2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95903", "link": "https://store.suburbanlg.com/products/bandwidth-maiden-grass-2g-16460.html", "root_group": "Perennial Grasses", "plant_group": "Variegated Perennial Grasses"}, "GJSV5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95905", "link": "https://store.suburbanlg.com/products/japanese-silver-variegated-grass-3-5g-2646.html", "root_group": "Perennial Grasses", "plant_group": "Variegated Perennial Grasses"}, "GLZ2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95907", "link": "https://store.suburbanlg.com/products/japanese-silver-variegated-grass-3-5g-3136.html", "root_group": "Perennial Grasses", "plant_group": "Variegated Perennial Grasses"}, "GLZ5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95909", "link": "https://store.suburbanlg.com/products/japanese-silver-variegated-grass-3-5g-3137.html", "root_group": "Perennial Grasses", "plant_group": "Variegated Perennial Grasses"}, "GPP5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95911", "link": "https://store.suburbanlg.com/products/porcupine-grass-3-5g-3367.html", "root_group": "Perennial Grasses", "plant_group": "Variegated Perennial Grasses"}, "YAN5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95913", "link": "https://store.suburbanlg.com/products/adams-needle-yucca-3-5g-3312.html", "root_group": "Perennial Grasses", "plant_group": "Yucca"}, "YBE5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95915", "link": "https://store.suburbanlg.com/products/bright-edged-yucca-3-5g-3313.html", "root_group": "Perennial Grasses", "plant_group": "Yucca"}, "YCG2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95917", "link": "https://store.suburbanlg.com/products/color-guard-yucca-2g-3314.html", "root_group": "Perennial Grasses", "plant_group": "Yucca"}, "YCG5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95919", "link": "https://store.suburbanlg.com/products/color-guard-yucca-3-5g-3315.html", "root_group": "Perennial Grasses", "plant_group": "Yucca"}, "YFGS5": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=95921", "link": "https://store.suburbanlg.com/products/golden-sword-yucca-3-5g-2806.html", "root_group": "Perennial Grasses", "plant_group": "Yucca"}, "ROSEAPDR2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85760", "link": "https://store.suburbanlg.com/products/apricot-drift--rose-2g-2509.html", "root_group": "Roses", "plant_group": "Drift® Roses"}, "ROSEBD2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85767", "link": "https://store.suburbanlg.com/products/blushing-drift--rose-2g-18924.html", "root_group": "Roses", "plant_group": "Drift® Roses"}, "ROSECD2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85765", "link": "https://store.suburbanlg.com/products/coral-drift--rose-2g-2512.html", "root_group": "Roses", "plant_group": "Drift® Roses"}, "ROSELD2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85769", "link": "https://store.suburbanlg.com/products/lemon-drift--rose-2g-10115.html", "root_group": "Roses", "plant_group": "Drift® Roses"}, "ROSEPED2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85771", "link": "https://store.suburbanlg.com/products/peach-drift--rose-2g-2527.html", "root_group": "Roses", "plant_group": "Drift® Roses"}, "ROSEPID2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85773", "link": "https://store.suburbanlg.com/products/pink-drift--rose-2g-2530.html", "root_group": "Roses", "plant_group": "Drift® Roses"}, "ROSEPOPD2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85777", "link": "https://store.suburbanlg.com/products/popcorn-drift--rose-2g-2533.html", "root_group": "Roses", "plant_group": "Drift® Roses"}, "ROSERD2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85779", "link": "https://store.suburbanlg.com/products/red-drift--rose-2g-2535.html", "root_group": "Roses", "plant_group": "Drift® Roses"}, "ROSEWD2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85855", "link": "https://store.suburbanlg.com/products/white-drift--rose-2g-2540.html", "root_group": "Roses", "plant_group": "Drift® Roses"}, "ROSEKOC": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85781", "link": "https://store.suburbanlg.com/products/coral-knock-out-rose-2g-9993.html", "root_group": "Roses", "plant_group": "Knock Out® Roses"}, "ROSEDKO": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85783", "link": "https://store.suburbanlg.com/products/double-knock-out-rose-2g-2514.html", "root_group": "Roses", "plant_group": "Knock Out® Roses"}, "ROSEDKOP": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85785", "link": "https://store.suburbanlg.com/products/double-pink-knock-out-rose-2g-6419.html", "root_group": "Roses", "plant_group": "Knock Out® Roses"}, "ROSEKOEB": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85787", "link": "https://store.suburbanlg.com/products/easy-bee-zy-knock-out-rose-2g-23202.html", "root_group": "Roses", "plant_group": "Knock Out® Roses"}, "ROSEKOOG": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85789", "link": "https://store.suburbanlg.com/products/orange-glow-knock-out-rose-2g-23203.html", "root_group": "Roses", "plant_group": "Knock Out® Roses"}, "ROSEPKO": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85795", "link": "https://store.suburbanlg.com/products/petite-knock-out-rose-2g-15491.html", "root_group": "Roses", "plant_group": "Knock Out® Roses"}, "ROSEKOS": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85791", "link": "https://store.suburbanlg.com/products/sunny-knock-out-rose-2g-2521.html", "root_group": "Roses", "plant_group": "Knock Out® Roses"}, "ROSEKOW": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85793", "link": "https://store.suburbanlg.com/products/white-knock-out-rose-2g-14766.html", "root_group": "Roses", "plant_group": "Knock Out® Roses"}, "ROSEAL2": {"image": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85799", "link": "https://store.suburbanlg.com/products/at-last--rose--2g-8041.html", "root_group": "Roses", "plant_group": "Proven Winners® Roses"}};
+
+  function safeNormalize(v) {
+    try {
+      if (typeof normalizeText === "function") return normalizeText(v);
+    } catch (_) {}
+    return String(v || "").trim().toLowerCase();
+  }
+
+  function safeSpaces(v) {
+    try {
+      if (typeof normalizeSpaces === "function") return normalizeSpaces(v);
+    } catch (_) {}
+    return String(v || "").replace(/\s+/g, " ").trim();
+  }
+
+  function skuKey(v) {
+    try {
+      if (typeof normalizeSku === "function") return normalizeSku(v);
+    } catch (_) {}
+    return String(v || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  }
+
+  function appReadyMeta(item) {
+    const key = skuKey(item?.sku || item?.id || "");
+    return key ? (APP_READY_BY_SKU[key] || null) : null;
+  }
+
+  function roseLike(item) {
+    const meta = appReadyMeta(item);
+    const parts = [
+      item?.browserGroup,
+      item?.category,
+      item?.section,
+      item?.plant_group,
+      item?.name,
+      item?.common,
+      item?.genus,
+      item?.series,
+      item?.searchBlob,
+      item?.notes,
+      meta?.root_group,
+      meta?.plant_group
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    if (safeNormalize(item?.browserGroup) === "roses") return true;
+    if (safeNormalize(item?.category) === "roses") return true;
+    if (safeNormalize(item?.section) === "roses") return true;
+    if (safeNormalize(item?.plant_group) === "roses") return true;
+    if (safeNormalize(meta?.root_group) === "roses") return true;
+    if (/\brosa\b/.test(parts)) return true;
+    if (/\b(drift|knock\s*out|knockout|floribunda|grandiflora|hybrid\s*tea|climbing|shrub)\b/.test(parts) && /\brose\b/.test(parts)) return true;
+    return false;
+  }
+
+  function isGenericMappedItem(item) {
+    const name = safeNormalize(item?.name);
+    return name === "roses" || name === "grasses";
+  }
+
+  function deriveBrowserGroup(plant) {
+    const meta = appReadyMeta(plant);
+    const section = safeNormalize(plant?.section);
+    const category = safeNormalize(plant?.category);
+    const group = safeNormalize(plant?.plant_group);
+    const name = safeNormalize(plant?.name);
+    const metaRoot = safeNormalize(meta?.root_group);
+    const metaGroup = safeNormalize(meta?.plant_group);
+
+    if (metaRoot) return meta.root_group;
+    if (section === "roses" || category === "roses" || group === "roses" || /\brose\b/.test(name)) return "Roses";
+    if (group.includes("bamboo") || category.includes("bamboo") || section.includes("bamboo")) return "Bamboo";
+    if (group.includes("grass") || category.includes("grass") || section.includes("grass") || group.includes("yucca")) return "Perennial Grasses";
+    if (metaGroup) return meta.plant_group;
+    if (category === "tree") return "Trees";
+    if (category === "shrub") return "Shrubs";
+    return safeSpaces(plant?.plant_group || plant?.category || plant?.section || "");
+  }
+
+  function imageForAny(item) {
+    const meta = appReadyMeta(item);
+    const img = item?.image || "";
+    if (roseLike(item) && meta?.image) return meta.image;
+    if (img) return img;
+    return meta?.image || "";
+  }
+
+  function linkForAny(item) {
+    const meta = appReadyMeta(item);
+    return item?.link || item?.url || meta?.link || "";
+  }
+
+  function categoryLabelFor(item) {
+    if (item?.category === "Plant" && item?.browserGroup) return item.browserGroup;
+    return item?.category || item?.browserGroup || "";
+  }
+
+  function installTargetedCss() {
+    if (document.getElementById("targeted-finder-kiosk-fix-css")) return;
+    const style = document.createElement("style");
+    style.id = "targeted-finder-kiosk-fix-css";
+    style.textContent = `
+      .finder-result-row,
+      .kiosk-result-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .finder-result-main,
+      .kiosk-result-main {
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+      .finder-thumb,
+      .kiosk-thumb {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 12px;
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        flex: 0 0 auto;
+      }
+      .finder-thumb {
+        width: 54px;
+        height: 54px;
+      }
+      .kiosk-thumb {
+        width: 48px;
+        height: 48px;
+      }
+      .finder-thumb img,
+      .kiosk-thumb img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+      .finder-detail-image-wrap,
+      .kiosk-detail-image-wrap {
+        width: 100%;
+        max-width: 220px;
+        margin: 0 0 12px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg-soft);
+      }
+      .finder-detail-image,
+      .kiosk-detail-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+      }
+      @media (max-width: 900px) {
+        .finder-thumb {
+          width: 48px;
+          height: 48px;
+        }
+        .kiosk-thumb {
+          width: 44px;
+          height: 44px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function buildCatalogItems(plants) {
+    const list = [];
+    const seen = new Set();
+
+    (Array.isArray(plants) ? plants : []).forEach((plant, index) => {
+      const meta = typeof kioskZoneMetaForPlant === "function"
+        ? kioskZoneMetaForPlant(plant)
+        : { zoneIds: [], locationLabel: "", area: "", flagColor: "", topCategory: "Plant" };
+
+      const browserGroup = deriveBrowserGroup(plant);
+      const category = meta.topCategory || (safeNormalize(plant?.category) === "tree" ? "Tree" : safeNormalize(plant?.category) === "shrub" ? "Shrub" : "Plant");
+      const traits = typeof kioskTraitsFromPlant === "function" ? kioskTraitsFromPlant(plant) : [];
+      const name = safeSpaces(plant?.name || plant?.common || plant?.sku || `Plant ${index + 1}`);
+      const item = {
+        id: `catalog-${skuKey(plant?.sku || name || index)}-${index}`,
+        sku: plant?.sku || "",
+        name,
+        category,
+        browserGroup,
+        zoneIds: Array.isArray(meta.zoneIds) ? meta.zoneIds : [],
+        locationLabel: meta.locationLabel || "",
+        area: meta.area || "",
+        flagColor: meta.flagColor || "",
+        traits: Array.from(new Set((traits || []).filter(Boolean))),
+        image: imageForAny(plant),
+        link: linkForAny(plant),
+        notes: safeSpaces(plant?.notes || plant?.description || (plant?.size ? `${plant.size}${plant?.price ? ` · ${plant.price}` : ""}` : plant?.price || "")),
+        section: plant?.section || "",
+        plant_group: plant?.plant_group || "",
+        searchBlob: [
+          plant?.name, plant?.common, plant?.genus, plant?.sku, plant?.series,
+          plant?.plant_group, plant?.category, plant?.section, browserGroup,
+          plant?.light, meta.locationLabel, meta.area, (traits || []).join(" "),
+          plant?.notes, plant?.description
+        ].map(safeSpaces).filter(Boolean).join(" ").toLowerCase()
+      };
+
+      // only add catalog items that improve mapped plant visibility
+      const include = roseLike(item) || browserGroup === "Perennial Grasses" || browserGroup === "Bamboo";
+      if (!include) return;
+
+      const dedupeKey = `${safeNormalize(item.name)}|${safeNormalize(item.locationLabel)}|${safeNormalize(item.browserGroup)}`;
+      if (seen.has(dedupeKey)) return;
+      seen.add(dedupeKey);
+      list.push(item);
+    });
+
+    return list;
+  }
+
+  function getCombinedItems() {
+    const base = (Array.isArray(NURSERY_ITEMS) ? NURSERY_ITEMS : []).filter(item => !isGenericMappedItem(item));
+    const extra = Array.isArray(state.kioskCatalogItems) ? state.kioskCatalogItems : [];
+    const seen = new Set();
+    return [...base, ...extra].filter(item => {
+      const key = `${safeNormalize(item?.name)}|${safeNormalize(item?.locationLabel)}|${safeNormalize(item?.browserGroup)}|${safeNormalize(item?.category)}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  window.isRoseNurseryItem = function(item) {
+    return roseLike(item);
+  };
+
+  window.imageFor = function(plant) {
+    return imageForAny(plant);
+  };
+
+  window.getKioskItems = function() {
+    return getCombinedItems();
+  };
+
+  window.getFinderItems = function() {
+    return getCombinedItems();
+  };
+
+  window.finderMatches = function(item, query, category, activeTraits) {
+    if (query) {
+      if ((query === "rose" || query === "roses") && !roseLike(item)) return false;
+      if ((query === "grass" || query === "grasses") && safeNormalize(item.browserGroup) !== "perennial grasses") return false;
+      if (query === "bamboo" && safeNormalize(item.browserGroup) !== "bamboo") return false;
+      if (!["rose","roses","grass","grasses","bamboo"].includes(query) && !safeNormalize(item.searchBlob).includes(query)) return false;
+    }
+    if (category) {
+      if (category === "Shrub") {
+        if (!(item.category === "Shrub" || roseLike(item))) return false;
+      } else if (item.category !== category) {
+        return false;
+      }
+    }
+    for (const trait of activeTraits) {
+      if (!item.traits.includes(trait)) return false;
+    }
+    return true;
+  };
+
+  window.applyFinderFilters = function() {
+    state.finderQuery = normalizeText(els.finderSearch.value);
+    state.finderCategory = els.finderCategory.value;
+    state.finderResults = sortFinderItems(getFinderItems().filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits)));
+    if (state.selectedFinderId && !state.finderResults.some(item => item.id === state.selectedFinderId)) {
+      state.selectedFinderId = "";
+    }
+    renderFinderResults();
+    if (state.selectedFinderId) {
+      selectFinderItem(state.selectedFinderId);
+    } else {
+      renderFinderMaps(state.selectedZoneIds, []);
+    }
+  };
+
+  window.renderFinderResults = function() {
+    const results = state.finderResults;
+    if (!results.length) {
+      els.finderResults.innerHTML = `<div class="empty">No nursery matches found. Try a different plant name or clear a filter.</div>`;
+      return;
+    }
+    els.finderResults.innerHTML = results.map(item => {
+      const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+      const active = state.selectedFinderId === item.id;
+      const tags = (item.traits || []).slice(0, 4).map(trait => `<span class="trait-badge">${titleCase(trait.replace(/-/g, " "))}</span>`).join("");
+      const image = imageForAny(item);
+      const thumb = image
+        ? `<span class="finder-thumb"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></span>`
+        : "";
+      return `
+        <button type="button" class="finder-card${active ? " active" : ""}" data-item-id="${item.id}">
+          <div class="finder-result-row">
+            ${thumb}
+            <div class="finder-result-main">
+              <div class="topline">
+                <div>
+                  <h3>${escapeHtml(item.name)}</h3>
+                  <div class="finder-meta">${escapeHtml(item.locationLabel)} · ${escapeHtml(item.area)}</div>
+                </div>
+                <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")}</span>
+              </div>
+              <div class="finder-tag-row">
+                <span class="location-badge">${escapeHtml(categoryLabelFor(item))}</span>
+                ${tags}
+              </div>
+              <div class="details-text">${escapeHtml(item.notes || directionFromZone(item))}</div>
+            </div>
+          </div>
+        </button>
+      `;
+    }).join("");
+
+    els.finderResults.querySelectorAll("[data-item-id]").forEach(btn => {
+      btn.addEventListener("click", () => selectFinderItem(btn.dataset.itemId));
+    });
+  };
+
+  window.selectFinderItem = function(itemId) {
+    const item = getFinderItems().find(entry => entry.id === itemId);
+    if (!item) return;
+    state.selectedFinderId = item.id;
+    state.selectedZoneIds = (item.zoneIds || []).slice();
+    renderFinderResults();
+    renderFinderMaps(item.zoneIds || [], [item]);
+    els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
+    wireCopyButtons(els.locationDetails);
+  };
+
+  window.buildDetailHtml = function(item, mode = "finder") {
+    const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+    const traits = item.traits && item.traits.length
+      ? item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, " "))}</span>`).join("")
+      : `<span class="trait-badge">No brochure traits listed</span>`;
+    const extraNote = item.notes ? `<p class="finder-note">${escapeHtml(item.notes)}</p>` : "";
+    const zones = (item.zoneIds || []).map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("");
+    const image = imageForAny(item);
+    const imageHtml = image
+      ? `<div class="${mode === "finder" ? "finder-detail-image-wrap" : "kiosk-detail-image-wrap"}"><img class="${mode === "finder" ? "finder-detail-image" : "kiosk-detail-image"}" src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+      : "";
+    const productLink = linkForAny(item)
+      ? `<a class="map-link" href="${escapeHtml(linkForAny(item))}" target="_blank" rel="noopener noreferrer">Open product page</a>`
+      : "";
+    const mapLink = mode === "finder"
+      ? `<a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open property in Google Maps</a>`
+      : "";
+    return `
+      ${imageHtml}
+      <h3>${escapeHtml(item.name)}</h3>
+      <p class="finder-note"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
+      <div class="detail-tag-row">
+        <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")} flag</span>
+        <span class="location-badge">${escapeHtml(categoryLabelFor(item))}</span>
+      </div>
+      <div class="detail-tag-row">${zones}</div>
+      <div class="detail-tag-row">${traits}</div>
+      <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
+      ${extraNote}
+      <div class="detail-actions">
+        ${productLink}
+        ${mapLink}
+        <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Quick line</button>
+      </div>
+    `;
+  };
+
+  window.renderKioskActions = function () {
+    const actions = [
+      { label: "All Plants", value: "" },
+      { label: "Trees", value: "Tree" },
+      { label: "Shrubs", value: "Shrub" },
+      { label: "Shade", value: "shade" },
+      { label: "Conifers", value: "conifers" },
+      { label: "Roses", value: "roses" },
+      { label: "Pollinator", value: "pollinator-friendly" }
+    ];
+    const hasQuery = !!safeNormalize(els?.kioskSearch?.value || "");
+    const hasActiveFilter = !!state?.kioskTrait;
+    if (hasQuery || hasActiveFilter) actions.push({ label: "Clear Search", value: "__clear__" });
+
+    els.kioskActions.innerHTML = actions.map(action => `
+      <button
+        type="button"
+        class="kiosk-btn${state.kioskTrait === action.value || (action.value === "__clear__" && (hasQuery || hasActiveFilter)) ? " active" : ""}"
+        data-kiosk-value="${action.value}"
+      >${action.label}</button>
+    `).join("");
+
+    els.kioskActions.querySelectorAll("[data-kiosk-value]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const value = btn.dataset.kioskValue;
+        if (value === "__clear__") {
+          els.kioskSearch.value = "";
+          state.kioskTrait = "";
+          state.selectedKioskId = "";
+          renderKioskActions();
+          applyKioskFilters();
+          return;
+        }
+        state.kioskTrait = value;
+        renderKioskActions();
+        applyKioskFilters();
+      });
+    });
+  };
+
+  window.applyKioskFilters = function () {
+    const query = safeNormalize(els.kioskSearch.value);
+    const picked = state.kioskTrait;
+    const sourceItems = getKioskItems();
+
+    const filtered = sortFinderItems(sourceItems.filter(item => {
+      const blob = safeNormalize(item.searchBlob);
+      if (query) {
+        if ((query === "rose" || query === "roses") && !roseLike(item)) return false;
+        if ((query === "grass" || query === "grasses") && safeNormalize(item.browserGroup) !== "perennial grasses") return false;
+        if (query === "bamboo" && safeNormalize(item.browserGroup) !== "bamboo") return false;
+        if (!["rose","roses","grass","grasses","bamboo"].includes(query) && !blob.includes(query)) return false;
+      }
+
+      if (!picked) return true;
+      if (picked === "Tree") return item.category === "Tree";
+      if (picked === "Shrub") return item.category === "Shrub" && !roseLike(item);
+      if (picked === "conifers") return item.browserGroup === "Conifers" || (typeof isConiferNurseryItem === "function" && isConiferNurseryItem(item));
+      if (picked === "roses") return roseLike(item);
+      if (picked === "shade") return Array.isArray(item.traits) && item.traits.includes("shade");
+      if (picked === "pollinator-friendly") return Array.isArray(item.traits) && item.traits.includes("pollinator-friendly");
+      return Array.isArray(item.traits) && item.traits.includes(picked);
+    }));
+
+    state.kioskMatchCount = filtered.length;
+    state.kioskResults = filtered.slice(0, 120);
+
+    const selected = state.kioskResults.find(item => item.id === state.selectedKioskId) || null;
+    if (!selected) state.selectedKioskId = "";
+
+    renderKioskResults();
+    renderKioskDetail(selected);
+  };
+
+  window.renderKioskResults = function () {
+    const total = state.kioskMatchCount || 0;
+    if (!state.kioskResults.length) {
+      els.kioskResults.innerHTML = `<div class="empty">No matches in kiosk mode. Try another search or clear a quick filter.</div>`;
+      return;
+    }
+
+    const summary = total > state.kioskResults.length
+      ? `<p class="kiosk-result-summary">Showing first ${state.kioskResults.length} of ${total} matches.</p>`
+      : `<p class="kiosk-result-summary">${total} match${total === 1 ? "" : "es"}.</p>`;
+
+    els.kioskResults.innerHTML = summary + state.kioskResults.map(item => {
+      const active = state.selectedKioskId === item.id;
+      const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+      const image = imageForAny(item);
+      const thumb = image
+        ? `<span class="kiosk-thumb"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></span>`
+        : "";
+      return `
+        <button type="button" class="kiosk-card${active ? " active" : ""}" data-kiosk-id="${item.id}">
+          <div class="kiosk-result-row">
+            ${thumb}
+            <div class="kiosk-result-main">
+              <div class="topline">
+                <div>
+                  <h3>${escapeHtml(item.name)}</h3>
+                  <div class="kiosk-meta">Go to ${escapeHtml(item.locationLabel)}</div>
+                </div>
+                <span class="mini-flag" style="--flag:${flagColor}"></span>
+              </div>
+              <div class="finder-tag-row">
+                <span class="location-badge">${escapeHtml(categoryLabelFor(item))}</span>
+              </div>
+              <div class="details-text">${escapeHtml((item.traits || []).slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area || item.browserGroup || item.category)}</div>
+            </div>
+          </div>
+        </button>
+      `;
+    }).join("");
+
+    els.kioskResults.querySelectorAll("[data-kiosk-id]").forEach(btn => {
+      btn.addEventListener("click", () => selectKioskItem(btn.dataset.kioskId));
+    });
+  };
+
+  window.renderKioskDetail = function(item = null) {
+    if (!item) {
+      els.kioskDetailPanel.innerHTML = `
+        <h2>Directions</h2>
+        <p class="kiosk-lead">Select a result to show a short polished direction you can repeat to a customer.</p>
+        <p class="zone-directions">The map preview keeps the full nursery in view and always shows the red starting marker at perennials / checkout.</p>
+      `;
+      renderKioskMap(null);
+      return;
+    }
+
+    const image = imageForAny(item);
+    const imageHtml = image
+      ? `<div class="kiosk-detail-image-wrap"><img class="kiosk-detail-image" src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+      : "";
+    const productLink = linkForAny(item)
+      ? `<a class="map-link" href="${escapeHtml(linkForAny(item))}" target="_blank" rel="noopener noreferrer">Open Product Page</a>`
+      : "";
+
+    els.kioskDetailPanel.innerHTML = `
+      ${imageHtml}
+      <h2>${escapeHtml(item.name)}</h2>
+      <p class="kiosk-lead"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
+      <div class="detail-tag-row">
+        <span class="flag-inline"><span class="mini-flag" style="--flag:${FLAG_COLORS[item.flagColor] || item.flagColor || '#666'}"></span>${titleCase(item.flagColor || 'field')} flag</span>
+      </div>
+      <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
+      <div class="detail-tag-row">${(item.traits || []).map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
+      <div class="detail-actions">
+        ${productLink}
+        <a class="map-link" href="${withSatelliteView(NURSERY_MAPS_LINK)}" target="_blank" rel="noopener noreferrer">Open Satellite Map</a>
+        <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy quick line</button>
+      </div>
+    `;
+    wireCopyButtons(els.kioskDetailPanel);
+    renderKioskMap(item);
+  };
+
+  function applyTargetedPatch(attempts) {
+    installTargetedCss();
+
+    if (typeof state === "undefined" || typeof els === "undefined" || !els?.kioskResults || !els?.finderResults) {
+      if (attempts > 0) return setTimeout(() => applyTargetedPatch(attempts - 1), 150);
+      return;
+    }
+
+    if (Array.isArray(state.plants) && state.plants.length) {
+      state.kioskCatalogItems = buildCatalogItems(state.plants);
+      renderKioskActions();
+      applyKioskFilters();
+      applyFinderFilters();
+      if (typeof applyFilters === "function") applyFilters();
+      return;
+    }
+
+    if (attempts > 0) setTimeout(() => applyTargetedPatch(attempts - 1), 150);
+  }
+
+  applyTargetedPatch(50);
+})();
+</script>
+
 </body>
 </html>
