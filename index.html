@@ -1563,32 +1563,46 @@
         font-size: 15px;
       }
 
+      .finder-card-layout,
+      .kiosk-card-layout {
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 10px;
+      }
+
+      .finder-thumb,
+      .kiosk-thumb,
+      .detail-thumb {
+        width: 72px;
+        height: 72px;
+      }
+
       .map-fixed-flag {
-        transform: scale(1.08);
+        opacity: .78;
+        transform: scale(1.06);
       }
 
       .map-fixed-flag.active {
         filter:
-          drop-shadow(0 0 10px rgba(123, 208, 95, 0.65))
+          drop-shadow(0 0 10px rgba(123, 208, 95, 0.68))
           drop-shadow(0 0 22px rgba(123, 208, 95, 0.34));
         animation: flagWaveMobile 1.55s ease-in-out infinite;
       }
 
       .map-fixed-flag.active .map-flag-base {
-        stroke-width: 2.4;
+        stroke-width: 2.2;
       }
 
       .map-fixed-flag.active .map-flag-stick {
-        stroke-width: 2.2;
+        stroke-width: 2.1;
       }
     }
 
     @keyframes flagWaveMobile {
-      0% { transform: rotate(0deg) scale(1.08); }
-      25% { transform: rotate(-3.3deg) scale(1.16); }
-      50% { transform: rotate(3deg) scale(1.2); }
-      75% { transform: rotate(-2.2deg) scale(1.16); }
-      100% { transform: rotate(0deg) scale(1.08); }
+      0% { transform: rotate(0deg) scale(1.06); }
+      25% { transform: rotate(-3.2deg) scale(1.14); }
+      50% { transform: rotate(3deg) scale(1.18); }
+      75% { transform: rotate(-2deg) scale(1.14); }
+      100% { transform: rotate(0deg) scale(1.06); }
     }
 
     .map-title-accent {
@@ -2699,9 +2713,11 @@
     function isRoseNurseryItem(item) {
       const exactName = normalizeText(item?.name || "");
       const exactCategory = normalizeText(item?.category || "");
+      const exactGroup = normalizeText(item?.browserGroup || "");
       const joined = [
         item?.name,
         item?.category,
+        item?.browserGroup,
         item?.locationLabel,
         item?.area,
         ...(Array.isArray(item?.aliases) ? item.aliases : [])
@@ -2709,7 +2725,7 @@
 
       if (exactName === "roses" || exactName === "rose") return true;
       if (exactCategory === "roses" || exactCategory === "rose") return true;
-      if (joined.includes("roses & grasses area") && exactName !== "grasses") return true;
+      if (exactGroup === "roses" || exactGroup === "rose") return true;
       if (/(^|\b)(drift rose|knock out rose|hybrid tea rose|floribunda rose|grandiflora rose|climbing rose|shrub rose|rose bush)(\b|$)/i.test(joined)) return true;
       return false;
     }
@@ -3490,10 +3506,10 @@
       const category = normalizeText(plant.category);
 
       if (group === "Roses") {
-        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right roses and ornamental grasses section", flagColor: "red", topCategory: "Plant" };
+        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right roses and grasses section", flagColor: "red", topCategory: "Plant" };
       }
       if (group === "Perennial Grasses" || group === "Bamboo") {
-        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right roses and ornamental grasses section", flagColor: "red", topCategory: "Plant" };
+        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right roses and grasses section", flagColor: "red", topCategory: "Plant" };
       }
       if (group === "Conifers") {
         return { zoneIds: ["b", "c"], locationLabel: "Ball & Burlap B / C", area: "Conifers & evergreens", flagColor: "blue", topCategory: "Tree" };
@@ -3545,10 +3561,14 @@
           traits,
           image: plant.image || "",
           link: plant.link || plant.url || "",
+          sku: plant.sku || "",
           notes: normalizeSpaces(
-            plant.notes ||
             plant.description ||
-            (plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || "")
+            plant.notes ||
+            [
+              plant.size || "",
+              plant.price || ""
+            ].filter(Boolean).join(" · ")
           ),
           searchBlob: [
             plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, group, exposure, meta.locationLabel, meta.area, traits.join(" ")
@@ -3567,18 +3587,18 @@
     }
 
     function getFinderItems() {
-      const combined = [...NURSERY_ITEMS];
-      const seen = new Set(combined.map(item => `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`));
+      const base = [...NURSERY_ITEMS];
+      const seen = new Set(base.map(item => `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`));
 
       getKioskItems().forEach(item => {
         if (!item || !Array.isArray(item.zoneIds) || !item.zoneIds.length) return;
         const key = `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`;
         if (seen.has(key)) return;
         seen.add(key);
-        combined.push(item);
+        base.push(item);
       });
 
-      return combined;
+      return base;
     }
 
 function renderDefinitions() {
@@ -3884,7 +3904,15 @@ function renderDefinitions() {
     }
 
     function finderMatches(item, query, category, activeTraits) {
-      if (query && !item.searchBlob.includes(query)) return false;
+      const normalizedQuery = normalizeText(query);
+      const exactRoseQuery = normalizedQuery === "rose" || normalizedQuery === "roses";
+
+      if (exactRoseQuery) {
+        if (!(item.browserGroup === "Roses" || isRoseNurseryItem(item))) return false;
+      } else if (normalizedQuery && !item.searchBlob.includes(normalizedQuery)) {
+        return false;
+      }
+
       if (category && item.category !== category) return false;
       for (const trait of activeTraits) {
         if (!item.traits.includes(trait)) return false;
@@ -3910,20 +3938,28 @@ function renderDefinitions() {
         const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
         const active = state.selectedFinderId === item.id;
         const tags = item.traits.slice(0, 4).map(trait => `<span class="trait-badge">${titleCase(trait.replace(/-/g, " "))}</span>`).join("");
+        const thumb = item.image
+          ? `<div class="finder-thumb"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy"></div>`
+          : `<div class="finder-thumb empty">No image</div>`;
         return `
           <button type="button" class="finder-card${active ? " active" : ""}" data-item-id="${item.id}">
-            <div class="topline">
+            <div class="finder-card-layout">
+              ${thumb}
               <div>
-                <h3>${escapeHtml(item.name)}</h3>
-                <div class="finder-meta">${escapeHtml(item.locationLabel)} · ${escapeHtml(item.area)}</div>
+                <div class="topline">
+                  <div>
+                    <h3>${escapeHtml(item.name)}</h3>
+                    <div class="finder-meta">${escapeHtml(item.locationLabel)} · ${escapeHtml(item.area)}</div>
+                  </div>
+                  <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")}</span>
+                </div>
+                <div class="finder-tag-row">
+                  <span class="location-badge">${escapeHtml(item.browserGroup || item.category)}</span>
+                  ${tags}
+                </div>
+                <div class="details-text">${escapeHtml(item.notes || directionFromZone(item))}</div>
               </div>
-              <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")}</span>
             </div>
-            <div class="finder-tag-row">
-              <span class="location-badge">${escapeHtml(item.category)}</span>
-              ${tags}
-            </div>
-            <div class="details-text">${escapeHtml(item.notes || directionFromZone(item))}</div>
           </button>
         `;
       }).join("");
@@ -3943,12 +3979,23 @@ function renderDefinitions() {
       const link = mode === "finder"
         ? `<a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open property in Google Maps</a>`
         : "";
+      const productLink = item.link
+        ? `<a class="map-link" href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">Open product page</a>`
+        : "";
+      const thumb = item.image
+        ? `<div class="detail-thumb"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy"></div>`
+        : `<div class="detail-thumb empty">No image</div>`;
       return `
-        <h3>${escapeHtml(item.name)}</h3>
-        <p class="finder-note"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
-        <div class="detail-tag-row">
-          <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")} flag</span>
-          <span class="location-badge">${escapeHtml(item.category)}</span>
+        <div class="detail-media-row">
+          ${thumb}
+          <div class="detail-media-copy">
+            <h3>${escapeHtml(item.name)}</h3>
+            <p class="finder-note"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
+            <div class="detail-tag-row">
+              <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")} flag</span>
+              <span class="location-badge">${escapeHtml(item.browserGroup || item.category)}</span>
+            </div>
+          </div>
         </div>
         <div class="detail-tag-row">${zones}</div>
         <div class="detail-tag-row">${traits}</div>
@@ -3956,6 +4003,7 @@ function renderDefinitions() {
         ${extraNote}
         <div class="detail-actions">
           ${link}
+          ${productLink}
           <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Quick line</button>
         </div>
       `;
@@ -4129,16 +4177,24 @@ function renderDefinitions() {
       els.kioskResults.innerHTML = summary + state.kioskResults.map(item => {
         const active = state.selectedKioskId === item.id;
         const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+        const thumb = item.image
+          ? `<div class="kiosk-thumb"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy"></div>`
+          : `<div class="kiosk-thumb empty">No image</div>`;
         return `
           <button type="button" class="kiosk-card${active ? " active" : ""}" data-kiosk-id="${item.id}">
-            <div class="topline">
+            <div class="kiosk-card-layout">
+              ${thumb}
               <div>
-                <h3>${escapeHtml(item.name)}</h3>
-                <div class="kiosk-meta">Go to ${escapeHtml(item.locationLabel)}</div>
+                <div class="topline">
+                  <div>
+                    <h3>${escapeHtml(item.name)}</h3>
+                    <div class="kiosk-meta">Go to ${escapeHtml(item.locationLabel)}</div>
+                  </div>
+                  <span class="mini-flag" style="--flag:${flagColor}"></span>
+                </div>
+                <div class="details-text">${escapeHtml(item.browserGroup || item.area || item.category)}</div>
               </div>
-              <span class="mini-flag" style="--flag:${flagColor}"></span>
             </div>
-            <div class="details-text">${escapeHtml(item.traits.slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area || item.browserGroup || item.category)}</div>
           </button>
         `;
       }).join("");
@@ -4177,16 +4233,30 @@ function renderDefinitions() {
         return;
       }
 
+      const thumb = item.image
+        ? `<div class="detail-thumb"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy"></div>`
+        : `<div class="detail-thumb empty">No image</div>`;
+      const productLink = item.link
+        ? `<a class="map-link" href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">Open product page</a>`
+        : "";
+
       els.kioskDetailPanel.innerHTML = `
-        <h2>${escapeHtml(item.name)}</h2>
-        <p class="kiosk-lead"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
+        <div class="detail-media-row">
+          ${thumb}
+          <div class="detail-media-copy">
+            <h2>${escapeHtml(item.name)}</h2>
+            <p class="kiosk-lead"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
+          </div>
+        </div>
         <div class="detail-tag-row">
           <span class="flag-inline"><span class="mini-flag" style="--flag:${FLAG_COLORS[item.flagColor] || item.flagColor || '#666'}"></span>${titleCase(item.flagColor || 'field')} flag</span>
+          <span class="location-badge">${escapeHtml(item.browserGroup || item.category)}</span>
         </div>
         <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
         <div class="detail-tag-row">${item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
         <div class="detail-actions">
           <a class="map-link" href="${withSatelliteView(NURSERY_MAPS_LINK)}" target="_blank" rel="noopener noreferrer">Open Satellite Map</a>
+          ${productLink}
           <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy quick line</button>
         </div>
       `;
@@ -4314,6 +4384,14 @@ function renderDefinitions() {
   <footer class="site-footer">
     <div class="site-footer-inner">
       <div class="site-footer-copy">
+        <div class="footer-badge-wrap">
+          <img
+            class="footer-badge"
+            src="./images/cg-fox-badge.png"
+            alt="C.G. Fox badge"
+            onerror="this.style.display='none'; this.closest('.footer-badge-wrap').style.display='none';"
+          />
+        </div>
         <div class="site-footer-title">Designed and developed by C.G. Fox</div>
         <div class="site-footer-sub">Foxfield Studio</div>
       </div>
