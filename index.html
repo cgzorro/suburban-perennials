@@ -1975,60 +1975,6 @@
       line-height: 1.2;
     }
 
-
-    .kiosk-result-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .kiosk-result-main {
-      min-width: 0;
-      flex: 1 1 auto;
-    }
-
-    .kiosk-thumb {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--bg-soft);
-      border: 1px solid var(--border);
-      flex: 0 0 52px;
-    }
-
-    .kiosk-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .kiosk-detail-image-wrap {
-      width: 100%;
-      max-width: 220px;
-      margin: 0 0 12px;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: var(--bg-soft);
-    }
-
-    .kiosk-detail-image {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: cover;
-    }
-
-    @media (max-width: 900px) {
-      .kiosk-thumb {
-        width: 46px;
-        height: 46px;
-        flex-basis: 46px;
-      }
-    }
-
 </style>
 </head>
 <body>
@@ -2751,27 +2697,18 @@
     function isRoseNurseryItem(item) {
       const exactName = normalizeText(item?.name || "");
       const exactCategory = normalizeText(item?.category || "");
-      const exactGroup = normalizeText(item?.browserGroup || item?.plant_group || "");
-      const exactSection = normalizeText(item?.section || "");
-      const genus = normalizeText(item?.genus || "");
       const joined = [
         item?.name,
         item?.category,
-        item?.browserGroup,
-        item?.plant_group,
-        item?.section,
-        item?.series,
-        item?.genus,
+        item?.locationLabel,
+        item?.area,
         ...(Array.isArray(item?.aliases) ? item.aliases : [])
       ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase();
 
       if (exactName === "roses" || exactName === "rose") return true;
       if (exactCategory === "roses" || exactCategory === "rose") return true;
-      if (exactGroup === "roses" || exactGroup === "rose") return true;
-      if (exactSection === "roses" || exactSection === "rose") return true;
-      if (genus === "rosa") return true;
-      if (/(^|\b)(drift\s*rose|knock\s*out\s*rose|hybrid\s*tea\s*rose|floribunda\s*rose|grandiflora\s*rose|climbing\s*rose|shrub\s*rose|rose\s*bush)(\b|$)/i.test(joined)) return true;
-      if (/\brosa\b/i.test(joined)) return true;
+      if (joined.includes("roses & grasses area") && exactName !== "grasses") return true;
+      if (/(^|\b)(drift rose|knock out rose|hybrid tea rose|floribunda rose|grandiflora rose|climbing rose|shrub rose|rose bush)(\b|$)/i.test(joined)) return true;
       return false;
     }
 
@@ -3595,7 +3532,6 @@
         const id = `k-${normalizeSpaces(plant.sku || plant.name || index).replace(/[^a-zA-Z0-9_-]/g, "-")}-${index}`;
         const item = {
           id,
-          sku: normalizeSpaces(plant.sku || ""),
           name: normalizeSpaces(plant.name || plant.common || plant.sku || `Plant ${index + 1}`),
           category: meta.topCategory,
           browserGroup: group,
@@ -3604,18 +3540,12 @@
           area: meta.area,
           flagColor: meta.flagColor,
           traits,
-          image: normalizeSpaces(plant.image || ""),
-          link: normalizeSpaces(plant.link || plant.url || ""),
-          section: normalizeSpaces(plant.section || ""),
-          plant_group: normalizeSpaces(plant.plant_group || ""),
-          genus: normalizeSpaces(plant.genus || ""),
-          series: normalizeSpaces(plant.series || ""),
-          notes: normalizeSpaces(plant.notes || plant.description || (plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || "")),
+          notes: normalizeSpaces(plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || ""),
           searchBlob: [
-            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, group, exposure, meta.locationLabel, meta.area, traits.join(" "), plant.notes, plant.description
+            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, group, exposure, meta.locationLabel, meta.area, traits.join(" ")
           ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase()
         };
-        const dedupeKey = `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}|${normalizeText(item.browserGroup)}`;
+        const dedupeKey = `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`;
         if (seen.has(dedupeKey)) return null;
         seen.add(dedupeKey);
         return item;
@@ -3625,22 +3555,6 @@
     function getKioskItems() {
       if (Array.isArray(state.kioskCatalogItems) && state.kioskCatalogItems.length) return state.kioskCatalogItems;
       return NURSERY_ITEMS;
-    }
-
-    function kioskImageFor(item) {
-      if (item?.image) return item.image;
-      const sku = normalizeText(item?.sku || "");
-      if (!sku || !Array.isArray(state.plants)) return "";
-      const match = state.plants.find(p => normalizeText(p?.sku || "") === sku);
-      return match?.image || "";
-    }
-
-    function kioskLinkFor(item) {
-      if (item?.link) return item.link;
-      const sku = normalizeText(item?.sku || "");
-      if (!sku || !Array.isArray(state.plants)) return "";
-      const match = state.plants.find(p => normalizeText(p?.sku || "") === sku);
-      return match?.link || match?.url || "";
     }
 
 function renderDefinitions() {
@@ -4153,15 +4067,12 @@ function renderDefinitions() {
       const picked = state.kioskTrait;
       const sourceItems = getKioskItems();
       const filtered = sortFinderItems(sourceItems.filter(item => {
-        if (query) {
-          if ((query === "rose" || query === "roses") && !isRoseNurseryItem(item)) return false;
-          if (!["rose", "roses"].includes(query) && !item.searchBlob.includes(query)) return false;
-        }
+        if (query && !item.searchBlob.includes(query)) return false;
         if (!picked) return true;
         if (picked === "Tree") return item.category === "Tree";
-        if (picked === "Shrub") return item.category === "Shrub" && !isRoseNurseryItem(item);
+        if (picked === "Shrub") return item.category === "Shrub";
         if (picked === "conifers") return item.browserGroup === "Conifers" || isConiferNurseryItem(item);
-        if (picked === "roses") return isRoseNurseryItem(item);
+        if (picked === "roses") return item.browserGroup === "Roses" || isRoseNurseryItem(item);
         if (picked === "shade") return item.traits.includes("shade");
         if (picked === "pollinator-friendly") return item.traits.includes("pollinator-friendly");
         return item.traits.includes(picked);
@@ -4191,25 +4102,16 @@ function renderDefinitions() {
       els.kioskResults.innerHTML = summary + state.kioskResults.map(item => {
         const active = state.selectedKioskId === item.id;
         const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
-        const image = kioskImageFor(item);
-        const thumb = image
-          ? `<span class="kiosk-thumb"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></span>`
-          : "";
         return `
           <button type="button" class="kiosk-card${active ? " active" : ""}" data-kiosk-id="${item.id}">
-            <div class="kiosk-result-row">
-              ${thumb}
-              <div class="kiosk-result-main">
-                <div class="topline">
-                  <div>
-                    <h3>${escapeHtml(item.name)}</h3>
-                    <div class="kiosk-meta">Go to ${escapeHtml(item.locationLabel)}</div>
-                  </div>
-                  <span class="mini-flag" style="--flag:${flagColor}"></span>
-                </div>
-                <div class="details-text">${escapeHtml(item.traits.slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area || item.browserGroup || item.category)}</div>
+            <div class="topline">
+              <div>
+                <h3>${escapeHtml(item.name)}</h3>
+                <div class="kiosk-meta">Go to ${escapeHtml(item.locationLabel)}</div>
               </div>
+              <span class="mini-flag" style="--flag:${flagColor}"></span>
             </div>
+            <div class="details-text">${escapeHtml(item.traits.slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area || item.browserGroup || item.category)}</div>
           </button>
         `;
       }).join("");
@@ -4248,17 +4150,7 @@ function renderDefinitions() {
         return;
       }
 
-      const image = kioskImageFor(item);
-      const link = kioskLinkFor(item);
-      const imageHtml = image
-        ? `<div class="kiosk-detail-image-wrap"><img class="kiosk-detail-image" src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
-        : "";
-      const productLink = link
-        ? `<a class="map-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">Open Product Page</a>`
-        : "";
-
       els.kioskDetailPanel.innerHTML = `
-        ${imageHtml}
         <h2>${escapeHtml(item.name)}</h2>
         <p class="kiosk-lead"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
         <div class="detail-tag-row">
@@ -4267,7 +4159,6 @@ function renderDefinitions() {
         <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
         <div class="detail-tag-row">${item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
         <div class="detail-actions">
-          ${productLink}
           <a class="map-link" href="${withSatelliteView(NURSERY_MAPS_LINK)}" target="_blank" rel="noopener noreferrer">Open Satellite Map</a>
           <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy quick line</button>
         </div>
@@ -4401,5 +4292,502 @@ function renderDefinitions() {
       </div>
     </div>
   </footer>
+
+<script>
+(function () {
+  const ROSE_IMAGE_FALLBACKS = {
+  "ROSEAPDR2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85760",
+  "ROSEBD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85767",
+  "ROSECD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85765",
+  "ROSELD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85769",
+  "ROSEPED2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85771",
+  "ROSEPID2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85773",
+  "ROSEPOPD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85777",
+  "ROSERD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85779",
+  "ROSEWD2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85855",
+  "ROSEKOC": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85781",
+  "ROSEDKO": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85783",
+  "ROSEDKOP": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85785",
+  "ROSEKOEB": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85787",
+  "ROSEKOOG": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85789",
+  "ROSEPKO": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85795",
+  "ROSEKOS": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85791",
+  "ROSEKOW": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85793",
+  "ROSEAL2": "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85799"
+};
+  const ROSE_LINK_FALLBACKS = {
+  "ROSEAPDR2": "https://store.suburbanlg.com/products/apricot-drift--rose-2g-2509.html",
+  "ROSEBD2": "https://store.suburbanlg.com/products/blushing-drift--rose-2g-18924.html",
+  "ROSECD2": "https://store.suburbanlg.com/products/coral-drift--rose-2g-2512.html",
+  "ROSELD2": "https://store.suburbanlg.com/products/lemon-drift--rose-2g-10115.html",
+  "ROSEPED2": "https://store.suburbanlg.com/products/peach-drift--rose-2g-2527.html",
+  "ROSEPID2": "https://store.suburbanlg.com/products/pink-drift--rose-2g-2530.html",
+  "ROSEPOPD2": "https://store.suburbanlg.com/products/popcorn-drift--rose-2g-2533.html",
+  "ROSERD2": "https://store.suburbanlg.com/products/red-drift--rose-2g-2535.html",
+  "ROSEWD2": "https://store.suburbanlg.com/products/white-drift--rose-2g-2540.html",
+  "ROSEKOC": "https://store.suburbanlg.com/products/coral-knock-out-rose-2g-9993.html",
+  "ROSEDKO": "https://store.suburbanlg.com/products/double-knock-out-rose-2g-2514.html",
+  "ROSEDKOP": "https://store.suburbanlg.com/products/double-pink-knock-out-rose-2g-6419.html",
+  "ROSEKOEB": "https://store.suburbanlg.com/products/easy-bee-zy-knock-out-rose-2g-23202.html",
+  "ROSEKOOG": "https://store.suburbanlg.com/products/orange-glow-knock-out-rose-2g-23203.html",
+  "ROSEPKO": "https://store.suburbanlg.com/products/petite-knock-out-rose-2g-15491.html",
+  "ROSEKOS": "https://store.suburbanlg.com/products/sunny-knock-out-rose-2g-2521.html",
+  "ROSEKOW": "https://store.suburbanlg.com/products/white-knock-out-rose-2g-14766.html",
+  "ROSEAL2": "https://store.suburbanlg.com/products/at-last--rose--2g-8041.html"
+};
+  const GENERIC_ROSE_IMAGE = "https://store.suburbanlg.com/inet/storefront/getimage.php?recid=85760";
+  const GENERIC_ROSE_LINK = "https://store.suburbanlg.com/departments/roses-%7C55.html";
+
+  function safeNormalize(v) {
+    try {
+      if (typeof normalizeText === "function") return normalizeText(v);
+    } catch (_) {}
+    return String(v || "").trim().toLowerCase();
+  }
+
+  function safeSpaces(v) {
+    try {
+      if (typeof normalizeSpaces === "function") return normalizeSpaces(v);
+    } catch (_) {}
+    return String(v || "").replace(/\s+/g, " ").trim();
+  }
+
+  function roseLike(item) {
+    const exactName = safeNormalize(item?.name || "");
+    const exactCategory = safeNormalize(item?.category || "");
+    const exactSection = safeNormalize(item?.section || "");
+    const exactGroup = safeNormalize(item?.plant_group || item?.browserGroup || "");
+    const exactGenus = safeNormalize(item?.genus || "");
+    const hay = [
+      item?.browserGroup, item?.category, item?.section, item?.plant_group,
+      item?.name, item?.common, item?.genus, item?.series, item?.searchBlob, item?.notes
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    if (/rose of sharon|primrose|rosewood|wine and roses|rose campion/.test(hay)) return false;
+    if (exactName === "roses" || exactName === "rose") return true;
+    if (exactCategory === "roses" || exactSection === "roses" || exactGroup === "roses") return true;
+    if (exactGenus === "rosa") return true;
+    if (/\brosa\b/.test(hay)) return true;
+    if (/(^|\b)(drift|knock out|knockout|hybrid tea|floribunda|grandiflora|climbing|shrub|carpet)(\b|$)/.test(hay) && /\brose\b/.test(hay)) return true;
+    return false;
+  }
+
+  function deriveBrowserGroup(plant) {
+    const section = safeNormalize(plant?.section);
+    const category = safeNormalize(plant?.category);
+    const group = safeNormalize(plant?.plant_group);
+    const name = safeNormalize(plant?.name);
+    const genus = safeNormalize(plant?.genus);
+
+    if (section === "roses" || category === "roses" || group === "roses" || genus === "rosa" || /\brose\b/.test(name)) return "Roses";
+    if (group.includes("bamboo") || category.includes("bamboo") || section.includes("bamboo")) return "Bamboo";
+    if (group.includes("grass") || category.includes("grass") || section.includes("grass") || group.includes("yucca")) return "Perennial Grasses";
+    if (category === "tree") return "Trees";
+    if (category === "shrub" || category === "tree/shrub") return "Shrubs";
+    return safeSpaces(plant?.plant_group || plant?.category || plant?.section || "");
+  }
+
+  function findPlantRecord(item) {
+    const sku = safeNormalize(item?.sku);
+    if (sku && Array.isArray(state?.plants)) {
+      const bySku = state.plants.find(p => safeNormalize(p?.sku) === sku);
+      if (bySku) return bySku;
+    }
+    const exactName = safeNormalize(item?.name);
+    if (exactName && Array.isArray(state?.plants)) {
+      const byName = state.plants.find(p => safeNormalize(p?.name) === exactName);
+      if (byName) return byName;
+    }
+    return null;
+  }
+
+  function resolveImageForItem(item) {
+    const plant = findPlantRecord(item);
+    const sku = safeNormalize(item?.sku || plant?.sku);
+    let image = item?.image || plant?.image || "";
+    const isRose = roseLike(item) || roseLike(plant);
+
+    if (isRose) {
+      if (!image || /^\.\/images\/ROSE/i.test(image)) {
+        image = ROSE_IMAGE_FALLBACKS[sku.toUpperCase()] || image || GENERIC_ROSE_IMAGE;
+      }
+      if (!image) image = GENERIC_ROSE_IMAGE;
+    }
+    return image || "";
+  }
+
+  function resolveLinkForItem(item) {
+    const plant = findPlantRecord(item);
+    const sku = safeNormalize(item?.sku || plant?.sku);
+    let link = item?.link || item?.url || plant?.link || plant?.url || "";
+    if (!link && (roseLike(item) || roseLike(plant))) {
+      link = ROSE_LINK_FALLBACKS[sku.toUpperCase()] || GENERIC_ROSE_LINK;
+    }
+    return link || "";
+  }
+
+  function installFinalCss() {
+    if (document.getElementById("final-rose-finder-kiosk-css")) return;
+    const style = document.createElement("style");
+    style.id = "final-rose-finder-kiosk-css";
+    style.textContent = `
+      .result-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .result-main {
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+      .result-thumb {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 12px;
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        flex: 0 0 auto;
+      }
+      .result-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .finder-thumb {
+        width: 54px;
+        height: 54px;
+      }
+      .kiosk-thumb {
+        width: 48px;
+        height: 48px;
+      }
+      .detail-image-wrap {
+        width: 100%;
+        max-width: 240px;
+        margin: 0 0 12px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg-soft);
+      }
+      .detail-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+      }
+      .footer-badge {
+        width: 54px;
+        height: 54px;
+        object-fit: contain;
+        margin-right: 14px;
+        border-radius: 12px;
+        flex: 0 0 auto;
+      }
+      @media (max-width: 900px) {
+        .finder-thumb {
+          width: 48px;
+          height: 48px;
+        }
+        .kiosk-thumb {
+          width: 44px;
+          height: 44px;
+        }
+        .footer-badge {
+          width: 44px;
+          height: 44px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function installFooterBadge() {
+    const footerInner = document.querySelector(".site-footer-inner");
+    if (!footerInner || footerInner.querySelector(".footer-badge")) return;
+    const badge = document.createElement("img");
+    badge.className = "footer-badge";
+    badge.src = "./images/cg-fox-badge.png";
+    badge.alt = "C.G. Fox badge";
+    badge.onerror = function () { this.style.display = "none"; };
+    footerInner.prepend(badge);
+  }
+
+  function buildFinalKioskCatalogItems(plants) {
+    const seen = new Set();
+    return (Array.isArray(plants) ? plants : []).map((plant, index) => {
+      const meta = typeof kioskZoneMetaForPlant === "function"
+        ? kioskZoneMetaForPlant(plant)
+        : {
+            zoneIds: [],
+            locationLabel: "",
+            area: "",
+            flagColor: "",
+            topCategory: safeNormalize(plant?.category) === "tree" ? "Tree" : "Plant"
+          };
+      const group = typeof getPlantGroup === "function" ? getPlantGroup(plant) : deriveBrowserGroup(plant);
+      const exposure = typeof getExposure === "function" ? getExposure(plant) : safeSpaces(plant?.light || "");
+      const traits = typeof kioskTraitsFromPlant === "function" ? kioskTraitsFromPlant(plant) : [];
+      const rawCategory = safeNormalize(plant?.category);
+      let category = meta.topCategory || plant?.category || "";
+      if (rawCategory === "tree") category = "Tree";
+      else if (rawCategory === "shrub" || rawCategory === "tree/shrub") category = "Shrub";
+      else if (group === "Roses") category = "Shrub";
+      else if (category !== "Tree" && category !== "Shrub") category = "Plant";
+
+      const id = `k-${safeSpaces(plant?.sku || plant?.name || index).replace(/[^a-zA-Z0-9_-]/g, "-")}-${index}`;
+      const item = {
+        id,
+        sku: safeSpaces(plant?.sku),
+        name: safeSpaces(plant?.name || plant?.common || plant?.sku || `Plant ${index + 1}`),
+        category,
+        browserGroup: deriveBrowserGroup(plant) || group,
+        zoneIds: meta.zoneIds || [],
+        locationLabel: meta.locationLabel || "",
+        area: meta.area || "",
+        flagColor: meta.flagColor || "",
+        traits: Array.from(new Set((traits || []).filter(Boolean))),
+        image: plant?.image || "",
+        link: plant?.link || plant?.url || "",
+        section: plant?.section || "",
+        plant_group: plant?.plant_group || "",
+        common: plant?.common || "",
+        genus: plant?.genus || "",
+        series: plant?.series || "",
+        notes: safeSpaces(plant?.notes || plant?.description || (plant?.size ? `${plant.size}${plant?.price ? ` · ${plant.price}` : ""}` : plant?.price || "")),
+        searchBlob: [
+          plant?.name, plant?.common, plant?.genus, plant?.sku, plant?.series,
+          plant?.plant_group, plant?.category, plant?.section, group, exposure,
+          meta.locationLabel, meta.area, (traits || []).join(" "), plant?.notes, plant?.description
+        ].map(safeSpaces).filter(Boolean).join(" ").toLowerCase()
+      };
+      const key = `${safeNormalize(item.sku)}|${safeNormalize(item.name)}|${safeNormalize(item.locationLabel)}`;
+      if (seen.has(key)) return null;
+      seen.add(key);
+      return item;
+    }).filter(Boolean);
+  }
+
+  window.isRoseNurseryItem = function(item) {
+    return roseLike(item);
+  };
+
+  window.renderFinderResults = function () {
+    const results = state.finderResults;
+    if (!results.length) {
+      els.finderResults.innerHTML = `<div class="empty">No nursery matches found. Try a different plant name or clear a filter.</div>`;
+      return;
+    }
+    els.finderResults.innerHTML = results.map(item => {
+      const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+      const active = state.selectedFinderId === item.id;
+      const tags = item.traits.slice(0, 4).map(trait => `<span class="trait-badge">${titleCase(trait.replace(/-/g, " "))}</span>`).join("");
+      const image = resolveImageForItem(item);
+      const thumb = image
+        ? `<span class="result-thumb finder-thumb"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></span>`
+        : "";
+      return `
+        <button type="button" class="finder-card${active ? " active" : ""}" data-item-id="${item.id}">
+          <div class="result-row">
+            ${thumb}
+            <div class="result-main">
+              <div class="topline">
+                <div>
+                  <h3>${escapeHtml(item.name)}</h3>
+                  <div class="finder-meta">${escapeHtml(item.locationLabel)} · ${escapeHtml(item.area)}</div>
+                </div>
+                <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")}</span>
+              </div>
+              <div class="finder-tag-row">
+                <span class="location-badge">${escapeHtml(item.category)}</span>
+                ${tags}
+              </div>
+              <div class="details-text">${escapeHtml(item.notes || directionFromZone(item))}</div>
+            </div>
+          </div>
+        </button>
+      `;
+    }).join("");
+
+    els.finderResults.querySelectorAll("[data-item-id]").forEach(btn => {
+      btn.addEventListener("click", () => selectFinderItem(btn.dataset.itemId));
+    });
+  };
+
+  window.buildDetailHtml = function (item, mode = "finder") {
+    const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+    const traits = item.traits.length
+      ? item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, " "))}</span>`).join("")
+      : `<span class="trait-badge">No brochure traits listed</span>`;
+    const extraNote = item.notes ? `<p class="finder-note">${escapeHtml(item.notes)}</p>` : "";
+    const zones = item.zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("");
+    const image = resolveImageForItem(item);
+    const resolvedLink = resolveLinkForItem(item);
+    const productLink = resolvedLink
+      ? `<a class="map-link" href="${escapeHtml(resolvedLink)}" target="_blank" rel="noopener noreferrer">Open product page</a>`
+      : "";
+    const mapLink = mode === "finder"
+      ? `<a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open property in Google Maps</a>`
+      : "";
+    const imageHtml = image
+      ? `<div class="detail-image-wrap"><img class="detail-image" src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+      : "";
+    return `
+      ${imageHtml}
+      <h3>${escapeHtml(item.name)}</h3>
+      <p class="finder-note"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
+      <div class="detail-tag-row">
+        <span class="flag-inline"><span class="mini-flag" style="--flag:${flagColor}"></span>${titleCase(item.flagColor || "field")} flag</span>
+        <span class="location-badge">${escapeHtml(item.category)}</span>
+      </div>
+      <div class="detail-tag-row">${zones}</div>
+      <div class="detail-tag-row">${traits}</div>
+      <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
+      ${extraNote}
+      <div class="detail-actions">
+        ${productLink}
+        ${mapLink}
+        <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Quick line</button>
+      </div>
+    `;
+  };
+
+  window.applyKioskFilters = function () {
+    const query = safeNormalize(els.kioskSearch.value);
+    const picked = state.kioskTrait;
+    const sourceItems = typeof getKioskItems === "function" ? getKioskItems() : [];
+    const filtered = sortFinderItems(sourceItems.filter(item => {
+      if (query) {
+        if ((query === "rose" || query === "roses") && !roseLike(item)) return false;
+        if (!["rose", "roses"].includes(query) && !safeNormalize(item.searchBlob).includes(query)) return false;
+      }
+      if (!picked) return true;
+      if (picked === "Tree") return item.category === "Tree";
+      if (picked === "Shrub") return item.category === "Shrub" && !roseLike(item);
+      if (picked === "conifers") return item.browserGroup === "Conifers" || (typeof isConiferNurseryItem === "function" && isConiferNurseryItem(item));
+      if (picked === "roses") return roseLike(item);
+      if (picked === "shade") return item.traits.includes("shade");
+      if (picked === "pollinator-friendly") return item.traits.includes("pollinator-friendly");
+      return item.traits.includes(picked);
+    }));
+
+    state.kioskMatchCount = filtered.length;
+    state.kioskResults = filtered.slice(0, 120);
+    const selected = state.kioskResults.find(item => item.id === state.selectedKioskId) || null;
+    if (!selected) state.selectedKioskId = "";
+    renderKioskResults();
+    renderKioskDetail(selected);
+  };
+
+  window.renderKioskResults = function () {
+    const total = state.kioskMatchCount || 0;
+    if (!state.kioskResults.length) {
+      els.kioskResults.innerHTML = `<div class="empty">No matches in kiosk mode. Try another search or clear a quick filter.</div>`;
+      return;
+    }
+
+    const summary = total > state.kioskResults.length
+      ? `<p class="kiosk-result-summary">Showing first ${state.kioskResults.length} of ${total} matches.</p>`
+      : `<p class="kiosk-result-summary">${total} match${total === 1 ? "" : "es"}.</p>`;
+
+    els.kioskResults.innerHTML = summary + state.kioskResults.map(item => {
+      const active = state.selectedKioskId === item.id;
+      const flagColor = FLAG_COLORS[item.flagColor] || item.flagColor || "#666";
+      const image = resolveImageForItem(item);
+      const thumb = image
+        ? `<span class="result-thumb kiosk-thumb"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></span>`
+        : "";
+      return `
+        <button type="button" class="kiosk-card${active ? " active" : ""}" data-kiosk-id="${item.id}">
+          <div class="result-row">
+            ${thumb}
+            <div class="result-main">
+              <div class="topline">
+                <div>
+                  <h3>${escapeHtml(item.name)}</h3>
+                  <div class="kiosk-meta">Go to ${escapeHtml(item.locationLabel)}</div>
+                </div>
+                <span class="mini-flag" style="--flag:${flagColor}"></span>
+              </div>
+              <div class="details-text">${escapeHtml(item.traits.slice(0, 3).map(t => titleCase(t.replace(/-/g, " "))).join(" • ") || item.area || item.browserGroup || item.category)}</div>
+            </div>
+          </div>
+        </button>
+      `;
+    }).join("");
+    els.kioskResults.querySelectorAll("[data-kiosk-id]").forEach(btn => {
+      btn.addEventListener("click", () => selectKioskItem(btn.dataset.kioskId));
+    });
+  };
+
+  window.renderKioskDetail = function (item = null) {
+    if (!item) {
+      els.kioskDetailPanel.innerHTML = `
+        <h2>Directions</h2>
+        <p class="kiosk-lead">Select a result to show a short polished direction you can repeat to a customer.</p>
+        <p class="zone-directions">The map preview keeps the full nursery in view and always shows the red starting marker at perennials / checkout.</p>
+      `;
+      renderKioskMap(null);
+      return;
+    }
+
+    const image = resolveImageForItem(item);
+    const link = resolveLinkForItem(item);
+    const imageHtml = image
+      ? `<div class="detail-image-wrap"><img class="detail-image" src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+      : "";
+    const productLink = link
+      ? `<a class="map-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">Open Product Page</a>`
+      : "";
+
+    els.kioskDetailPanel.innerHTML = `
+      ${imageHtml}
+      <h2>${escapeHtml(item.name)}</h2>
+      <p class="kiosk-lead"><strong>Go to:</strong> ${escapeHtml(item.locationLabel)}</p>
+      <div class="detail-tag-row">
+        <span class="flag-inline"><span class="mini-flag" style="--flag:${FLAG_COLORS[item.flagColor] || item.flagColor || '#666'}"></span>${titleCase(item.flagColor || 'field')} flag</span>
+      </div>
+      <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
+      <div class="detail-tag-row">${item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
+      <div class="detail-actions">
+        ${productLink}
+        <a class="map-link" href="${withSatelliteView(NURSERY_MAPS_LINK)}" target="_blank" rel="noopener noreferrer">Open Satellite Map</a>
+        <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy quick line</button>
+      </div>
+    `;
+    wireCopyButtons(els.kioskDetailPanel);
+    renderKioskMap(item);
+  };
+
+  function applyPatchWhenReady(attempts) {
+    installFinalCss();
+    installFooterBadge();
+    if (typeof state === "undefined" || typeof els === "undefined" || !els?.kioskResults || !els?.finderResults) {
+      if (attempts > 0) return setTimeout(() => applyPatchWhenReady(attempts - 1), 150);
+      return;
+    }
+    if (Array.isArray(state.plants) && state.plants.length) {
+      window.buildKioskCatalogItems = buildFinalKioskCatalogItems;
+      state.kioskCatalogItems = buildFinalKioskCatalogItems(state.plants);
+    }
+    renderFinderResults();
+    if (state.selectedFinderId) {
+      const selected = (state.finderResults || []).find(item => item.id === state.selectedFinderId);
+      if (selected && els.locationDetails) {
+        els.locationDetails.innerHTML = buildDetailHtml(selected, "finder");
+        wireCopyButtons(els.locationDetails);
+      }
+    }
+    if (typeof renderKioskActions === "function") renderKioskActions();
+    applyKioskFilters();
+  }
+
+  applyPatchWhenReady(40);
+})();
+</script>
+
 </body>
 </html>
