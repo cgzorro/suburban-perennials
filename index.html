@@ -2179,6 +2179,8 @@
               <option value="roses">Roses</option>
               <option value="grasses">Perennial Grasses</option>
               <option value="perennials">Perennials</option>
+              <option value="annuals">Annuals</option>
+              <option value="tropicals">Tropicals</option>
               <option value="hydrangeas">Hydrangeas</option>
               <option value="japanese-maples">Japanese Maples</option>
               <option value="dogwoods">Dogwoods</option>
@@ -2323,7 +2325,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script>
-    const NURSERY_MAPS_LINK = "https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D";
+    const NURSERY_MAPS_LINK = "https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,591m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&g_ep=EgoyMDI2MDQwOC4wIKXMDSoASAFQAw%3D%3D";
 
     const FLAG_COLORS = {
       black: "#1d2430",
@@ -3923,19 +3925,19 @@ function renderDefinitions() {
         "annuals": {
           title: "Annuals",
           zoneIds: ["annuals"],
-          description: "Annuals area highlighted. Live product listings for this section are not loaded yet.",
+          description: "Annuals area highlighted. Product listings for this section are being added.",
           locationOnly: true
         },
         "tropicals": {
           title: "Tropicals",
           zoneIds: ["tropicals"],
-          description: "Tropicals area highlighted. Live product listings for this section are not loaded yet.",
+          description: "Tropicals area highlighted. Product listings for this section are being added.",
           locationOnly: true
         },
         "rock yard": {
           title: "Rock Yard / Bulk Goods",
           zoneIds: ["rock-yard"],
-          description: "Rock Yard and bulk goods area highlighted. Product-level listings are not yet loaded for this section.",
+          description: "Rock Yard highlighted. Product listings for this section are being added.",
           locationOnly: true
         }
       };
@@ -3953,14 +3955,14 @@ function renderDefinitions() {
       const hasZone = zoneId => zones.includes(zoneId);
 
       if (cat === "trees") return topCategory === "tree" || group.includes("tree");
-      if (cat === "shrubs") return topCategory === "shrub" || topCategory === "tree shrub" || group.includes("shrub");
+      if (cat === "shrubs") return topCategory === "shrub" || topCategory === "tree shrub" || group.includes("shrub") || hasZone("field-shrub");
       if (cat === "fruit trees") return group === "fruit trees" || blob.includes("fruit tree") || ["between123","house1","house2","house3"].some(hasZone);
       if (cat === "ornamental trees") return group === "ornamental trees" || blob.includes("ornamental tree") || blob.includes("japanese maple") || blob.includes("dogwood");
       if (cat === "shade trees") return group === "shade trees" || blob.includes("shade tree");
       if (cat === "conifers") return group === "conifers" || blob.includes("conifer") || blob.includes("evergreen");
       if (cat === "roses") return group === "roses" || blob.includes(" drift") || blob.includes("knock out") || blob.includes(" rose");
-      if (cat === "grasses") return group.includes("grasses") || blob.includes("grasses") || blob.includes(" grass");
-      if (cat === "perennials") return blob.includes("perennial") || hasZone("shade-perennials") || hasZone("sun-perennials");
+      if (cat === "grasses") return group.includes("grasses") || blob.includes("grasses") || blob.includes(" grass") || blob.includes("liriope") || blob.includes("yucca");
+      if (cat === "perennials") return group.startswith("perennials") || group === "peonies" || hasZone("shade-perennials") || hasZone("sun-perennials") || blob.includes("perennial");
       if (cat === "annuals") return hasZone("annuals");
       if (cat === "tropicals") return hasZone("tropicals");
       if (cat === "hydrangeas") return blob.includes("hydrangea") || hasZone("house5");
@@ -4134,29 +4136,57 @@ function renderDefinitions() {
         return;
       }
 
-      if (categoryMeta && (!state.finderQuery || categoryMeta.locationOnly)) {
+      if (categoryMeta && !categoryMeta.locationOnly && state.finderResults.length) {
+        const nextItem = state.finderResults[0];
+        state.selectedFinderId = nextItem.id;
         state.selectedZoneIds = categoryMeta.zoneIds.slice();
-        renderFinderMaps(categoryMeta.zoneIds, categoryMeta.zoneIds.map(zoneId => ({ zoneIds: [zoneId] })));
+        renderFinderMaps(
+          categoryMeta.zoneIds,
+          [{ ...nextItem, flagId: nextItem.flagId || primaryFlagIdForZones(nextItem.zoneIds || []) }]
+        );
 
-        if (categoryMeta.locationOnly && !state.finderResults.length) {
-          els.finderResults.innerHTML = `
-            <div class="empty">
-              <strong>${escapeHtml(categoryMeta.title)}</strong><br>
-              ${escapeHtml(categoryMeta.description)}
-            </div>
-          `;
-        }
-
-        const resultsNote = !categoryMeta.locationOnly && state.finderResults.length
-          ? `<p class="finder-note">Showing ${state.finderResults.length} matching result${state.finderResults.length === 1 ? "" : "s"} across the highlighted category area${categoryMeta.zoneIds.length > 1 ? "s" : ""}.</p>`
-          : "";
-        const zoneBadges = categoryMeta.zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("");
+        const zoneBadges = categoryMeta.zoneIds
+          .map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`)
+          .join("");
 
         els.locationDetails.innerHTML = `
           <h3>${escapeHtml(categoryMeta.title)}</h3>
           <p class="finder-note">${escapeHtml(categoryMeta.description)}</p>
           <div class="detail-tag-row">${zoneBadges}</div>
-          ${resultsNote}
+          <p class="finder-note">Showing ${state.finderResults.length} matching result${state.finderResults.length === 1 ? "" : "s"} across the highlighted category area${categoryMeta.zoneIds.length > 1 ? "s" : ""}.</p>
+          <p class="zone-directions">${escapeHtml(directionFromZone(nextItem))}</p>
+        `;
+        wireCopyButtons(els.locationDetails);
+        if (shouldReveal) nudgeFinderMapIntoView(true);
+        state.finderRevealMap = false;
+        return;
+      }
+
+      if (categoryMeta && categoryMeta.locationOnly) {
+        state.selectedFinderId = "";
+        state.selectedZoneIds = categoryMeta.zoneIds.slice();
+        const markerItems = categoryMeta.zoneIds.map(zoneId => ({
+          zoneIds: [zoneId],
+          flagId: primaryFlagIdForZones([zoneId]),
+          flagColor: primaryFlagColorForZones([zoneId])
+        }));
+        renderFinderMaps(categoryMeta.zoneIds, markerItems);
+
+        els.finderResults.innerHTML = `
+          <div class="empty">
+            <strong>${escapeHtml(categoryMeta.title)}</strong><br>
+            ${escapeHtml(categoryMeta.description)}
+          </div>
+        `;
+
+        const zoneBadges = categoryMeta.zoneIds
+          .map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`)
+          .join("");
+
+        els.locationDetails.innerHTML = `
+          <h3>${escapeHtml(categoryMeta.title)}</h3>
+          <p class="finder-note">${escapeHtml(categoryMeta.description)}</p>
+          <div class="detail-tag-row">${zoneBadges}</div>
         `;
         if (shouldReveal) nudgeFinderMapIntoView(true);
         state.finderRevealMap = false;
