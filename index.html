@@ -1961,6 +1961,24 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .site-footer-logo {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      padding: 4px;
+      display: none;
+      flex: 0 0 auto;
+    }
+
+    .site-footer-logo.visible {
+      display: block;
     }
 
     .site-footer-copy {
@@ -2326,6 +2344,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script>
     const NURSERY_MAPS_LINK = "https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,591m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&g_ep=EgoyMDI2MDQwOC4wIKXMDSoASAFQAw%3D%3D";
+    const OWNER_LOGO = "./images/foxfield-studio-mark.png";
 
     const FLAG_COLORS = {
       black: "#1d2430",
@@ -2652,8 +2671,10 @@
       finderCategory: "",
       finderTraits: new Set(),
       finderResults: [],
+      finderRevealMap: false,
       selectedFinderId: "",
       selectedZoneIds: [],
+      selectedFlagId: "",
       kioskQuery: "",
       kioskTrait: "",
       kioskResults: [],
@@ -2710,13 +2731,19 @@
       kioskActions: document.getElementById("kioskActions"),
       kioskResults: document.getElementById("kioskResults"),
       kioskDetailPanel: document.getElementById("kioskDetailPanel"),
+      kioskMapPanel: document.getElementById("kioskMapPanel"),
       kioskMapBoard: document.getElementById("kioskMapBoard"),
       kioskMapCaption: document.getElementById("kioskMapCaption"),
-      kioskOpenLargeMap: document.getElementById("kioskOpenLargeMap")
+      kioskOpenLargeMap: document.getElementById("kioskOpenLargeMap"),
+      ownerLogo: document.getElementById("ownerLogo")
     };
 
     function normalizeText(v) {
       return String(v || "").trim().toLowerCase();
+    }
+
+    function normalizeCategoryKey(v) {
+      return normalizeText(v).replace(/[-_/]+/g, " ").replace(/\s+/g, " ").trim();
     }
 
     function normalizeSku(v) {
@@ -2792,6 +2819,17 @@
       els.html.setAttribute("data-theme", theme);
       localStorage.setItem("suburban-theme", theme);
       els.themeToggle.textContent = theme === "dark" ? "Dark / Light: Dark" : "Dark / Light: Light";
+    }
+
+    function syncOwnerLogo() {
+      if (!els.ownerLogo || !OWNER_LOGO) return;
+      els.ownerLogo.src = OWNER_LOGO;
+      els.ownerLogo.addEventListener("load", () => {
+        els.ownerLogo.classList.add("visible");
+      }, { once: true });
+      els.ownerLogo.addEventListener("error", () => {
+        els.ownerLogo.classList.remove("visible");
+      }, { once: true });
     }
 
     function showView(view) {
@@ -3034,15 +3072,40 @@
 
     function normalizePlantRecord(plant) {
       const copy = { ...(plant || {}) };
+
+      [
+        "name","common","genus","species","series","category","plant_group","section",
+        "source_department","source_subdepartment","tree_class","category_path","item_type",
+        "light","height","width","color","price","link","image","image_url","image_path",
+        "photo","photo_url","description","notes","size","sku"
+      ].forEach(key => {
+        if (key in copy) copy[key] = normalizeSpaces(copy[key]);
+      });
+
       copy.__group = derivePlantGroup(copy);
       copy.__exposure = deriveExposure(copy);
       copy.__traits = deriveTraits(copy);
       copy.__color = normalizeSpaces(copy.color);
+      copy.__searchBlob = [
+        copy.name, copy.common, copy.genus, copy.species, copy.series, copy.sku,
+        copy.category, copy.plant_group, copy.section, copy.source_department,
+        copy.source_subdepartment, copy.tree_class, copy.category_path, copy.item_type,
+        copy.light, copy.height, copy.width, copy.color, copy.description, copy.notes,
+        copy.__group, copy.__exposure
+      ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase();
+
       return copy;
     }
 
     function normalizePlantsData(plants) {
-      return (Array.isArray(plants) ? plants : []).map(normalizePlantRecord);
+      const rows = Array.isArray(plants) ? plants : [];
+      return rows
+        .map(normalizePlantRecord)
+        .sort((a, b) => {
+          const groupDiff = groupSortValue(getPlantGroup(a)) - groupSortValue(getPlantGroup(b));
+          if (groupDiff !== 0) return groupDiff;
+          return normalizeSpaces(a.name || a.common || "").localeCompare(normalizeSpaces(b.name || b.common || ""));
+        });
     }
 
     function groupSortValue(group) {
@@ -3109,7 +3172,7 @@
     }
 
     function imageFor(plant) {
-      return plant.image || "";
+      return plant.image || plant.image_url || plant.image_path || plant.photo || plant.photo_url || "";
     }
 
     async function setScanPanelOpen(isOpen, options = {}) {
@@ -3182,7 +3245,11 @@
 
       const exposureOrder = ["Sun", "Shade", "Mixed", "Unknown"];
       const exposures = [...exposureCounts.keys()]
-        .sort((a, b) => exposureOrder.indexOf(a) - exposureOrder.indexOf(b));
+        .sort((a, b) => {
+          const ai = exposureOrder.includes(a) ? exposureOrder.indexOf(a) : 999;
+          const bi = exposureOrder.includes(b) ? exposureOrder.indexOf(b) : 999;
+          return ai - bi || a.localeCompare(b);
+        });
 
       els.groupFilter.innerHTML = `<option value="">All groups</option>`;
       els.colorFilter.innerHTML = `<option value="">All colors</option>`;
@@ -3230,7 +3297,7 @@
 
     function matchesSearch(plant, q) {
       if (!q) return true;
-      const haystack = [
+      const haystack = plant.__searchBlob || [
         plant.name,
         plant.sku,
         plant.common,
@@ -3243,7 +3310,11 @@
         plant.light,
         plant.height,
         plant.width,
-        plant.color
+        plant.color,
+        plant.description,
+        plant.notes,
+        getPlantGroup(plant),
+        getExposure(plant)
       ].join(" ").toLowerCase();
       return haystack.includes(q);
     }
@@ -3261,9 +3332,23 @@
     function findPlantsBySku(rawSku) {
       const wanted = normalizeSku(rawSku);
       if (!wanted) return [];
+
       const exact = state.plants.filter(plant => normalizeSku(plant.sku) === wanted);
       if (exact.length) return exact;
-      return state.plants.filter(plant => normalizeSku(plant.sku).includes(wanted));
+
+      const partial = state.plants.filter(plant => {
+        const sku = normalizeSku(plant.sku);
+        return sku && (sku.includes(wanted) || wanted.includes(sku));
+      });
+      if (partial.length) return partial;
+
+      const wantedDigits = wanted.replace(/\D/g, "");
+      if (!wantedDigits) return [];
+
+      return state.plants.filter(plant => {
+        const skuDigits = normalizeSku(plant.sku).replace(/\D/g, "");
+        return skuDigits && (skuDigits === wantedDigits || skuDigits.includes(wantedDigits) || wantedDigits.includes(skuDigits));
+      });
     }
 
     async function clearFilters() {
@@ -3273,6 +3358,7 @@
       els.groupFilter.value = "";
       els.colorFilter.value = "";
       els.heightFilter.value = "";
+      els.showCount.value = "48";
       state.activeTraits.clear();
       renderTraitChips();
       setScanStatus("");
@@ -3333,14 +3419,18 @@
     function renderSummary() {
       const total = state.plants.length;
       const showing = state.filtered.length;
+      const visible = Math.min(showing, state.visibleCount || showing);
       const sun = state.filtered.filter(p => getExposure(p) === "Sun").length;
       const shade = state.filtered.filter(p => getExposure(p) === "Shade").length;
+      const mixed = state.filtered.filter(p => getExposure(p) === "Mixed").length;
       const activeTraits = state.activeTraits.size;
       els.summaryBar.innerHTML = `
         <span class="pill">${total} loaded</span>
-        <span class="pill">${showing} showing</span>
+        <span class="pill">${showing} matched</span>
+        <span class="pill">${visible} visible</span>
         <span class="pill">${sun} sun</span>
         <span class="pill">${shade} shade</span>
+        <span class="pill">${mixed} mixed</span>
         <span class="pill">${activeTraits} active traits</span>
       `;
     }
@@ -3912,7 +4002,7 @@ function renderDefinitions() {
     }
 
     function getFinderCategoryMeta(category) {
-      const cat = normalizeText(category || "");
+      const cat = normalizeCategoryKey(category || "");
       if (!cat) return null;
 
       const meta = {
@@ -3945,7 +4035,7 @@ function renderDefinitions() {
     }
 
     function finderCategoryMatch(item, category) {
-      const cat = normalizeText(category || "");
+      const cat = normalizeCategoryKey(category || "");
       if (!cat) return true;
 
       const blob = String(item.searchBlob || "").toLowerCase();
@@ -3956,21 +4046,21 @@ function renderDefinitions() {
 
       if (cat === "trees") return topCategory === "tree" || group.includes("tree");
       if (cat === "shrubs") return topCategory === "shrub" || topCategory === "tree shrub" || group.includes("shrub") || hasZone("field-shrub");
-      if (cat === "fruit trees") return group === "fruit trees" || blob.includes("fruit tree") || ["between123","house1","house2","house3"].some(hasZone);
-      if (cat === "ornamental trees") return group === "ornamental trees" || blob.includes("ornamental tree") || blob.includes("japanese maple") || blob.includes("dogwood");
-      if (cat === "shade trees") return group === "shade trees" || blob.includes("shade tree");
+      if (cat === "fruit trees" || cat === "fruit-trees") return group === "fruit trees" || blob.includes("fruit tree") || ["between123","house1","house2","house3"].some(hasZone);
+      if (cat === "ornamental trees" || cat === "ornamental-trees") return group === "ornamental trees" || blob.includes("ornamental tree") || blob.includes("japanese maple") || blob.includes("dogwood");
+      if (cat === "shade trees" || cat === "shade-trees") return group === "shade trees" || blob.includes("shade tree");
       if (cat === "conifers") return group === "conifers" || blob.includes("conifer") || blob.includes("evergreen");
       if (cat === "roses") return group === "roses" || blob.includes(" drift") || blob.includes("knock out") || blob.includes(" rose");
       if (cat === "grasses") return group.includes("grasses") || blob.includes("grasses") || blob.includes(" grass") || blob.includes("liriope") || blob.includes("yucca");
-      if (cat === "perennials") return group.startswith("perennials") || group === "peonies" || hasZone("shade-perennials") || hasZone("sun-perennials") || blob.includes("perennial");
+      if (cat === "perennials") return group.startsWith("perennials") || group === "peonies" || hasZone("shade-perennials") || hasZone("sun-perennials") || blob.includes("perennial");
       if (cat === "annuals") return hasZone("annuals");
       if (cat === "tropicals") return hasZone("tropicals");
       if (cat === "hydrangeas") return blob.includes("hydrangea") || hasZone("house5");
-      if (cat === "japanese maples") return blob.includes("japanese maple") || hasZone("house7");
+      if (cat === "japanese maples" || cat === "japanese-maples") return blob.includes("japanese maple") || hasZone("house7");
       if (cat === "dogwoods") return blob.includes("dogwood") || hasZone("house8");
-      if (cat === "azaleas rhododendron") return blob.includes("azalea") || blob.includes("rhododendron") || hasZone("house4");
-      if (cat === "hoop houses") return zones.some(zoneId => /^house\d$/.test(zoneId) || zoneId === "between123");
-      if (cat === "rock yard") return hasZone("rock-yard") || blob.includes("rock yard") || blob.includes("bulk goods");
+      if (cat === "azaleas rhododendron" || cat === "azaleas-rhododendron") return blob.includes("azalea") || blob.includes("rhododendron") || hasZone("house4");
+      if (cat === "hoop houses" || cat === "hoop-houses") return zones.some(zoneId => /^house\d$/.test(zoneId) || zoneId === "between123");
+      if (cat === "rock yard" || cat === "rock-yard") return hasZone("rock-yard") || blob.includes("rock yard") || blob.includes("bulk goods");
       return true;
     }
 
@@ -4386,10 +4476,11 @@ function renderDefinitions() {
 
     async function loadPlants() {
       try {
-        const res = await fetch("./plants.json", { cache: "no-store" });
+        const res = await fetch(`./plants.json?v=${Date.now()}`, { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        state.plants = normalizePlantsData(Array.isArray(data) ? data : []);
+        const rows = Array.isArray(data) ? data : (Array.isArray(data?.plants) ? data.plants : []);
+        state.plants = normalizePlantsData(rows);
         state.kioskCatalogItems = buildKioskCatalogItems(state.plants);
         populateFilters(state.plants);
         renderTraitChips();
@@ -4485,6 +4576,7 @@ function renderDefinitions() {
     }
 
     setTheme(state.theme);
+    syncOwnerLogo();
     updateScannerUi();
     wireEvents();
     initFinder();
@@ -4495,6 +4587,7 @@ function renderDefinitions() {
 
   <footer class="site-footer">
     <div class="site-footer-inner">
+      <img id="ownerLogo" class="site-footer-logo" alt="Foxfield Studio logo" />
       <div class="site-footer-copy">
         <div class="site-footer-title">Designed and developed by C.G. Fox</div>
         <div class="site-footer-sub">Foxfield Studio</div>
