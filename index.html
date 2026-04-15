@@ -1733,6 +1733,10 @@
       stroke-width: 5px;
     }
 
+    .map-zone-group[data-zone-group="rock-yard"] text {
+      display: none;
+    }
+
     html[data-theme="light"] .map-zone-shape {
       fill: rgba(236, 242, 248, 0.96);
       stroke: rgba(102, 119, 140, 0.38);
@@ -2210,7 +2214,7 @@
 
           <div class="finder-actions">
             <button id="finderClearBtn" class="btn" type="button">Clear</button>
-            <a class="map-link" href="https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,398m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&amp;g_ep=EgoyMDI2MDMyMy4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Open property in Google Maps</a>
+            <a class="map-link" href="https://www.google.com/maps/@?api=1&amp;map_action=map&amp;center=38.9594854,-94.8573139&amp;zoom=19&amp;basemap=satellite" target="_blank" rel="noopener noreferrer">Open satellite map</a>
           </div>
         </div>
 
@@ -2343,7 +2347,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script>
-    const NURSERY_MAPS_LINK = "https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,591m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu&g_ep=EgoyMDI2MDQwOC4wIKXMDSoASAFQAw%3D%3D";
+    const NURSERY_MAPS_LINK = "https://www.google.com/maps/@?api=1&map_action=map&center=38.9594854,-94.8573139&zoom=19&basemap=satellite";
     const OWNER_LOGO = "./images/foxfield-studio-mark.png";
 
     const FLAG_COLORS = {
@@ -2496,7 +2500,8 @@
       { id: "sun-perennials", title: "Sun Perennials", subtitle: "", shape: "rect", x: 676, y: 748, w: 156, h: 64, centerX: 754, centerY: 780 },
       { id: "tropicals", title: "Tropicals", subtitle: "", shape: "rect", x: 368, y: 814, w: 144, h: 96, centerX: 440, centerY: 862 },
       { id: "shade-perennials", title: "Shade Perennials", subtitle: "", shape: "rect", x: 524, y: 814, w: 184, h: 96, centerX: 616, centerY: 862 },
-      { id: "annuals", title: "Annuals", subtitle: "", shape: "rect", x: 718, y: 814, w: 140, h: 96, centerX: 788, centerY: 862 }
+      { id: "annuals", title: "Annuals", subtitle: "", shape: "rect", x: 718, y: 814, w: 140, h: 96, centerX: 788, centerY: 862 },
+      { id: "rock-yard", title: "Rock Yard", subtitle: "Bulk Goods", shape: "rect", x: 22, y: 586, w: 216, h: 286, centerX: 130, centerY: 729 }
     ];
 
     const MAP_FLAG_MARKERS = [
@@ -2539,8 +2544,7 @@
       "c": "flag-evergreen-white",
       "d": "flag-top-black",
       "between123": "flag-lower-teal",
-      "playground": "flag-house6-yellow",
-      "rock-yard": "flag-entry-magenta"
+      "playground": "flag-house6-yellow"
     };
 
     function primaryFlagIdForZones(zoneIds = []) {
@@ -2671,6 +2675,7 @@
       finderCategory: "",
       finderTraits: new Set(),
       finderResults: [],
+      finderFocusedZoneId: "",
       finderRevealMap: false,
       selectedFinderId: "",
       selectedZoneIds: [],
@@ -3591,13 +3596,19 @@
 
     function kioskTraitsFromPlant(plant) {
       const traits = inferTraits(plant) || {};
+      const brochure = getBrochureTraits(plant.name || plant.common || "");
+      const blob = [plant.name, plant.common, plant.category, plant.section, plant.plant_group, plant.description, plant.notes]
+        .map(normalizeText)
+        .join(" ");
       const list = [];
       if (traits.sun) list.push("sun");
       if (traits.shade) list.push("shade");
       if (traits.pollinator) list.push("pollinator-friendly");
       if (traits.drought) list.push("drought-tolerant");
       if (traits["deer resistant"]) list.push("deer-resistant");
-      return list;
+      if (brochure.includes("wet-tolerant") || /wet|moist|rain garden/.test(blob)) list.push("wet-tolerant");
+      if (brochure.includes("attracts-birds") || /bird|berries|berry/.test(blob)) list.push("attracts-birds");
+      return uniqueValues([...list, ...brochure]);
     }
 
     function kioskZoneMetaForPlant(plant) {
@@ -3607,6 +3618,9 @@
 
       if (group === "Roses") {
         return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right rose section", flagColor: "red", topCategory: "Shrub" };
+      }
+      if (group === "Perennial Grasses") {
+        return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right rose section", flagColor: "red", topCategory: "Plant" };
       }
       if (group === "Conifers") {
         return { zoneIds: ["b", "c"], locationLabel: "Ball & Burlap B / C", area: "Conifers & evergreens", flagColor: "blue", topCategory: "Tree" };
@@ -3626,7 +3640,7 @@
       if (group === "Perennials - Shade" || exposure === "Shade") {
         return { zoneIds: ["shade-perennials"], locationLabel: "Shade Perennials", area: "Shade perennial yard", flagColor: "teal", topCategory: "Plant" };
       }
-      if (group === "Perennials - Sun" || group === "Peonies" || exposure === "Sun") {
+      if (group === "Perennials - Sun" || group === "Peonies" || group === "Native Perennials" || exposure === "Sun") {
         return { zoneIds: ["sun-perennials"], locationLabel: "Sun Perennials", area: "Sun perennial yard", flagColor: "orange", topCategory: "Plant" };
       }
       if (group === "Ground Covers" || group === "Hardy Vining Plants" || group === "Grapes & Berries" || group === "Clematis") {
@@ -3749,6 +3763,10 @@ function renderDefinitions() {
         return clampZoomBox({ x: 320, y: 730, w: 580, h: 220 });
       }
 
+      if (zoneId === "rock-yard") {
+        return clampZoomBox({ x: 0, y: 520, w: 320, h: 420 });
+      }
+
       if (["field-shrub", "field-tree", "roses", "playground"].includes(zoneId)) {
         return clampZoomBox({
           x: Math.max(180, zone.x - 120),
@@ -3781,6 +3799,27 @@ function renderDefinitions() {
         y: Math.max(0, zone.y - 100),
         w: zone.w + 260,
         h: zone.h + 220
+      });
+    }
+
+    function getZonesZoomBox(zoneIds = []) {
+      const zones = (Array.isArray(zoneIds) ? zoneIds : [])
+        .map(id => MAP_ZONES.find(z => z.id === id))
+        .filter(Boolean);
+
+      if (!zones.length) return { x: 300, y: 700, w: 620, h: 230 };
+
+      const pad = 34;
+      const minX = Math.min(...zones.map(z => z.x));
+      const minY = Math.min(...zones.map(z => z.y));
+      const maxX = Math.max(...zones.map(z => z.x + z.w));
+      const maxY = Math.max(...zones.map(z => z.y + z.h));
+
+      return clampZoomBox({
+        x: minX - pad,
+        y: minY - pad,
+        w: (maxX - minX) + pad * 2,
+        h: (maxY - minY) + pad * 2
       });
     }
 
@@ -3898,12 +3937,15 @@ function renderDefinitions() {
       const active = Array.isArray(activeZoneIds) ? activeZoneIds.filter(Boolean) : [];
       const primaryZoneId = active[0] || markerItems?.[0]?.zoneIds?.[0] || "";
       const primaryZone = MAP_ZONES.find(z => z.id === primaryZoneId);
-      const detailBox = primaryZone ? getZoneZoomBox(primaryZone.id) : { x: 300, y: 700, w: 620, h: 230 };
+      const detailZoneIds = active.length > 1 ? active : (primaryZone ? [primaryZone.id] : active);
+      const detailBox = detailZoneIds.length > 1
+        ? getZonesZoomBox(detailZoneIds)
+        : (primaryZone ? getZoneZoomBox(primaryZone.id) : { x: 300, y: 700, w: 620, h: 230 });
 
       els.overviewMapBoard.innerHTML = buildMapSvg(active, markerItems, "0 0 1020 950");
       wireMapClicks(els.overviewMapBoard);
 
-      els.detailMapBoard.innerHTML = buildMapSvg(primaryZone ? [primaryZone.id] : active, markerItems, `${detailBox.x} ${detailBox.y} ${detailBox.w} ${detailBox.h}`);
+      els.detailMapBoard.innerHTML = buildMapSvg(detailZoneIds, markerItems, `${detailBox.x} ${detailBox.y} ${detailBox.w} ${detailBox.h}`);
       wireMapClicks(els.detailMapBoard);
 
       const flagSummary = uniqueValues((markerItems || []).map(item => item.flagColor).filter(Boolean))
@@ -3911,11 +3953,11 @@ function renderDefinitions() {
         .join(" • ");
 
       els.overviewMapCaption.textContent = primaryZone
-        ? `${zoneTitle(primaryZone.id)} stays highlighted on the full map so the rest of the nursery remains visible.${flagSummary ? ` Matching cue: ${flagSummary}.` : ""}`
+        ? `${active.length > 1 ? `${active.length} related zones stay highlighted` : zoneTitle(primaryZone.id)} on the full map so the rest of the nursery remains visible.${flagSummary ? ` Matching cue: ${flagSummary}.` : ""}`
         : "The full nursery stays visible while each section uses darker blocks and reverse type for faster reading. Tap a result or any zone to highlight it.";
 
       els.detailMapCaption.textContent = primaryZone
-        ? `Closer look: ${zoneTitle(primaryZone.id)}.${flagSummary ? ` Look for ${flagSummary.toLowerCase()}.` : ""}`
+        ? `Closer look: ${active.length > 1 ? active.map(zoneTitle).join(" • ") : zoneTitle(primaryZone.id)}.${flagSummary ? ` Look for ${flagSummary.toLowerCase()}.` : ""}`
         : "Closer look starts near perennials / checkout until you choose a plant or map section.";
     }
 
@@ -3976,6 +4018,7 @@ function renderDefinitions() {
           const trait = btn.dataset.trait;
           if (state.finderTraits.has(trait)) state.finderTraits.delete(trait);
           else state.finderTraits.add(trait);
+          state.finderFocusedZoneId = "";
           state.finderRevealMap = true;
           renderFinderChips();
           applyFinderFilters();
@@ -4029,6 +4072,12 @@ function renderDefinitions() {
           zoneIds: ["rock-yard"],
           description: "Rock Yard highlighted. Product listings for this section are being added.",
           locationOnly: true
+        },
+        "hoop houses": {
+          title: "Hoop Houses",
+          zoneIds: ["house1","house2","house3","house4","house5","house6","house7","house8","between123"],
+          description: "Hoop-house stock spans Houses 1–8 plus the fruit-tree row between Houses 1–3. Tap a result to narrow to the exact house.",
+          locationOnly: false
         }
       };
       return meta[cat] || null;
@@ -4045,14 +4094,14 @@ function renderDefinitions() {
       const hasZone = zoneId => zones.includes(zoneId);
 
       if (cat === "trees") return topCategory === "tree" || group.includes("tree");
-      if (cat === "shrubs") return topCategory === "shrub" || topCategory === "tree shrub" || group.includes("shrub") || hasZone("field-shrub");
+      if (cat === "shrubs") return topCategory === "shrub" || group.includes("shrub") || blob.includes(" shrub");
       if (cat === "fruit trees" || cat === "fruit-trees") return group === "fruit trees" || blob.includes("fruit tree") || ["between123","house1","house2","house3"].some(hasZone);
       if (cat === "ornamental trees" || cat === "ornamental-trees") return group === "ornamental trees" || blob.includes("ornamental tree") || blob.includes("japanese maple") || blob.includes("dogwood");
       if (cat === "shade trees" || cat === "shade-trees") return group === "shade trees" || blob.includes("shade tree");
       if (cat === "conifers") return group === "conifers" || blob.includes("conifer") || blob.includes("evergreen");
-      if (cat === "roses") return group === "roses" || blob.includes(" drift") || blob.includes("knock out") || blob.includes(" rose");
+      if (cat === "roses") return group === "roses" || hasZone("roses") || blob.includes(" drift") || blob.includes("knock out") || blob.includes(" rose");
       if (cat === "grasses") return group.includes("grasses") || blob.includes("grasses") || blob.includes(" grass") || blob.includes("liriope") || blob.includes("yucca");
-      if (cat === "perennials") return group.startsWith("perennials") || group === "peonies" || hasZone("shade-perennials") || hasZone("sun-perennials") || blob.includes("perennial");
+      if (cat === "perennials") return group.startsWith("perennials") || group === "peonies" || group === "native perennials" || hasZone("shade-perennials") || hasZone("sun-perennials") || blob.includes("perennial");
       if (cat === "annuals") return hasZone("annuals");
       if (cat === "tropicals") return hasZone("tropicals");
       if (cat === "hydrangeas") return blob.includes("hydrangea") || hasZone("house5");
@@ -4081,8 +4130,15 @@ function renderDefinitions() {
       });
     }
 
+    function getVisibleFinderResults() {
+      const zoneId = state.finderFocusedZoneId;
+      if (!zoneId) return state.finderResults;
+      const narrowed = state.finderResults.filter(item => (item.zoneIds || []).includes(zoneId));
+      return narrowed.length ? sortFinderItems(narrowed) : state.finderResults;
+    }
+
     function renderFinderResults() {
-      const results = state.finderResults;
+      const results = getVisibleFinderResults();
       if (!results.length) {
         els.finderResults.innerHTML = `<div class="empty">No nursery matches found. Try a different plant name or clear a filter.</div>`;
         return;
@@ -4122,7 +4178,7 @@ function renderDefinitions() {
       const extraNote = item.notes ? `<p class="finder-note">${escapeHtml(item.notes)}</p>` : "";
       const zones = item.zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("");
       const link = mode === "finder"
-        ? `<a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open property in Google Maps</a>`
+        ? `<a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open satellite map</a>`
         : "";
       return `
         <h3>${escapeHtml(item.name)}</h3>
@@ -4163,6 +4219,7 @@ function renderDefinitions() {
       if (!item) return;
       state.selectedFinderId = "";
       state.selectedFinderId = item.id;
+      state.finderFocusedZoneId = item.zoneIds?.[0] || "";
       state.selectedZoneIds = item.zoneIds.slice();
       state.selectedFlagId = item.flagId || primaryFlagIdForZones(item.zoneIds || []);
       renderFinderResults();
@@ -4174,16 +4231,20 @@ function renderDefinitions() {
 
     function handleZoneClick(zoneId) {
       state.selectedFinderId = "";
+      state.finderFocusedZoneId = zoneId;
       state.selectedZoneIds = [zoneId];
       state.selectedFlagId = primaryFlagIdForZones([zoneId]);
-      const matches = sortFinderItems(getFinderItems().filter(item => item.zoneIds.includes(zoneId)));
+      const matches = sortFinderItems(state.finderResults.filter(item => (item.zoneIds || []).includes(zoneId)));
+      const fallbackMatches = sortFinderItems(getFinderItems().filter(item => (item.zoneIds || []).includes(zoneId)));
+      const displayMatches = matches.length ? matches : fallbackMatches;
       const cueColor = primaryFlagColorForZones([zoneId]);
-      const markerItems = matches.length
-        ? [{ ...matches[0], flagId: state.selectedFlagId || matches[0].flagId || primaryFlagIdForZones(matches[0].zoneIds || []) }]
+      const markerItems = displayMatches.length
+        ? [{ ...displayMatches[0], flagId: state.selectedFlagId || displayMatches[0].flagId || primaryFlagIdForZones(displayMatches[0].zoneIds || []) }]
         : (cueColor ? [{ flagColor: cueColor, flagId: state.selectedFlagId, zoneIds: [zoneId] }] : []);
       renderFinderMaps([zoneId], markerItems);
+      renderFinderResults();
       const zoneName = zoneTitle(zoneId);
-      if (!matches.length) {
+      if (!displayMatches.length) {
         els.locationDetails.innerHTML = `
           <h3>${escapeHtml(zoneName)}</h3>
           <p class="finder-note">No mapped plants are assigned to this zone yet, but the zone is available on the digital map.</p>
@@ -4193,9 +4254,9 @@ function renderDefinitions() {
       }
       els.locationDetails.innerHTML = `
         <h3>${escapeHtml(zoneName)}</h3>
-        <p class="finder-note">Mapped plants in this zone:</p>
-        <div class="detail-tag-row">${matches.slice(0, 14).map(item => `<span class="location-badge">${escapeHtml(item.name)}</span>`).join("")}</div>
-        <p class="zone-directions">${escapeHtml(directionFromZone(matches[0]))}</p>
+        <p class="finder-note">${matches.length ? "Matching results in this zone for the current Finder filters:" : "Mapped plants in this zone:"}</p>
+        <div class="detail-tag-row">${displayMatches.slice(0, 14).map(item => `<span class="location-badge">${escapeHtml(item.name)}</span>`).join("")}</div>
+        <p class="zone-directions">${escapeHtml(directionFromZone(displayMatches[0]))}</p>
       `;
       nudgeFinderMapIntoView(true);
     }
@@ -4207,6 +4268,10 @@ function renderDefinitions() {
         getFinderItems().filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits))
       );
 
+      if (state.finderFocusedZoneId && !state.finderResults.some(item => (item.zoneIds || []).includes(state.finderFocusedZoneId))) {
+        state.finderFocusedZoneId = "";
+      }
+
       const shouldReveal = state.finderRevealMap && (
         !!state.finderCategory ||
         state.finderTraits.size > 0 ||
@@ -4215,7 +4280,7 @@ function renderDefinitions() {
 
       const categoryMeta = getFinderCategoryMeta(state.finderCategory);
 
-      if (state.selectedFinderId && !state.finderResults.some(item => item.id === state.selectedFinderId)) {
+      if (state.selectedFinderId && !getVisibleFinderResults().some(item => item.id === state.selectedFinderId)) {
         state.selectedFinderId = "";
       }
 
@@ -4227,7 +4292,8 @@ function renderDefinitions() {
       }
 
       if (categoryMeta && !categoryMeta.locationOnly && state.finderResults.length) {
-        const nextItem = state.finderResults[0];
+        const visibleResults = getVisibleFinderResults();
+        const nextItem = visibleResults[0] || state.finderResults[0];
         state.selectedFinderId = nextItem.id;
         state.selectedZoneIds = categoryMeta.zoneIds.slice();
         renderFinderMaps(
@@ -4243,7 +4309,7 @@ function renderDefinitions() {
           <h3>${escapeHtml(categoryMeta.title)}</h3>
           <p class="finder-note">${escapeHtml(categoryMeta.description)}</p>
           <div class="detail-tag-row">${zoneBadges}</div>
-          <p class="finder-note">Showing ${state.finderResults.length} matching result${state.finderResults.length === 1 ? "" : "s"} across the highlighted category area${categoryMeta.zoneIds.length > 1 ? "s" : ""}.</p>
+          <p class="finder-note">Showing ${getVisibleFinderResults().length} matching result${getVisibleFinderResults().length === 1 ? "" : "s"} across the highlighted category area${categoryMeta.zoneIds.length > 1 ? "s" : ""}. Tap a specific zone to narrow the list further.</p>
           <p class="zone-directions">${escapeHtml(directionFromZone(nextItem))}</p>
         `;
         wireCopyButtons(els.locationDetails);
@@ -4302,6 +4368,7 @@ function renderDefinitions() {
       state.finderQuery = "";
       state.finderCategory = "";
       state.finderTraits.clear();
+      state.finderFocusedZoneId = "";
       state.selectedFinderId = "";
       state.selectedZoneIds = [];
       state.finderRevealMap = false;
@@ -4485,6 +4552,7 @@ function renderDefinitions() {
         populateFilters(state.plants);
         renderTraitChips();
         applyFilters();
+        applyFinderFilters();
         applyKioskFilters();
       } catch (err) {
         els.summaryBar.innerHTML = `<span class="pill">Failed to load plants</span>`;
@@ -4529,10 +4597,12 @@ function renderDefinitions() {
       });
 
       els.finderSearch.addEventListener("input", () => {
+        state.finderFocusedZoneId = "";
         state.finderRevealMap = true;
         applyFinderFilters();
       });
       els.finderCategory.addEventListener("change", () => {
+        state.finderFocusedZoneId = "";
         state.finderRevealMap = true;
         applyFinderFilters();
       });
