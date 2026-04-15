@@ -1341,7 +1341,14 @@
       }
     }
 
-    @media (min-width: 901px) {
+    
+    @media (max-width: 900px){
+      .map-fixed-flag.active .map-fixed-flag-inner {
+        transform: scale(1.28);
+      }
+    }
+
+@media (min-width: 901px) {
       .mobile-map-tools,
       .mobile-swipe-note {
         display: none !important;
@@ -1497,12 +1504,13 @@
     }
 
     .map-fixed-flag.active .map-flag-glow {
-      opacity: .24;
+      opacity: .32;
       animation: flagGlow 1.65s ease-in-out infinite;
     }
 
     .map-fixed-flag.active .map-fixed-flag-inner {
       animation: flagWave 1.65s ease-in-out infinite;
+      transform: scale(1.22);
     }
 
     .map-fixed-flag.active .map-flag-base {
@@ -3683,12 +3691,11 @@ function renderDefinitions() {
 
     function buildMapSvg(activeZoneIds = [], markerItems = [], viewBox = "0 0 1020 950") {
       const active = new Set(activeZoneIds || []);
-      const selectedFlagIds = new Set(
-        [
-          ...(markerItems || []).map(item => item.flagId || primaryFlagIdForZones(item.zoneIds || [])).filter(Boolean),
-          ...Array.from(active).map(zoneId => primaryFlagIdForZones([zoneId])).filter(Boolean)
-        ]
-      );
+      const primaryItem = (markerItems && markerItems.length) ? markerItems[0] : null;
+      const primaryZoneForFlag = primaryItem?.zoneIds?.[0] || Array.from(active)[0] || "";
+      const selectedFlagId = primaryItem?.flagId
+        || primaryFlagIdForZones(primaryZoneForFlag ? [primaryZoneForFlag] : []);
+      const selectedFlagIds = new Set(selectedFlagId ? [selectedFlagId] : []);
 
       const staticText = `
         <text class="map-title-accent" x="458" y="158">Ball &amp; Burlap Trees</text>
@@ -4059,20 +4066,26 @@ function renderDefinitions() {
     function selectFinderItem(itemId, revealMap = false) {
       const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
       if (!item) return;
+      state.selectedFinderId = "";
       state.selectedFinderId = item.id;
       state.selectedZoneIds = item.zoneIds.slice();
+      state.selectedFlagId = item.flagId || primaryFlagIdForZones(item.zoneIds || []);
       renderFinderResults();
-      renderFinderMaps(item.zoneIds, [item]);
+      renderFinderMaps(item.zoneIds, [{ ...item, flagId: state.selectedFlagId }]);
       els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
       wireCopyButtons(els.locationDetails);
       if (revealMap) nudgeFinderMapIntoView(true);
     }
 
     function handleZoneClick(zoneId) {
+      state.selectedFinderId = "";
       state.selectedZoneIds = [zoneId];
+      state.selectedFlagId = primaryFlagIdForZones([zoneId]);
       const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
       const cueColor = primaryFlagColorForZones([zoneId]);
-      const markerItems = matches.length ? matches.slice(0, 6) : (cueColor ? [{ flagColor: cueColor, zoneIds: [zoneId] }] : []);
+      const markerItems = matches.length
+        ? [{ ...matches[0], flagId: state.selectedFlagId || matches[0].flagId || primaryFlagIdForZones(matches[0].zoneIds || []) }]
+        : (cueColor ? [{ flagColor: cueColor, flagId: state.selectedFlagId, zoneIds: [zoneId] }] : []);
       renderFinderMaps([zoneId], markerItems);
       const zoneName = zoneTitle(zoneId);
       if (!matches.length) {
