@@ -2762,9 +2762,7 @@
     }
 
     function withSatelliteView(url) {
-      if (!url) return url;
-      if (/[?&]t=k\b/i.test(url)) return url;
-      return url + (url.includes("?") ? "&t=k" : "?t=k");
+      return NURSERY_MAPS_LINK;
     }
 
     function isTruthy(value) {
@@ -3583,6 +3581,11 @@
       return NURSERY_ITEMS;
     }
 
+    function getFinderItems() {
+      if (Array.isArray(state.kioskCatalogItems) && state.kioskCatalogItems.length) return state.kioskCatalogItems;
+      return NURSERY_ITEMS;
+    }
+
 function renderDefinitions() {
       els.definitionsGrid.innerHTML = DEFINITIONS.map(def => `
         <article class="def-card">
@@ -4064,7 +4067,7 @@ function renderDefinitions() {
     }
 
     function selectFinderItem(itemId, revealMap = false) {
-      const item = NURSERY_ITEMS.find(entry => entry.id === itemId);
+      const item = getFinderItems().find(entry => entry.id === itemId);
       if (!item) return;
       state.selectedFinderId = "";
       state.selectedFinderId = item.id;
@@ -4081,7 +4084,7 @@ function renderDefinitions() {
       state.selectedFinderId = "";
       state.selectedZoneIds = [zoneId];
       state.selectedFlagId = primaryFlagIdForZones([zoneId]);
-      const matches = sortFinderItems(NURSERY_ITEMS.filter(item => item.zoneIds.includes(zoneId)));
+      const matches = sortFinderItems(getFinderItems().filter(item => item.zoneIds.includes(zoneId)));
       const cueColor = primaryFlagColorForZones([zoneId]);
       const markerItems = matches.length
         ? [{ ...matches[0], flagId: state.selectedFlagId || matches[0].flagId || primaryFlagIdForZones(matches[0].zoneIds || []) }]
@@ -4109,7 +4112,7 @@ function renderDefinitions() {
       state.finderQuery = normalizeText(els.finderSearch.value);
       state.finderCategory = els.finderCategory.value;
       state.finderResults = sortFinderItems(
-        NURSERY_ITEMS.filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits))
+        getFinderItems().filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits))
       );
 
       const shouldReveal = state.finderRevealMap && (
@@ -4145,7 +4148,7 @@ function renderDefinitions() {
         }
 
         const resultsNote = !categoryMeta.locationOnly && state.finderResults.length
-          ? `<p class="finder-note">Showing ${state.finderResults.length} matching plant${state.finderResults.length === 1 ? "" : "s"} across the highlighted perennial areas.</p>`
+          ? `<p class="finder-note">Showing ${state.finderResults.length} matching result${state.finderResults.length === 1 ? "" : "s"} across the highlighted category area${categoryMeta.zoneIds.length > 1 ? "s" : ""}.</p>`
           : "";
         const zoneBadges = categoryMeta.zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("");
 
@@ -4428,7 +4431,7 @@ function renderDefinitions() {
         const item = getKioskItems().find(entry => entry.id === state.selectedKioskId);
         if (!item) return;
         showView("finder");
-        const mappedFinder = NURSERY_ITEMS.find(entry => normalizeText(entry.name) === normalizeText(item.name)) || null;
+        const mappedFinder = getFinderItems().find(entry => normalizeText(entry.name) === normalizeText(item.name)) || null;
         if (mappedFinder) {
           selectFinderItem(mappedFinder.id);
         } else {
