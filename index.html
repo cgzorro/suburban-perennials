@@ -1477,8 +1477,10 @@
     }
 
     .map-fixed-flag {
-      opacity: .66;
-      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.14));
+      opacity: .82;
+      filter:
+        drop-shadow(0 2px 6px rgba(0,0,0,0.22))
+        drop-shadow(0 0 6px rgba(255,255,255,0.08));
       transform-box: fill-box;
       transform-origin: center bottom;
     }
@@ -1499,28 +1501,29 @@
     .map-fixed-flag.active {
       opacity: 1;
       filter:
-        drop-shadow(0 0 10px rgba(123, 208, 95, 0.64))
-        drop-shadow(0 0 22px rgba(123, 208, 95, 0.30));
+        drop-shadow(0 0 16px rgba(123, 208, 95, 0.82))
+        drop-shadow(0 0 34px rgba(123, 208, 95, 0.48))
+        drop-shadow(0 0 56px rgba(123, 208, 95, 0.24));
     }
 
     .map-fixed-flag.active .map-flag-glow {
-      opacity: .32;
-      animation: flagGlow 1.65s ease-in-out infinite;
+      opacity: .48;
+      animation: flagGlow 1.45s ease-in-out infinite;
     }
 
     .map-fixed-flag.active .map-fixed-flag-inner {
-      animation: flagWave 1.65s ease-in-out infinite;
-      transform: scale(1.22);
+      animation: flagWave 1.45s ease-in-out infinite;
+      transform: scale(1.4);
     }
 
     .map-fixed-flag.active .map-flag-base {
       stroke: #eef8ea;
-      stroke-width: 1.8;
+      stroke-width: 2.4;
     }
 
     .map-fixed-flag.active .map-flag-stick {
-      stroke: #b7c8d9;
-      stroke-width: 1.8;
+      stroke: #eef8ea;
+      stroke-width: 2.4;
     }
 
     @keyframes flagWave {
@@ -1538,12 +1541,12 @@
 
     .map-flag-stick {
       stroke: #667384;
-      stroke-width: 1.5;
+      stroke-width: 2.2;
     }
 
     .map-flag-base {
       stroke: #263243;
-      stroke-width: 1.2;
+      stroke-width: 1.8;
     }
 
     .map-flag-base.white {
@@ -2200,7 +2203,8 @@
               <option value="conifers">Conifers & Evergreens</option>
               <option value="roses">Roses</option>
               <option value="grasses">Perennial Grasses</option>
-              <option value="perennials">Perennials</option>
+              <option value="perennials-sun">Perennials - Sun</option>
+              <option value="perennials-shade">Perennials - Shade</option>
               <option value="annuals">Annuals</option>
               <option value="tropicals">Tropicals</option>
               <option value="hydrangeas">Hydrangeas</option>
@@ -2347,8 +2351,9 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script>
-    const NURSERY_MAPS_LINK = "https://www.google.com/maps/@?api=1&map_action=map&center=38.9594854,-94.8573139&zoom=19&basemap=satellite";
-    const OWNER_LOGO = "./images/foxfield-studio-mark.png";
+    const NURSERY_MAPS_LINK = "https://www.google.com/maps/@38.9594854,-94.8573139,220m/data=!3m1!1e3";
+    const NURSERY_SATELLITE_BROWSER_LINK = "https://www.google.com/maps/place/Suburban+Lawn+%26+Garden/@38.960931,-94.8577483,591m/data=!3m1!1e3!4m6!3m5!1s0x87c09727c98aebf3:0x64952357a52993e6!8m2!3d38.9594854!4d-94.8573139!16s%2Fg%2F1tnplj87?entry=ttu";
+    const OWNER_LOGO = "images/foxfield-studio-mark.png";
 
     const FLAG_COLORS = {
       black: "#1d2430",
@@ -2513,11 +2518,11 @@
       { id: "flag-house6-yellow", color: "yellow", x: 726, y: 408, note: "Right-center flag shown on paper map" },
       { id: "flag-evergreen-white", color: "white", x: 410, y: 494, note: "Evergreen strip flag shown on paper map" },
       { id: "flag-evergreen-charcoal", color: "charcoal", x: 565, y: 494, note: "Evergreen strip dark flag shown on paper map" },
-      { id: "flag-lower-blue", color: "blue", x: 472, y: 598, note: "Lower left bed flag shown on paper map" },
-      { id: "flag-lower-pink", color: "pink", x: 592, y: 598, note: "Lower middle bed flag shown on paper map" },
-      { id: "flag-lower-orange", color: "orange", x: 732, y: 596, note: "Lower right bed flag shown on paper map" },
-      { id: "flag-lower-teal", color: "teal", x: 620, y: 704, note: "Curved lower bed flag shown on paper map" },
-      { id: "flag-roses-red", color: "red", x: 752, y: 682, note: "Roses and grasses flag shown on paper map" }
+      { id: "flag-lower-blue", color: "blue", x: 472, y: 560, note: "Lower left field flag" },
+      { id: "flag-lower-pink", color: "pink", x: 592, y: 560, note: "Lower middle field flag" },
+      { id: "flag-lower-orange", color: "orange", x: 754, y: 726, note: "Sun perennial field flag" },
+      { id: "flag-lower-teal", color: "teal", x: 618, y: 770, note: "Shade perennial field flag" },
+      { id: "flag-roses-red", color: "red", x: 754, y: 676, note: "Roses and grasses field flag" }
     ];
 
     const ZONE_PRIMARY_FLAG_IDS = {
@@ -2528,8 +2533,8 @@
       "field-tree": "flag-lower-blue",
       "roses": "flag-roses-red",
       "sun-perennials": "flag-lower-orange",
-      "tropicals": "flag-lower-teal",
-      "shade-perennials": "flag-lower-blue",
+      "tropicals": "flag-lower-blue",
+      "shade-perennials": "flag-lower-teal",
       "annuals": "flag-lower-orange",
       "house8": "flag-house8-purple",
       "house7": "flag-house8-purple",
@@ -2827,6 +2832,7 @@
     }
 
     function syncOwnerLogo() {
+      els.ownerLogo = els.ownerLogo || document.getElementById("ownerLogo");
       if (!els.ownerLogo || !OWNER_LOGO) return;
       els.ownerLogo.src = OWNER_LOGO;
       els.ownerLogo.addEventListener("load", () => {
@@ -3062,6 +3068,7 @@
         plant.source_subdepartment,
         plant.tree_class,
         plant.light,
+        plant.soil,
         plant.description,
         plant.notes
       ].join(" ").toLowerCase();
@@ -3070,7 +3077,9 @@
         sun: exposure === "Sun" || exposure === "Mixed",
         shade: exposure === "Shade" || exposure === "Mixed",
         pollinator: isTruthy(plant.pollinator) || haystack.includes("pollinator") || haystack.includes("butterfly") || haystack.includes("bee") || haystack.includes("hummingbird"),
-        drought: isTruthy(plant.drought) || haystack.includes("drought"),
+        drought: isTruthy(plant.drought) || haystack.includes("drought") || haystack.includes("dry") || haystack.includes("poor, well-drained"),
+        wet: haystack.includes("wet") || haystack.includes("moist") || haystack.includes("consistently moist") || haystack.includes("rain garden"),
+        birds: haystack.includes("attracts birds") || haystack.includes("bird") || haystack.includes("berry") || haystack.includes("berries") || haystack.includes("finch"),
         "deer resistant": isTruthy(plant.deer) || isTruthy(plant.deer_resistant) || isTruthy(plant.deerResistant) || haystack.includes("deer resistant") || haystack.includes("deer-resistan") || haystack.includes("deer tolerant")
       };
     }
@@ -3081,7 +3090,7 @@
       [
         "name","common","genus","species","series","category","plant_group","section",
         "source_department","source_subdepartment","tree_class","category_path","item_type",
-        "light","height","width","color","price","link","image","image_url","image_path",
+        "light","soil","height","width","color","price","link","image","image_url","image_path",
         "photo","photo_url","description","notes","size","sku"
       ].forEach(key => {
         if (key in copy) copy[key] = normalizeSpaces(copy[key]);
@@ -3095,7 +3104,7 @@
         copy.name, copy.common, copy.genus, copy.species, copy.series, copy.sku,
         copy.category, copy.plant_group, copy.section, copy.source_department,
         copy.source_subdepartment, copy.tree_class, copy.category_path, copy.item_type,
-        copy.light, copy.height, copy.width, copy.color, copy.description, copy.notes,
+        copy.light, copy.soil, copy.height, copy.width, copy.color, copy.description, copy.notes,
         copy.__group, copy.__exposure
       ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase();
 
@@ -3597,7 +3606,10 @@
     function kioskTraitsFromPlant(plant) {
       const traits = inferTraits(plant) || {};
       const brochure = getBrochureTraits(plant.name || plant.common || "");
-      const blob = [plant.name, plant.common, plant.category, plant.section, plant.plant_group, plant.description, plant.notes]
+      const blob = [
+        plant.name, plant.common, plant.genus, plant.category, plant.section,
+        plant.plant_group, plant.soil, plant.description, plant.notes
+      ]
         .map(normalizeText)
         .join(" ");
       const list = [];
@@ -3606,8 +3618,8 @@
       if (traits.pollinator) list.push("pollinator-friendly");
       if (traits.drought) list.push("drought-tolerant");
       if (traits["deer resistant"]) list.push("deer-resistant");
-      if (brochure.includes("wet-tolerant") || /wet|moist|rain garden/.test(blob)) list.push("wet-tolerant");
-      if (brochure.includes("attracts-birds") || /bird|berries|berry/.test(blob)) list.push("attracts-birds");
+      if (traits.wet || brochure.includes("wet-tolerant") || /wet|moist|rain garden/.test(blob)) list.push("wet-tolerant");
+      if (traits.birds || brochure.includes("attracts-birds") || /bird|berries|berry|finch/.test(blob)) list.push("attracts-birds");
       return uniqueValues([...list, ...brochure]);
     }
 
@@ -3670,9 +3682,13 @@
           area: meta.area,
           flagColor: meta.flagColor,
           traits,
-          notes: normalizeSpaces(plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : plant.price || ""),
+          sourceType: "catalog-plant",
+          notes: normalizeSpaces([
+            plant.size ? `${plant.size}${plant.price ? ` · ${plant.price}` : ""}` : (plant.price || ""),
+            plant.soil ? `Soil: ${plant.soil}` : ""
+          ].filter(Boolean).join(" · ")),
           searchBlob: [
-            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, group, exposure, meta.locationLabel, meta.area, traits.join(" ")
+            plant.name, plant.common, plant.genus, plant.sku, plant.series, plant.plant_group, plant.category, plant.section, plant.soil, group, exposure, meta.locationLabel, meta.area, traits.join(" ")
           ].map(normalizeSpaces).filter(Boolean).join(" ").toLowerCase()
         };
         const dedupeKey = `${normalizeText(item.name)}|${normalizeText(item.locationLabel)}`;
@@ -3688,8 +3704,23 @@
     }
 
     function getFinderItems() {
-      if (Array.isArray(state.kioskCatalogItems) && state.kioskCatalogItems.length) return state.kioskCatalogItems;
-      return NURSERY_ITEMS;
+      const catalogItems = Array.isArray(state.kioskCatalogItems) ? state.kioskCatalogItems : [];
+      if (!catalogItems.length) return NURSERY_ITEMS;
+
+      const merged = [];
+      const seen = new Set();
+      [...NURSERY_ITEMS, ...catalogItems].forEach(item => {
+        const key = [
+          normalizeText(item.name),
+          normalizeText(item.locationLabel),
+          (Array.isArray(item.zoneIds) ? item.zoneIds.join('|') : ''),
+          normalizeText(item.category)
+        ].join('||');
+        if (seen.has(key)) return;
+        seen.add(key);
+        merged.push(item);
+      });
+      return merged;
     }
 
 function renderDefinitions() {
@@ -3868,10 +3899,10 @@ function renderDefinitions() {
         const isActive = selectedFlagIds.has(marker.id);
         return `
           <g class="map-fixed-flag${isActive ? " active" : ""}" aria-hidden="true" transform="translate(${marker.x} ${marker.y})">
-            <circle class="map-flag-glow" cx="-10" cy="2" r="18" fill="${color}"></circle>
+            <circle class="map-flag-glow" cx="-12" cy="2" r="26" fill="${color}"></circle>
             <g class="map-fixed-flag-inner">
-              <line class="map-flag-stick" x1="-2" y1="8" x2="-2" y2="28"></line>
-              <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="0,0 -22,-12 -22,12" fill="${color}"></polygon>
+              <line class="map-flag-stick" x1="-2" y1="10" x2="-2" y2="38"></line>
+              <polygon class="map-flag-base ${marker.color === "white" ? "white" : ""}" points="2,0 -30,-16 -30,16" fill="${color}"></polygon>
             </g>
           </g>
         `;
@@ -4055,6 +4086,18 @@ function renderDefinitions() {
           description: "Perennials are split between Sun Perennials and Shade Perennials. Use plant light needs or the result card to guide the customer to the correct section.",
           locationOnly: false
         },
+        "perennials sun": {
+          title: "Perennials - Sun",
+          zoneIds: ["sun-perennials"],
+          description: "Sun perennial stock is highlighted in the dedicated Sun Perennials section.",
+          locationOnly: false
+        },
+        "perennials shade": {
+          title: "Perennials - Shade",
+          zoneIds: ["shade-perennials"],
+          description: "Shade perennial stock is highlighted in the dedicated Shade Perennials section.",
+          locationOnly: false
+        },
         "annuals": {
           title: "Annuals",
           zoneIds: ["annuals"],
@@ -4102,6 +4145,8 @@ function renderDefinitions() {
       if (cat === "roses") return group === "roses" || hasZone("roses") || blob.includes(" drift") || blob.includes("knock out") || blob.includes(" rose");
       if (cat === "grasses") return group.includes("grasses") || blob.includes("grasses") || blob.includes(" grass") || blob.includes("liriope") || blob.includes("yucca");
       if (cat === "perennials") return group.startsWith("perennials") || group === "peonies" || group === "native perennials" || hasZone("shade-perennials") || hasZone("sun-perennials") || blob.includes("perennial");
+      if (cat === "perennials sun" || cat === "perennials-sun") return group === "perennials - sun" || group === "peonies" || group === "native perennials" || hasZone("sun-perennials");
+      if (cat === "perennials shade" || cat === "perennials-shade") return group === "perennials - shade" || hasZone("shade-perennials");
       if (cat === "annuals") return hasZone("annuals");
       if (cat === "tropicals") return hasZone("tropicals");
       if (cat === "hydrangeas") return blob.includes("hydrangea") || hasZone("house5");
@@ -4134,13 +4179,14 @@ function renderDefinitions() {
       const zoneId = state.finderFocusedZoneId;
       if (!zoneId) return state.finderResults;
       const narrowed = state.finderResults.filter(item => (item.zoneIds || []).includes(zoneId));
-      return narrowed.length ? sortFinderItems(narrowed) : state.finderResults;
+      return sortFinderItems(narrowed);
     }
 
     function renderFinderResults() {
       const results = getVisibleFinderResults();
       if (!results.length) {
-        els.finderResults.innerHTML = `<div class="empty">No nursery matches found. Try a different plant name or clear a filter.</div>`;
+        const zoneNote = state.finderFocusedZoneId ? ` in ${escapeHtml(zoneTitle(state.finderFocusedZoneId))}` : "";
+        els.finderResults.innerHTML = `<div class="empty">No nursery matches found${zoneNote}. Try a different plant name, a different section, or clear a filter.</div>`;
         return;
       }
       els.finderResults.innerHTML = results.map(item => {
@@ -4178,7 +4224,7 @@ function renderDefinitions() {
       const extraNote = item.notes ? `<p class="finder-note">${escapeHtml(item.notes)}</p>` : "";
       const zones = item.zoneIds.map(zoneId => `<span class="location-badge">${escapeHtml(zoneTitle(zoneId))}</span>`).join("");
       const link = mode === "finder"
-        ? `<a class="map-link" href="${NURSERY_MAPS_LINK}" target="_blank" rel="noopener noreferrer">Open satellite map</a>`
+        ? `<a class="map-link" href="${NURSERY_SATELLITE_BROWSER_LINK}" target="_blank" rel="noopener noreferrer">Open satellite map</a>`
         : "";
       return `
         <h3>${escapeHtml(item.name)}</h3>
@@ -4235,7 +4281,10 @@ function renderDefinitions() {
       state.selectedZoneIds = [zoneId];
       state.selectedFlagId = primaryFlagIdForZones([zoneId]);
       const matches = sortFinderItems(state.finderResults.filter(item => (item.zoneIds || []).includes(zoneId)));
-      const fallbackMatches = sortFinderItems(getFinderItems().filter(item => (item.zoneIds || []).includes(zoneId)));
+      const hasActiveFinderFilters = !!state.finderCategory || !!state.finderQuery || state.finderTraits.size > 0;
+      const fallbackMatches = hasActiveFinderFilters
+        ? []
+        : sortFinderItems(getFinderItems().filter(item => (item.zoneIds || []).includes(zoneId)));
       const displayMatches = matches.length ? matches : fallbackMatches;
       const cueColor = primaryFlagColorForZones([zoneId]);
       const markerItems = displayMatches.length
@@ -4247,7 +4296,7 @@ function renderDefinitions() {
       if (!displayMatches.length) {
         els.locationDetails.innerHTML = `
           <h3>${escapeHtml(zoneName)}</h3>
-          <p class="finder-note">No mapped plants are assigned to this zone yet, but the zone is available on the digital map.</p>
+          <p class="finder-note">${hasActiveFinderFilters ? "No current Finder matches land in this section. Try a different zone, clear the current filter, or tap another result." : "No mapped plants are assigned to this zone yet, but the zone is available on the digital map."}</p>
         `;
         nudgeFinderMapIntoView(true);
         return;
@@ -4519,7 +4568,7 @@ function renderDefinitions() {
         <p class="zone-directions">${escapeHtml(directionFromZone(item))}</p>
         <div class="detail-tag-row">${item.traits.map(trait => `<span class="trait-badge good">${titleCase(trait.replace(/-/g, ' '))}</span>`).join('') || `<span class="trait-badge">General lookup</span>`}</div>
         <div class="detail-actions">
-          <a class="map-link" href="${withSatelliteView(NURSERY_MAPS_LINK)}" target="_blank" rel="noopener noreferrer">Open Satellite Map</a>
+          <a class="map-link" href="${NURSERY_SATELLITE_BROWSER_LINK}" target="_blank" rel="noopener noreferrer">Open Satellite Map</a>
           <button type="button" class="location-btn" data-copy-line="${escapeHtml(`Go to ${item.locationLabel}. ${directionFromZone(item)}`)}">Copy quick line</button>
         </div>
       `;
@@ -4558,6 +4607,7 @@ function renderDefinitions() {
         els.summaryBar.innerHTML = `<span class="pill">Failed to load plants</span>`;
         els.results.innerHTML = `<div class="empty">Could not load <code>plants.json</code>. ${err.message}</div>`;
         state.kioskCatalogItems = [];
+        applyFinderFilters();
         applyKioskFilters();
       }
     }
@@ -4647,6 +4697,7 @@ function renderDefinitions() {
 
     setTheme(state.theme);
     syncOwnerLogo();
+    window.addEventListener("DOMContentLoaded", syncOwnerLogo, { once: true });
     updateScannerUi();
     wireEvents();
     initFinder();
