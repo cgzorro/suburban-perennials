@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -4134,13 +4135,56 @@ function renderDefinitions() {
         || null;
     }
 
-    function nudgeFinderMapIntoView(force = false) {
+    function finderZoneUnion(zoneIds = []) {
+      const zones = (Array.isArray(zoneIds) ? zoneIds : [])
+        .map(zoneId => MAP_ZONES.find(zone => zone.id === zoneId))
+        .filter(Boolean);
+      if (!zones.length) return null;
+
+      const minX = Math.min(...zones.map(zone => zone.x));
+      const maxX = Math.max(...zones.map(zone => zone.x + zone.w));
+      const minY = Math.min(...zones.map(zone => zone.y));
+      const maxY = Math.max(...zones.map(zone => zone.y + zone.h));
+
+      return {
+        minX,
+        maxX,
+        minY,
+        maxY,
+        centerX: (minX + maxX) / 2,
+        centerY: (minY + maxY) / 2
+      };
+    }
+
+    function panFinderMapToZoneIds(zoneIds = []) {
+      if (window.innerWidth > 900) return;
+      if (!els.mapPanShell) return;
+      const union = finderZoneUnion(zoneIds);
+      if (!union) return;
+
+      const shell = els.mapPanShell;
+      const maxLeft = Math.max(0, shell.scrollWidth - shell.clientWidth);
+      if (maxLeft <= 0) return;
+
+      const contentCenterX = (union.centerX / 1020) * shell.scrollWidth;
+      const desiredLeft = Math.max(0, Math.min(maxLeft, contentCenterX - (shell.clientWidth / 2)));
+      shell.scrollTo({ left: desiredLeft, behavior: "smooth" });
+    }
+
+    function nudgeFinderMapIntoView(force = false, zoneIds = []) {
       if (window.innerWidth > 900) return;
       if (!force && !state.finderRevealMap) return;
       const target = finderMapScrollTarget();
       if (!target) return;
+      const zonesToShow = Array.isArray(zoneIds) && zoneIds.length
+        ? zoneIds
+        : (Array.isArray(state.selectedZoneIds) ? state.selectedZoneIds : []);
+
       requestAnimationFrame(() => {
         target.scrollIntoView({ behavior: "smooth", block: "start" });
+        setTimeout(() => {
+          panFinderMapToZoneIds(zonesToShow);
+        }, 120);
       });
       state.finderRevealMap = false;
     }
@@ -4349,7 +4393,7 @@ function renderDefinitions() {
       renderFinderMaps(state.selectedZoneIds, [{ ...item, flagId: state.selectedFlagId, flagColor: item.flagColor || primaryFlagColorForZones(item.zoneIds || []) }]);
       els.locationDetails.innerHTML = buildDetailHtml(item, "finder");
       wireCopyButtons(els.locationDetails);
-      if (revealMap) nudgeFinderMapIntoView(true);
+      if (revealMap) nudgeFinderMapIntoView(true, state.selectedZoneIds);
     }
 
     function handleZoneClick(zoneId) {
@@ -4375,7 +4419,7 @@ function renderDefinitions() {
           <h3>${escapeHtml(zoneName)}</h3>
           <p class="finder-note">${hasActiveFinderFilters ? "No current Finder matches land in this section. Try a different zone, clear the current filter, or tap another result." : "No mapped plants are assigned to this zone yet, but the zone is available on the digital map."}</p>
         `;
-        nudgeFinderMapIntoView(true);
+        nudgeFinderMapIntoView(true, [zoneId]);
         return;
       }
       els.locationDetails.innerHTML = `
@@ -4384,7 +4428,7 @@ function renderDefinitions() {
         <div class="detail-tag-row">${displayMatches.slice(0, 14).map(item => `<span class="location-badge">${escapeHtml(item.name)}</span>`).join("")}</div>
         <p class="zone-directions">${escapeHtml(directionFromZone(displayMatches[0]))}</p>
       `;
-      nudgeFinderMapIntoView(true);
+      nudgeFinderMapIntoView(true, [zoneId]);
     }
 
     function applyFinderFilters() {
@@ -4439,7 +4483,7 @@ function renderDefinitions() {
           <p class="zone-directions">${escapeHtml(directionFromZone(nextItem))}</p>
         `;
         wireCopyButtons(els.locationDetails);
-        if (shouldReveal) nudgeFinderMapIntoView(true);
+        if (shouldReveal) nudgeFinderMapIntoView(true, categoryMeta.zoneIds);
         state.finderRevealMap = false;
         return;
       }
@@ -4470,7 +4514,7 @@ function renderDefinitions() {
           <p class="finder-note">${escapeHtml(categoryMeta.description)}</p>
           <div class="detail-tag-row">${zoneBadges}</div>
         `;
-        if (shouldReveal) nudgeFinderMapIntoView(true);
+        if (shouldReveal) nudgeFinderMapIntoView(true, categoryMeta.zoneIds);
         state.finderRevealMap = false;
         return;
       }
