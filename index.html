@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -4135,56 +4134,13 @@ function renderDefinitions() {
         || null;
     }
 
-    function finderZoneUnion(zoneIds = []) {
-      const zones = (Array.isArray(zoneIds) ? zoneIds : [])
-        .map(zoneId => MAP_ZONES.find(zone => zone.id === zoneId))
-        .filter(Boolean);
-      if (!zones.length) return null;
-
-      const minX = Math.min(...zones.map(zone => zone.x));
-      const maxX = Math.max(...zones.map(zone => zone.x + zone.w));
-      const minY = Math.min(...zones.map(zone => zone.y));
-      const maxY = Math.max(...zones.map(zone => zone.y + zone.h));
-
-      return {
-        minX,
-        maxX,
-        minY,
-        maxY,
-        centerX: (minX + maxX) / 2,
-        centerY: (minY + maxY) / 2
-      };
-    }
-
-    function panFinderMapToZoneIds(zoneIds = []) {
-      if (window.innerWidth > 900) return;
-      if (!els.mapPanShell) return;
-      const union = finderZoneUnion(zoneIds);
-      if (!union) return;
-
-      const shell = els.mapPanShell;
-      const maxLeft = Math.max(0, shell.scrollWidth - shell.clientWidth);
-      if (maxLeft <= 0) return;
-
-      const contentCenterX = (union.centerX / 1020) * shell.scrollWidth;
-      const desiredLeft = Math.max(0, Math.min(maxLeft, contentCenterX - (shell.clientWidth / 2)));
-      shell.scrollTo({ left: desiredLeft, behavior: "smooth" });
-    }
-
-    function nudgeFinderMapIntoView(force = false, zoneIds = []) {
+    function nudgeFinderMapIntoView(force = false, _zoneIds = []) {
       if (window.innerWidth > 900) return;
       if (!force && !state.finderRevealMap) return;
       const target = finderMapScrollTarget();
       if (!target) return;
-      const zonesToShow = Array.isArray(zoneIds) && zoneIds.length
-        ? zoneIds
-        : (Array.isArray(state.selectedZoneIds) ? state.selectedZoneIds : []);
-
       requestAnimationFrame(() => {
         target.scrollIntoView({ behavior: "smooth", block: "start" });
-        setTimeout(() => {
-          panFinderMapToZoneIds(zonesToShow);
-        }, 120);
       });
       state.finderRevealMap = false;
     }
