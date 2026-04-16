@@ -1954,6 +1954,103 @@
     }
 
 
+    .finder-map-mode {
+      display: inline-flex;
+      gap: 8px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg-soft);
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .finder-mode-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background .18s ease, border-color .18s ease, color .18s ease;
+    }
+
+    .finder-mode-btn.active {
+      background: linear-gradient(180deg, #19c4c4, #0ea5a5);
+      color: #fff;
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .finder-beta-note {
+      margin: 0 0 12px;
+      color: var(--text-muted);
+      font-size: .92rem;
+      line-height: 1.35;
+    }
+
+    .beta-map-wrap {
+      position: relative;
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      min-height: 360px;
+      background: var(--map-bg);
+      border: 1px solid rgba(166, 187, 203, 0.18);
+    }
+
+    .beta-map-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-height: 360px;
+      object-fit: cover;
+    }
+
+    .beta-map-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .beta-zone-highlight {
+      position: absolute;
+      border-radius: 18px;
+      border: 3px solid rgba(25, 196, 196, 0.95);
+      background: rgba(25, 196, 196, 0.16);
+      box-shadow: 0 0 0 3px rgba(8, 24, 34, 0.28), 0 0 28px rgba(25, 196, 196, 0.30);
+    }
+
+    .beta-zone-label {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(7, 19, 37, 0.84);
+      color: #fff;
+      font-size: .86rem;
+      font-weight: 800;
+      line-height: 1;
+      backdrop-filter: blur(4px);
+      max-width: calc(100% - 20px);
+    }
+
+    .beta-zone-flag {
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 14px solid currentColor;
+      color: var(--flag, #19c4c4);
+      filter: drop-shadow(0 0 10px color-mix(in srgb, currentColor 55%, transparent));
+      flex: 0 0 auto;
+    }
+
+
     .site-footer {
       margin-top: 32px;
       padding: 18px 16px 28px;
@@ -2255,6 +2352,12 @@
               <button type="button" class="location-btn" data-map-focus="houses">Hoop houses</button>
               <button type="button" class="location-btn" data-map-focus="perennials">Perennials</button>
             </div>
+
+            <div class="finder-map-mode" role="tablist" aria-label="Finder map view">
+              <button id="finderModeSchematic" class="finder-mode-btn active" type="button" data-map-mode="schematic" aria-pressed="true">Schematic</button>
+              <button id="finderModeBeta" class="finder-mode-btn" type="button" data-map-mode="beta" aria-pressed="false">Beta Map</button>
+            </div>
+            <p class="finder-beta-note" id="finderBetaNote" hidden>Preview the nursery on a satellite-aligned beta overlay while keeping the current Finder selection and highlighted destination synced.</p>
 
             <div class="map-pan-shell" id="mapPanShell">
               <div class="map-board" id="overviewMapBoard"></div>
@@ -2710,6 +2813,7 @@
       selectedFinderId: "",
       selectedZoneIds: [],
       selectedFlagId: "",
+      finderMapMode: "schematic",
       kioskQuery: "",
       kioskTrait: "",
       kioskResults: [],
@@ -2719,6 +2823,7 @@
     };
 
     const TRAITS = ["sun", "shade", "pollinator", "drought", "deer resistant"];
+    const FINDER_BETA_MAP_IMAGE = "./images/suburban-beta-map-teaser.png";
 
     const els = {
       html: document.documentElement,
@@ -2760,6 +2865,9 @@
       legendDisclosure: document.getElementById("legendDisclosure"),
       mobileMapTools: document.getElementById("mobileMapTools"),
       locationDetails: document.getElementById("locationDetails"),
+      finderModeSchematic: document.getElementById("finderModeSchematic"),
+      finderModeBeta: document.getElementById("finderModeBeta"),
+      finderBetaNote: document.getElementById("finderBetaNote"),
       definitionsGrid: document.getElementById("definitionsGrid"),
       zoneJumpButtons: Array.from(document.querySelectorAll("[data-zone-jump]")),
       kioskSearch: document.getElementById("kioskSearch"),
@@ -4033,6 +4141,52 @@ function renderDefinitions() {
       });
     }
 
+    function betaZoneMarkup(zone, markerItems = []) {
+      const left = (zone.x / 1020) * 100;
+      const top = (zone.y / 950) * 100;
+      const width = (zone.w / 1020) * 100;
+      const height = (zone.h / 950) * 100;
+      const marker = (markerItems || []).find(item => (item.zoneIds || []).includes(zone.id)) || null;
+      const flagColor = FLAG_COLORS[marker?.flagColor] || marker?.flagColor || primaryFlagColorForZones([zone.id]) || "#19c4c4";
+      return `
+        <div class="beta-zone-highlight" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%">
+          <div class="beta-zone-label"><span class="beta-zone-flag" style="--flag:${flagColor}"></span>${escapeHtml(zoneTitle(zone.id))}</div>
+        </div>
+      `;
+    }
+
+    function renderFinderBetaOverview(activeZoneIds = [], markerItems = []) {
+      const active = Array.isArray(activeZoneIds) ? activeZoneIds.filter(Boolean) : [];
+      const zones = active
+        .map(zoneId => MAP_ZONES.find(z => z.id === zoneId))
+        .filter(Boolean);
+      els.overviewMapBoard.innerHTML = `
+        <div class="beta-map-wrap">
+          <img class="beta-map-image" src="${FINDER_BETA_MAP_IMAGE}" alt="Suburban L&G beta satellite map overlay" />
+          <div class="beta-map-overlay">${zones.map(zone => betaZoneMarkup(zone, markerItems)).join("")}</div>
+        </div>
+      `;
+    }
+
+    function setFinderMapMode(mode) {
+      state.finderMapMode = mode === "beta" ? "beta" : "schematic";
+      els.finderModeSchematic?.classList.toggle("active", state.finderMapMode === "schematic");
+      els.finderModeBeta?.classList.toggle("active", state.finderMapMode === "beta");
+      els.finderModeSchematic?.setAttribute("aria-pressed", state.finderMapMode === "schematic" ? "true" : "false");
+      els.finderModeBeta?.setAttribute("aria-pressed", state.finderMapMode === "beta" ? "true" : "false");
+      if (els.finderBetaNote) els.finderBetaNote.hidden = state.finderMapMode !== "beta";
+      const activeZoneIds = Array.isArray(state.selectedZoneIds) && state.selectedZoneIds.length
+        ? state.selectedZoneIds
+        : (state.finderFocusedZoneId ? [state.finderFocusedZoneId] : []);
+      const selectedItem = state.selectedFinderId
+        ? getFinderItems().find(entry => entry.id === state.selectedFinderId)
+        : null;
+      const markerItems = selectedItem
+        ? [{ ...selectedItem, flagId: resolveFinderFlagId(selectedItem), flagColor: selectedItem.flagColor || primaryFlagColorForZones(selectedItem.zoneIds || []) }]
+        : activeZoneIds.map(zoneId => ({ zoneIds: [zoneId], flagId: primaryFlagIdForZones([zoneId]), flagColor: primaryFlagColorForZones([zoneId]) }));
+      renderFinderMaps(activeZoneIds, markerItems);
+    }
+
     function renderFinderMaps(activeZoneIds = [], markerItems = []) {
       const active = Array.isArray(activeZoneIds) ? activeZoneIds.filter(Boolean) : [];
       const primaryZoneId = active[0] || markerItems?.[0]?.zoneIds?.[0] || "";
@@ -4043,8 +4197,12 @@ function renderDefinitions() {
         : (primaryZone ? getZoneZoomBox(primaryZone.id) : { x: 300, y: 700, w: 620, h: 230 });
       const detailBox = expandZoomBox(baseDetailBox, 1.25);
 
-      els.overviewMapBoard.innerHTML = buildMapSvg(active, markerItems, "0 0 1020 950");
-      wireMapClicks(els.overviewMapBoard);
+      if (state.finderMapMode === "beta") {
+        renderFinderBetaOverview(active, markerItems);
+      } else {
+        els.overviewMapBoard.innerHTML = buildMapSvg(active, markerItems, "0 0 1020 950");
+        wireMapClicks(els.overviewMapBoard);
+      }
 
       els.detailMapBoard.innerHTML = buildMapSvg(detailZoneIds, markerItems, `${detailBox.x} ${detailBox.y} ${detailBox.w} ${detailBox.h}`);
       wireMapClicks(els.detailMapBoard);
@@ -4054,8 +4212,10 @@ function renderDefinitions() {
         .join(" • ");
 
       els.overviewMapCaption.textContent = primaryZone
-        ? `${active.length > 1 ? `${active.length} related zones stay highlighted` : zoneTitle(primaryZone.id)} on the full map so the rest of the nursery remains visible.${flagSummary ? ` Matching cue: ${flagSummary}.` : ""}`
-        : "The full nursery stays visible while each section uses darker blocks and reverse type for faster reading. Tap a result or any zone to highlight it.";
+        ? `${state.finderMapMode === "beta" ? "Beta Map" : active.length > 1 ? `${active.length} related zones stay highlighted` : zoneTitle(primaryZone.id)} on the full map so the rest of the nursery remains visible.${flagSummary ? ` Matching cue: ${flagSummary}.` : ""}`
+        : state.finderMapMode === "beta"
+          ? "Beta Map preview keeps the same Finder selection while showing the satellite-aligned nursery overlay."
+          : "The full nursery stays visible while each section uses darker blocks and reverse type for faster reading. Tap a result or any zone to highlight it.";
 
       els.detailMapCaption.textContent = primaryZone
         ? `Closer look: ${active.length > 1 ? active.map(zoneTitle).join(" • ") : zoneTitle(primaryZone.id)}.${flagSummary ? ` Look for ${flagSummary.toLowerCase()}.` : ""}`
@@ -4500,7 +4660,6 @@ function renderDefinitions() {
       state.finderRevealMap = false;
       renderFinderChips();
       applyFinderFilters();
-      renderFinderMaps([], []);
       els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel shows the location, any flag cue from the sheets, and a short direction line you can use with customers on the floor.</p>`;
     }
 
@@ -4734,6 +4893,8 @@ function renderDefinitions() {
         applyFinderFilters();
       });
       els.finderClearBtn.addEventListener("click", clearFinder);
+      els.finderModeSchematic?.addEventListener("click", () => setFinderMapMode("schematic"));
+      els.finderModeBeta?.addEventListener("click", () => setFinderMapMode("beta"));
       els.zoneJumpButtons.forEach(btn => {
         btn.addEventListener("click", () => handleZoneClick(btn.dataset.zoneJump));
       });
@@ -4765,7 +4926,7 @@ function renderDefinitions() {
       renderDefinitions();
       renderFlagLegend();
       renderFinderChips();
-      renderFinderMaps([], []);
+      setFinderMapMode(state.finderMapMode);
       applyFinderFilters();
       renderKioskActions();
       renderKioskMap(null);
