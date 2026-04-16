@@ -2540,7 +2540,7 @@
       "field-shrub": "flag-lower-pink",
       "field-tree": "flag-lower-blue",
       "roses": "flag-roses-red",
-      "sun-perennials": "flag-lower-orange",
+      "sun-perennials": "flag-lower-teal",
       "tropicals": "flag-lower-blue",
       "shade-perennials": "flag-lower-teal",
       "annuals": "flag-lower-orange",
@@ -2554,7 +2554,7 @@
       "house1": "flag-lower-teal",
       "a": "flag-top-black",
       "b": "flag-top-black",
-      "c": "flag-evergreen-white",
+      "c": "flag-top-black",
       "d": "flag-top-black",
       "between123": "flag-lower-teal",
       "playground": "flag-house6-yellow"
@@ -3673,7 +3673,7 @@
         return { zoneIds: ["roses"], locationLabel: "Roses & Grasses", area: "Lower-right rose section", flagColor: "red", flagId: "flag-roses-red", topCategory: "Plant" };
       }
       if (group === "Conifers" || treeClass.includes("conifer") || treeClass.includes("evergreen")) {
-        return { zoneIds: ["b", "c"], locationLabel: "Ball & Burlap B / C", area: "Conifers & evergreens", flagColor: "blue", flagId: "flag-lower-blue", topCategory: "Tree" };
+        return { zoneIds: ["b", "c"], locationLabel: "Ball & Burlap B / C", area: "Conifers & evergreens", flagColor: "black", flagId: "flag-top-black", topCategory: "Tree" };
       }
       if (group === "Fruit Trees" || treeClass.includes("fruit") || sourceSub.includes("fruit")) {
         return { zoneIds: ["between123", "house1", "house2", "house3"], locationLabel: "Between Houses 1–3", area: "Fruit trees", flagColor: "yellow", flagId: "flag-house6-yellow", topCategory: "Tree" };
@@ -3691,7 +3691,7 @@
         return { zoneIds: ["shade-perennials"], locationLabel: "Shade Perennials", area: "Shade perennial yard", flagColor: "teal", flagId: "flag-lower-teal", topCategory: "Plant" };
       }
       if (group === "Perennials - Sun" || group === "Peonies" || group === "Native Perennials" || exposure === "Sun") {
-        return { zoneIds: ["sun-perennials"], locationLabel: "Sun Perennials", area: "Sun perennial yard", flagColor: "orange", flagId: "flag-lower-orange", topCategory: "Plant" };
+        return { zoneIds: ["sun-perennials"], locationLabel: "Sun Perennials", area: "Sun perennial yard", flagColor: "teal", flagId: "flag-lower-teal", topCategory: "Plant" };
       }
       if (group === "Ground Covers" || group === "Hardy Vining Plants" || group === "Grapes & Berries" || group === "Clematis") {
         return { zoneIds: ["house1"], locationLabel: "Hoop House 1", area: "Groundcovers / vines / berries", flagColor: "yellow", flagId: "flag-house6-yellow", topCategory: "Plant" };
