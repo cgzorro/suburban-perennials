@@ -2043,23 +2043,36 @@
 
     .beta-zone-label {
       position: absolute;
-      left: 10px;
-      top: 10px;
+      left: 8px;
+      top: 8px;
       display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      align-items: flex-start;
+      gap: 7px;
       padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(7,19,37,0.78);
+      border-radius: 16px;
+      background: rgba(7,19,37,0.80);
       color: #fff;
-      font-size: .82rem;
+      font-size: .80rem;
       font-weight: 800;
-      line-height: 1;
+      line-height: 1.1;
       box-shadow: 0 8px 18px rgba(0,0,0,0.20);
-      max-width: calc(100% - 20px);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      max-width: calc(100% - 16px);
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    .beta-zone-label.narrow {
+      font-size: .70rem;
+      padding: 6px 8px;
+      gap: 6px;
+      max-width: calc(100% - 12px);
+    }
+
+    .beta-zone-label-text {
+      display: block;
+      white-space: normal;
+      overflow-wrap: anywhere;
     }
 
     .beta-zone-flag {
@@ -2080,22 +2093,43 @@
       box-shadow: 0 0 0 3px rgba(8, 24, 34, 0.28), 0 0 28px rgba(25, 196, 196, 0.30);
     }
 
+
+    .beta-zone-highlight.narrow {
+      border-radius: 14px;
+    }
+
+    .beta-house-zone .beta-zone-label {
+      left: 6px;
+      top: 6px;
+      max-width: calc(100% - 12px);
+      font-size: .68rem;
+      padding: 6px 7px;
+      gap: 5px;
+    }
+
+    .beta-house-zone .beta-zone-flag {
+      border-top-width: 7px;
+      border-bottom-width: 7px;
+      border-left-width: 11px;
+    }
+
     .beta-zone-label {
       position: absolute;
-      left: 10px;
-      top: 10px;
+      left: 8px;
+      top: 8px;
       display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 999px;
+      align-items: flex-start;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 16px;
       background: rgba(7, 19, 37, 0.84);
       color: #fff;
-      font-size: .86rem;
+      font-size: .80rem;
       font-weight: 800;
-      line-height: 1;
+      line-height: 1.1;
       backdrop-filter: blur(4px);
-      max-width: calc(100% - 20px);
+      max-width: calc(100% - 16px);
+      white-space: normal;
     }
 
     .beta-zone-flag {
@@ -4206,20 +4240,37 @@ function renderDefinitions() {
         "shade-perennials": "Shade Perennials",
         "roses": "Roses & Grasses",
         "rock-yard": "Rock Yard",
-        "bc": "B & C Trees"
+        "bc": "B & C Trees",
+        "fruit-edibles": "Fruit & Edibles",
+        "house1": "Ground Covers",
+        "house2": "Yews",
+        "house3": "Shade Shrubs",
+        "house4": "Azalea / Rhody",
+        "house5": "Hydrangeas",
+        "house6": "Redbud / Magnolia",
+        "house7": "Japanese Maples",
+        "house8": "Dogwoods"
       };
       return custom[zoneId] || zoneTitle(zoneId);
     }
 
     const BETA_ZONE_RECT_OVERRIDES = {
-      "rock-yard": { left: 10.5, top: 52.0, width: 20.0, height: 31.0 },
-      "field-shrub": { left: 48.0, top: 47.8, width: 12.5, height: 9.6 },
-      "sun-perennials": { left: 35.0, top: 56.0, width: 42.0, height: 13.5 },
-      "roses": { left: 59.0, top: 56.2, width: 22.5, height: 22.0 },
-      "tropicals": { left: 30.0, top: 77.2, width: 13.5, height: 11.2 },
-      "shade-perennials": { left: 33.5, top: 67.3, width: 42.0, height: 10.0 },
-      "annuals": { left: 46.5, top: 78.0, width: 18.0, height: 10.2 },
-      "fruit-edibles": { left: 63.8, top: 77.8, width: 18.0, height: 10.2 }
+      "rock-yard": { left: 9.8, top: 51.6, width: 20.5, height: 31.8 },
+      "field-shrub": { left: 49.6, top: 46.8, width: 12.0, height: 9.0 },
+      "sun-perennials": { left: 37.8, top: 55.4, width: 43.8, height: 13.6 },
+      "roses": { left: 61.8, top: 56.0, width: 21.8, height: 21.8 },
+      "tropicals": { left: 28.4, top: 75.8, width: 13.0, height: 11.0 },
+      "shade-perennials": { left: 38.6, top: 66.1, width: 39.8, height: 9.6 },
+      "annuals": { left: 52.4, top: 77.0, width: 17.6, height: 9.6 },
+      "fruit-edibles": { left: 67.8, top: 77.0, width: 16.2, height: 9.8 },
+      "house1": { left: 84.4, top: 77.6, width: 11.5, height: 8.2 },
+      "house2": { left: 84.5, top: 69.0, width: 11.5, height: 8.0 },
+      "house3": { left: 84.6, top: 60.4, width: 11.5, height: 8.0 },
+      "house4": { left: 84.7, top: 51.8, width: 11.5, height: 8.0 },
+      "house5": { left: 84.8, top: 43.2, width: 11.5, height: 8.0 },
+      "house6": { left: 84.9, top: 34.6, width: 11.5, height: 8.0 },
+      "house7": { left: 85.0, top: 26.0, width: 11.5, height: 8.0 },
+      "house8": { left: 85.1, top: 17.4, width: 11.5, height: 8.0 }
     };
 
     function betaZoneRect(zone) {
@@ -4239,9 +4290,12 @@ function renderDefinitions() {
       const { left, top, width, height } = betaZoneRect(zone);
       const marker = (markerItems || []).find(item => (item.zoneIds || []).includes(zone.id)) || null;
       const flagColor = FLAG_COLORS[marker?.flagColor] || marker?.flagColor || primaryFlagColorForZones([zone.id]) || "#19c4c4";
+      const isHouse = /^house\d$/.test(zone.id);
+      const narrowClass = width <= 14 || isHouse ? " narrow" : "";
+      const houseClass = isHouse ? " beta-house-zone" : "";
       return `
-        <div class="beta-zone-highlight active" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%;--beta-zone-color:${flagColor}">
-          <div class="beta-zone-label"><span class="beta-zone-flag" style="--flag:${flagColor}"></span>${escapeHtml(betaZoneLabel(zone.id))}</div>
+        <div class="beta-zone-highlight active${houseClass}${narrowClass}" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%;--beta-zone-color:${flagColor}">
+          <div class="beta-zone-label${narrowClass}"><span class="beta-zone-flag" style="--flag:${flagColor}"></span><span class="beta-zone-label-text">${escapeHtml(betaZoneLabel(zone.id))}</span></div>
         </div>
       `;
     }
