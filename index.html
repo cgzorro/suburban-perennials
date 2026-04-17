@@ -2007,36 +2007,77 @@
       object-fit: cover;
     }
 
+
     .beta-map-overlay {
       position: absolute;
       inset: 0;
       pointer-events: none;
     }
 
-    .beta-map-scrim {
-      position: absolute;
-      inset: 0;
-      background: rgba(3, 10, 18, 0.22);
-    }
-
     .beta-zone-highlight {
       position: absolute;
-      border-radius: 18px;
-      border: 3px solid var(--beta-zone-color, rgba(25, 196, 196, 0.95));
-      background: color-mix(in srgb, var(--beta-zone-color, #19c4c4) 18%, transparent);
+      border-radius: 20px;
+      background: color-mix(in srgb, var(--beta-zone-color, #19c4c4) 22%, transparent);
+      border: 2px solid color-mix(in srgb, var(--beta-zone-color, #19c4c4) 72%, white 8%);
       box-shadow:
-        0 0 0 3px rgba(8, 24, 34, 0.28),
-        0 0 28px color-mix(in srgb, var(--beta-zone-color, #19c4c4) 38%, transparent);
-      animation: betaZonePulse 2.2s ease-in-out infinite;
+        0 0 0 1px rgba(255,255,255,0.10) inset,
+        0 0 18px color-mix(in srgb, var(--beta-zone-color, #19c4c4) 35%, transparent);
+      backdrop-filter: saturate(1.02);
     }
 
     .beta-zone-highlight::after {
       content: "";
       position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14);
-      pointer-events: none;
+      inset: -8px;
+      border-radius: 26px;
+      border: 1px solid color-mix(in srgb, var(--beta-zone-color, #19c4c4) 40%, transparent);
+      opacity: .7;
+    }
+
+    .beta-zone-highlight.active {
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,0.14) inset,
+        0 0 24px color-mix(in srgb, var(--beta-zone-color, #19c4c4) 55%, transparent),
+        0 0 44px color-mix(in srgb, var(--beta-zone-color, #19c4c4) 28%, transparent);
+    }
+
+    .beta-zone-label {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(7,19,37,0.78);
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 800;
+      line-height: 1;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.20);
+      max-width: calc(100% - 20px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .beta-zone-flag {
+      width: 0;
+      height: 0;
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      border-left: 15px solid var(--flag, #19c4c4);
+      filter: drop-shadow(0 0 8px color-mix(in srgb, var(--flag, #19c4c4) 50%, transparent));
+      flex: 0 0 auto;
+    }
+
+    .beta-zone-highlight {
+      position: absolute;
+      border-radius: 18px;
+      border: 3px solid rgba(25, 196, 196, 0.95);
+      background: rgba(25, 196, 196, 0.16);
+      box-shadow: 0 0 0 3px rgba(8, 24, 34, 0.28), 0 0 28px rgba(25, 196, 196, 0.30);
     }
 
     .beta-zone-label {
@@ -2055,7 +2096,6 @@
       line-height: 1;
       backdrop-filter: blur(4px);
       max-width: calc(100% - 20px);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.16);
     }
 
     .beta-zone-flag {
@@ -2067,53 +2107,6 @@
       color: var(--flag, #19c4c4);
       filter: drop-shadow(0 0 10px color-mix(in srgb, currentColor 55%, transparent));
       flex: 0 0 auto;
-    }
-
-    .beta-selection-badge {
-      position: absolute;
-      left: 14px;
-      right: 14px;
-      bottom: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(7, 19, 37, 0.88);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #fff;
-      font-size: .88rem;
-      font-weight: 700;
-      line-height: 1.2;
-      backdrop-filter: blur(5px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.18);
-      max-width: calc(100% - 28px);
-    }
-
-    .beta-selection-title {
-      font-weight: 850;
-      letter-spacing: -0.01em;
-    }
-
-    .beta-selection-meta {
-      color: rgba(255,255,255,0.78);
-      font-size: .8rem;
-      font-weight: 700;
-    }
-
-    @keyframes betaZonePulse {
-      0%, 100% {
-        transform: scale(1);
-        box-shadow:
-          0 0 0 3px rgba(8, 24, 34, 0.28),
-          0 0 28px color-mix(in srgb, var(--beta-zone-color, #19c4c4) 38%, transparent);
-      }
-      50% {
-        transform: scale(1.01);
-        box-shadow:
-          0 0 0 4px rgba(8, 24, 34, 0.24),
-          0 0 36px color-mix(in srgb, var(--beta-zone-color, #19c4c4) 54%, transparent);
-      }
     }
 
 
@@ -4207,6 +4200,17 @@ function renderDefinitions() {
       });
     }
 
+    function betaZoneLabel(zoneId) {
+      const custom = {
+        "perennials-sun": "Perennials Sun",
+        "shade-perennials": "Shade Perennials",
+        "roses": "Roses & Grasses",
+        "rock-yard": "Rock Yard",
+        "bc": "B & C Trees"
+      };
+      return custom[zoneId] || zoneTitle(zoneId);
+    }
+
     function betaZoneMarkup(zone, markerItems = []) {
       const left = (zone.x / 1020) * 100;
       const top = (zone.y / 950) * 100;
@@ -4215,27 +4219,21 @@ function renderDefinitions() {
       const marker = (markerItems || []).find(item => (item.zoneIds || []).includes(zone.id)) || null;
       const flagColor = FLAG_COLORS[marker?.flagColor] || marker?.flagColor || primaryFlagColorForZones([zone.id]) || "#19c4c4";
       return `
-        <div class="beta-zone-highlight" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%;--beta-zone-color:${flagColor}">
-          <div class="beta-zone-label"><span class="beta-zone-flag" style="--flag:${flagColor}"></span>${escapeHtml(zoneTitle(zone.id))}</div>
+        <div class="beta-zone-highlight active" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%;--beta-zone-color:${flagColor}">
+          <div class="beta-zone-label"><span class="beta-zone-flag" style="--flag:${flagColor}"></span>${escapeHtml(betaZoneLabel(zone.id))}</div>
         </div>
       `;
     }
 
-    function renderFinderBetaOverview(activeZoneIds = [], markerItems = [], selected = null) {
+    function renderFinderBetaOverview(activeZoneIds = [], markerItems = []) {
       const active = Array.isArray(activeZoneIds) ? activeZoneIds.filter(Boolean) : [];
       const zones = active
         .map(zoneId => MAP_ZONES.find(z => z.id === zoneId))
         .filter(Boolean);
-      const selectedTitle = selected?.name || (zones.length === 1 ? zoneTitle(zones[0].id) : active.length ? `${active.length} active areas` : "");
-      const selectedMeta = selected?.locationLabel || selected?.area || (zones.length ? zones.map(zone => zoneTitle(zone.id)).join(" • ") : "Preview layer");
       els.overviewMapBoard.innerHTML = `
         <div class="beta-map-wrap">
           <img class="beta-map-image" src="${FINDER_BETA_MAP_IMAGE}" alt="Suburban L&G beta satellite map overlay" />
-          <div class="beta-map-overlay">
-            <div class="beta-map-scrim"></div>
-            ${zones.map(zone => betaZoneMarkup(zone, markerItems)).join("")}
-            ${selectedTitle ? `<div class="beta-selection-badge"><span class="beta-zone-flag" style="--flag:${FLAG_COLORS[selected?.flagColor] || selected?.flagColor || primaryFlagColorForZones(active) || '#19c4c4'}"></span><div><div class="beta-selection-title">${escapeHtml(selectedTitle)}</div><div class="beta-selection-meta">${escapeHtml(selectedMeta)}</div></div></div>` : ""}
-          </div>
+          <div class="beta-map-overlay">${zones.map(zone => betaZoneMarkup(zone, markerItems)).join("")}</div>
         </div>
       `;
     }
@@ -4270,7 +4268,7 @@ function renderDefinitions() {
       const detailBox = expandZoomBox(baseDetailBox, 1.25);
 
       if (state.finderMapMode === "beta") {
-        renderFinderBetaOverview(active, markerItems, markerItems?.[0] || null);
+        renderFinderBetaOverview(active, markerItems);
       } else {
         els.overviewMapBoard.innerHTML = buildMapSvg(active, markerItems, "0 0 1020 950");
         wireMapClicks(els.overviewMapBoard);
