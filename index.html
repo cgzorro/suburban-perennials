@@ -1257,10 +1257,6 @@
     }
 
     @media (max-width: 900px) {
-      .beta-house-guide {
-        grid-template-columns: 1fr;
-      }
-
       .container {
         width: min(100%, calc(100% - 14px));
         padding: 12px 0 18px;
@@ -1577,10 +1573,6 @@
     }
 
     @media (max-width: 900px) {
-      .beta-house-guide {
-        grid-template-columns: 1fr;
-      }
-
       .flag-chip-note {
         width: 100%;
         border-radius: 16px;
@@ -1855,10 +1847,6 @@
     }
 
     @media (max-width: 900px) {
-      .beta-house-guide {
-        grid-template-columns: 1fr;
-      }
-
       .kiosk-grid { grid-template-columns: 1fr; }
       .kiosk-side { grid-template-columns: 1fr; }
     }
@@ -1916,10 +1904,6 @@
 
     /* Header-only finish pass */
     @media (max-width: 900px) {
-      .beta-house-guide {
-        grid-template-columns: 1fr;
-      }
-
       .hero {
         gap: 14px;
         padding: 16px 14px 15px;
@@ -1967,301 +1951,6 @@
         width: 18px;
         height: 18px;
       }
-    }
-
-
-    .finder-map-mode {
-      display: inline-flex;
-      gap: 8px;
-      padding: 6px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: var(--bg-soft);
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-
-    .finder-mode-btn {
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--text);
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: background .18s ease, border-color .18s ease, color .18s ease;
-    }
-
-    .finder-mode-btn.active {
-      background: linear-gradient(180deg, #19c4c4, #0ea5a5);
-      color: #fff;
-      border-color: rgba(255,255,255,0.12);
-    }
-
-    .finder-beta-note {
-      margin: 0 0 12px;
-      color: var(--text-muted);
-      font-size: .92rem;
-      line-height: 1.35;
-    }
-
-    .beta-map-wrap {
-      position: relative;
-      width: 100%;
-      border-radius: 18px;
-      overflow: hidden;
-      min-height: 360px;
-      background: var(--map-bg);
-      border: 1px solid rgba(166, 187, 203, 0.18);
-    }
-
-    .beta-map-image {
-      display: block;
-      width: 100%;
-      height: auto;
-      min-height: 360px;
-      object-fit: cover;
-    }
-
-
-    .beta-map-overlay {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-
-    .beta-zone-highlight {
-      position: absolute;
-      border-radius: 20px;
-      background: color-mix(in srgb, var(--beta-zone-color, #19c4c4) 22%, transparent);
-      border: 2px solid color-mix(in srgb, var(--beta-zone-color, #19c4c4) 72%, white 8%);
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.10) inset,
-        0 0 18px color-mix(in srgb, var(--beta-zone-color, #19c4c4) 35%, transparent);
-      backdrop-filter: saturate(1.02);
-    }
-
-    .beta-zone-highlight::after {
-      content: "";
-      position: absolute;
-      inset: -8px;
-      border-radius: 26px;
-      border: 1px solid color-mix(in srgb, var(--beta-zone-color, #19c4c4) 40%, transparent);
-      opacity: .7;
-    }
-
-    .beta-zone-highlight.active {
-      box-shadow:
-        0 0 0 2px rgba(255,255,255,0.14) inset,
-        0 0 24px color-mix(in srgb, var(--beta-zone-color, #19c4c4) 55%, transparent),
-        0 0 44px color-mix(in srgb, var(--beta-zone-color, #19c4c4) 28%, transparent);
-    }
-
-    .beta-zone-label {
-      position: absolute;
-      left: 8px;
-      top: 8px;
-      display: inline-flex;
-      align-items: flex-start;
-      gap: 7px;
-      padding: 7px 10px;
-      border-radius: 16px;
-      background: rgba(7,19,37,0.80);
-      color: #fff;
-      font-size: .80rem;
-      font-weight: 800;
-      line-height: 1.1;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.20);
-      max-width: calc(100% - 16px);
-      white-space: normal;
-      overflow: visible;
-      text-overflow: clip;
-    }
-
-    .beta-zone-label.narrow {
-      font-size: .70rem;
-      padding: 6px 8px;
-      gap: 6px;
-      max-width: calc(100% - 12px);
-    }
-
-    .beta-zone-label-text {
-      display: block;
-      white-space: normal;
-      overflow-wrap: anywhere;
-    }
-
-    .beta-zone-flag {
-      width: 0;
-      height: 0;
-      border-top: 9px solid transparent;
-      border-bottom: 9px solid transparent;
-      border-left: 15px solid var(--flag, #19c4c4);
-      filter: drop-shadow(0 0 8px color-mix(in srgb, var(--flag, #19c4c4) 50%, transparent));
-      flex: 0 0 auto;
-    }
-
-    .beta-zone-highlight {
-      position: absolute;
-      border-radius: 18px;
-      border: 3px solid rgba(25, 196, 196, 0.95);
-      background: rgba(25, 196, 196, 0.16);
-      box-shadow: 0 0 0 3px rgba(8, 24, 34, 0.28), 0 0 28px rgba(25, 196, 196, 0.30);
-    }
-
-
-    .beta-zone-highlight.narrow {
-      border-radius: 14px;
-    }
-
-    .beta-house-zone .beta-zone-label {
-      left: 6px;
-      top: 6px;
-      max-width: calc(100% - 12px);
-      font-size: .68rem;
-      padding: 6px 7px;
-      gap: 5px;
-    }
-
-    .beta-house-zone .beta-zone-flag {
-      border-top-width: 7px;
-      border-bottom-width: 7px;
-      border-left-width: 11px;
-    }
-
-    .beta-zone-label {
-      position: absolute;
-      left: 8px;
-      top: 8px;
-      display: inline-flex;
-      align-items: flex-start;
-      gap: 7px;
-      padding: 7px 10px;
-      border-radius: 16px;
-      background: rgba(7, 19, 37, 0.84);
-      color: #fff;
-      font-size: .80rem;
-      font-weight: 800;
-      line-height: 1.1;
-      backdrop-filter: blur(4px);
-      max-width: calc(100% - 16px);
-      white-space: normal;
-    }
-
-    .beta-zone-flag {
-      width: 0;
-      height: 0;
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
-      border-left: 14px solid currentColor;
-      color: var(--flag, #19c4c4);
-      filter: drop-shadow(0 0 10px color-mix(in srgb, currentColor 55%, transparent));
-      flex: 0 0 auto;
-    }
-
-
-
-    .beta-zone-label {
-      max-width: calc(100% - 10px);
-      font-size: .72rem;
-      line-height: 1.04;
-      padding: 6px 8px;
-    }
-
-    .beta-zone-label-text {
-      display: block;
-      white-space: normal;
-      overflow-wrap: break-word;
-      word-break: normal;
-      text-wrap: balance;
-    }
-
-    .beta-house-zone .beta-zone-highlight {
-      border-radius: 16px;
-    }
-
-    .beta-house-zone .beta-zone-label {
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 26px;
-      height: 26px;
-      min-height: 26px;
-      padding: 0;
-      border-radius: 999px;
-      background: rgba(7, 19, 37, 0.92);
-      border: 1px solid rgba(255,255,255,0.18);
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      gap: 0;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.28);
-    }
-
-    .beta-house-zone .beta-zone-label-text {
-      display: none;
-    }
-
-    .beta-house-zone .beta-zone-flag {
-      display: none;
-    }
-
-    .beta-house-zone .beta-zone-number {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      border-radius: 999px;
-      background: transparent;
-      border: none;
-      color: #fff;
-      font-size: .78rem;
-      font-weight: 900;
-    }
-
-    .beta-house-guide {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .beta-house-guide-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: color-mix(in srgb, var(--panel) 92%, transparent);
-      color: var(--text);
-      font-size: .82rem;
-      line-height: 1.15;
-      box-shadow: var(--shadow-sm, 0 8px 20px rgba(0,0,0,0.18));
-    }
-
-    .beta-house-guide-num {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      background: rgba(7, 19, 37, 0.92);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: #fff;
-      font-size: .74rem;
-      font-weight: 900;
-      flex: 0 0 auto;
-    }
-
-    .beta-house-guide-text {
-      min-width: 0;
-      font-weight: 700;
-    }
-
-      flex: 0 0 auto;
     }
 
 
@@ -2321,10 +2010,6 @@
     }
 
     @media (max-width: 900px) {
-      .beta-house-guide {
-        grid-template-columns: 1fr;
-      }
-
       .site-footer-logo {
         width: 58px;
         height: 58px;
@@ -2570,12 +2255,6 @@
               <button type="button" class="location-btn" data-map-focus="houses">Hoop houses</button>
               <button type="button" class="location-btn" data-map-focus="perennials">Perennials</button>
             </div>
-
-            <div class="finder-map-mode" role="tablist" aria-label="Finder map view">
-              <button id="finderModeSchematic" class="finder-mode-btn active" type="button" data-map-mode="schematic" aria-pressed="true">Schematic</button>
-              <button id="finderModeBeta" class="finder-mode-btn" type="button" data-map-mode="beta" aria-pressed="false">Beta Map</button>
-            </div>
-            <p class="finder-beta-note" id="finderBetaNote" hidden>Preview the nursery on a satellite-aligned beta overlay while keeping the current Finder selection and highlighted destination synced.</p>
 
             <div class="map-pan-shell" id="mapPanShell">
               <div class="map-board" id="overviewMapBoard"></div>
@@ -3031,7 +2710,6 @@
       selectedFinderId: "",
       selectedZoneIds: [],
       selectedFlagId: "",
-      finderMapMode: "schematic",
       kioskQuery: "",
       kioskTrait: "",
       kioskResults: [],
@@ -3041,7 +2719,6 @@
     };
 
     const TRAITS = ["sun", "shade", "pollinator", "drought", "deer resistant"];
-    const FINDER_BETA_MAP_IMAGE = "./images/suburban-beta-map-teaser.png";
 
     const els = {
       html: document.documentElement,
@@ -3083,9 +2760,6 @@
       legendDisclosure: document.getElementById("legendDisclosure"),
       mobileMapTools: document.getElementById("mobileMapTools"),
       locationDetails: document.getElementById("locationDetails"),
-      finderModeSchematic: document.getElementById("finderModeSchematic"),
-      finderModeBeta: document.getElementById("finderModeBeta"),
-      finderBetaNote: document.getElementById("finderBetaNote"),
       definitionsGrid: document.getElementById("definitionsGrid"),
       zoneJumpButtons: Array.from(document.querySelectorAll("[data-zone-jump]")),
       kioskSearch: document.getElementById("kioskSearch"),
@@ -4359,132 +4033,6 @@ function renderDefinitions() {
       });
     }
 
-    function betaZoneLabel(zoneId) {
-      const custom = {
-        "perennials-sun": "Perennials Sun",
-        "shade-perennials": "Shade Perennials",
-        "roses": "Roses & Grasses",
-        "rock-yard": "Rock Yard",
-        "bc": "B & C Trees",
-        "fruit-edibles": "Fruit & Edibles",
-        "house1": "Ground Covers",
-        "house2": "Yews",
-        "house3": "Shade Shrubs",
-        "house4": "Azalea / Rhody",
-        "house5": "Hydrangeas",
-        "house6": "Redbud / Magnolia",
-        "house7": "Japanese Maples",
-        "house8": "Dogwoods"
-      };
-      return custom[zoneId] || zoneTitle(zoneId);
-    }
-
-    const BETA_ZONE_RECT_OVERRIDES = {
-      "rock-yard": { left: 7.2, top: 50.4, width: 20.2, height: 31.8 },
-      "field-shrub": { left: 49.4, top: 49.6, width: 8.8, height: 7.8 },
-      "sun-perennials": { left: 53.6, top: 55.2, width: 15.8, height: 10.6 },
-      "roses": { left: 57.6, top: 50.0, width: 14.6, height: 18.0 },
-      "tropicals": { left: 33.4, top: 66.2, width: 11.8, height: 7.8 },
-      "shade-perennials": { left: 50.6, top: 61.8, width: 18.6, height: 7.6 },
-      "annuals": { left: 51.6, top: 70.2, width: 13.2, height: 7.8 },
-      "fruit-edibles": { left: 68.6, top: 62.0, width: 7.0, height: 15.4 },
-      "house1": { left: 85.9, top: 72.4, width: 4.8, height: 4.8 },
-      "house2": { left: 85.9, top: 65.5, width: 4.8, height: 4.8 },
-      "house3": { left: 85.9, top: 58.6, width: 4.8, height: 4.8 },
-      "house4": { left: 85.9, top: 51.7, width: 4.8, height: 4.8 },
-      "house5": { left: 85.9, top: 44.8, width: 4.8, height: 4.8 },
-      "house6": { left: 85.9, top: 37.9, width: 4.8, height: 4.8 },
-      "house7": { left: 85.9, top: 31.0, width: 4.8, height: 4.8 },
-      "house8": { left: 85.9, top: 24.1, width: 4.8, height: 4.8 }
-    };
-
-    function betaZoneRect(zone) {
-      const override = BETA_ZONE_RECT_OVERRIDES[zone.id];
-      if (override) {
-        return override;
-      }
-      return {
-        left: (zone.x / 1020) * 100,
-        top: (zone.y / 950) * 100,
-        width: (zone.w / 1020) * 100,
-        height: (zone.h / 950) * 100
-      };
-    }
-
-    function betaZoneMarkup(zone, markerItems = []) {
-      const { left, top, width, height } = betaZoneRect(zone);
-      const marker = (markerItems || []).find(item => (item.zoneIds || []).includes(zone.id)) || null;
-      const flagColor = FLAG_COLORS[marker?.flagColor] || marker?.flagColor || primaryFlagColorForZones([zone.id]) || "#19c4c4";
-      const isHouse = /^house\d$/.test(zone.id);
-      const narrowClass = width <= 14 || isHouse ? " narrow" : "";
-      const houseClass = isHouse ? " beta-house-zone" : "";
-      const houseNumber = isHouse ? zone.id.replace("house", "") : "";
-      const labelInner = isHouse
-        ? `<span class="beta-zone-number">${escapeHtml(houseNumber)}</span>`
-        : `<span class="beta-zone-flag" style="--flag:${flagColor}"></span><span class="beta-zone-label-text">${escapeHtml(betaZoneLabel(zone.id))}</span>`;
-      return `
-        <div class="beta-zone-highlight active${houseClass}${narrowClass}" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%;--beta-zone-color:${flagColor}">
-          <div class="beta-zone-label${narrowClass}">${labelInner}</div>
-        </div>
-      `;
-    }
-
-    function renderBetaHouseGuide() {
-      const houses = [
-        [8, "Dogwoods"],
-        [7, "Japanese Maples"],
-        [6, "Redbud / Magnolia"],
-        [5, "Hydrangeas"],
-        [4, "Azalea / Rhody"],
-        [3, "Shade Shrubs"],
-        [2, "Yews"],
-        [1, "Ground Covers"]
-      ];
-      return `
-        <div class="beta-house-guide" aria-label="Hoop house guide">
-          ${houses.map(([num, label]) => `
-            <div class="beta-house-guide-item">
-              <span class="beta-house-guide-num">${num}</span>
-              <span class="beta-house-guide-text">${escapeHtml(label)}</span>
-            </div>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    function renderFinderBetaOverview(activeZoneIds = [], markerItems = []) {
-      const active = Array.isArray(activeZoneIds) ? activeZoneIds.filter(Boolean) : [];
-      const zones = active
-        .map(zoneId => MAP_ZONES.find(z => z.id === zoneId))
-        .filter(Boolean);
-      els.overviewMapBoard.innerHTML = `
-        <div class="beta-map-wrap">
-          <img class="beta-map-image" src="${FINDER_BETA_MAP_IMAGE}" alt="Suburban L&G beta satellite map overlay" />
-          <div class="beta-map-overlay">${zones.map(zone => betaZoneMarkup(zone, markerItems)).join("")}</div>
-        </div>
-        ${renderBetaHouseGuide()}
-      `;
-    }
-
-    function setFinderMapMode(mode) {
-      state.finderMapMode = mode === "beta" ? "beta" : "schematic";
-      els.finderModeSchematic?.classList.toggle("active", state.finderMapMode === "schematic");
-      els.finderModeBeta?.classList.toggle("active", state.finderMapMode === "beta");
-      els.finderModeSchematic?.setAttribute("aria-pressed", state.finderMapMode === "schematic" ? "true" : "false");
-      els.finderModeBeta?.setAttribute("aria-pressed", state.finderMapMode === "beta" ? "true" : "false");
-      if (els.finderBetaNote) els.finderBetaNote.hidden = state.finderMapMode !== "beta";
-      const activeZoneIds = Array.isArray(state.selectedZoneIds) && state.selectedZoneIds.length
-        ? state.selectedZoneIds
-        : (state.finderFocusedZoneId ? [state.finderFocusedZoneId] : []);
-      const selectedItem = state.selectedFinderId
-        ? getFinderItems().find(entry => entry.id === state.selectedFinderId)
-        : null;
-      const markerItems = selectedItem
-        ? [{ ...selectedItem, flagId: resolveFinderFlagId(selectedItem), flagColor: selectedItem.flagColor || primaryFlagColorForZones(selectedItem.zoneIds || []) }]
-        : activeZoneIds.map(zoneId => ({ zoneIds: [zoneId], flagId: primaryFlagIdForZones([zoneId]), flagColor: primaryFlagColorForZones([zoneId]) }));
-      renderFinderMaps(activeZoneIds, markerItems);
-    }
-
     function renderFinderMaps(activeZoneIds = [], markerItems = []) {
       const active = Array.isArray(activeZoneIds) ? activeZoneIds.filter(Boolean) : [];
       const primaryZoneId = active[0] || markerItems?.[0]?.zoneIds?.[0] || "";
@@ -4495,12 +4043,8 @@ function renderDefinitions() {
         : (primaryZone ? getZoneZoomBox(primaryZone.id) : { x: 300, y: 700, w: 620, h: 230 });
       const detailBox = expandZoomBox(baseDetailBox, 1.25);
 
-      if (state.finderMapMode === "beta") {
-        renderFinderBetaOverview(active, markerItems);
-      } else {
-        els.overviewMapBoard.innerHTML = buildMapSvg(active, markerItems, "0 0 1020 950");
-        wireMapClicks(els.overviewMapBoard);
-      }
+      els.overviewMapBoard.innerHTML = buildMapSvg(active, markerItems, "0 0 1020 950");
+      wireMapClicks(els.overviewMapBoard);
 
       els.detailMapBoard.innerHTML = buildMapSvg(detailZoneIds, markerItems, `${detailBox.x} ${detailBox.y} ${detailBox.w} ${detailBox.h}`);
       wireMapClicks(els.detailMapBoard);
@@ -4510,10 +4054,8 @@ function renderDefinitions() {
         .join(" • ");
 
       els.overviewMapCaption.textContent = primaryZone
-        ? `${state.finderMapMode === "beta" ? "Beta Map" : active.length > 1 ? `${active.length} related zones stay highlighted` : zoneTitle(primaryZone.id)} on the full map so the rest of the nursery remains visible.${flagSummary ? ` Matching cue: ${flagSummary}.` : ""}`
-        : state.finderMapMode === "beta"
-          ? "Beta Map preview keeps the same Finder selection while showing the satellite-aligned nursery overlay."
-          : "The full nursery stays visible while each section uses darker blocks and reverse type for faster reading. Tap a result or any zone to highlight it.";
+        ? `${active.length > 1 ? `${active.length} related zones stay highlighted` : zoneTitle(primaryZone.id)} on the full map so the rest of the nursery remains visible.${flagSummary ? ` Matching cue: ${flagSummary}.` : ""}`
+        : "The full nursery stays visible while each section uses darker blocks and reverse type for faster reading. Tap a result or any zone to highlight it.";
 
       els.detailMapCaption.textContent = primaryZone
         ? `Closer look: ${active.length > 1 ? active.map(zoneTitle).join(" • ") : zoneTitle(primaryZone.id)}.${flagSummary ? ` Look for ${flagSummary.toLowerCase()}.` : ""}`
@@ -4958,6 +4500,7 @@ function renderDefinitions() {
       state.finderRevealMap = false;
       renderFinderChips();
       applyFinderFilters();
+      renderFinderMaps([], []);
       els.locationDetails.innerHTML = `<h3>Select a plant or zone</h3><p class="finder-note">This panel shows the location, any flag cue from the sheets, and a short direction line you can use with customers on the floor.</p>`;
     }
 
@@ -5191,8 +4734,6 @@ function renderDefinitions() {
         applyFinderFilters();
       });
       els.finderClearBtn.addEventListener("click", clearFinder);
-      els.finderModeSchematic?.addEventListener("click", () => setFinderMapMode("schematic"));
-      els.finderModeBeta?.addEventListener("click", () => setFinderMapMode("beta"));
       els.zoneJumpButtons.forEach(btn => {
         btn.addEventListener("click", () => handleZoneClick(btn.dataset.zoneJump));
       });
@@ -5224,7 +4765,7 @@ function renderDefinitions() {
       renderDefinitions();
       renderFlagLegend();
       renderFinderChips();
-      setFinderMapMode(state.finderMapMode);
+      renderFinderMaps([], []);
       applyFinderFilters();
       renderKioskActions();
       renderKioskMap(null);
