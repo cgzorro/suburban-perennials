@@ -4380,22 +4380,22 @@ function renderDefinitions() {
     }
 
     const BETA_ZONE_RECT_OVERRIDES = {
-      "rock-yard": { left: 6.8, top: 49.0, width: 20.8, height: 33.8 },
-      "field-shrub": { left: 50.8, top: 48.8, width: 10.2, height: 8.6 },
-      "sun-perennials": { left: 47.8, top: 56.0, width: 25.8, height: 11.8 },
-      "roses": { left: 66.6, top: 54.0, width: 15.0, height: 18.2 },
-      "tropicals": { left: 29.8, top: 63.2, width: 16.0, height: 9.8 },
-      "shade-perennials": { left: 53.6, top: 65.2, width: 18.4, height: 7.8 },
-      "annuals": { left: 55.8, top: 73.8, width: 13.8, height: 8.4 },
-      "fruit-edibles": { left: 70.8, top: 64.8, width: 7.0, height: 18.6 },
-      "house1": { left: 89.9, top: 73.4, width: 5.2, height: 5.6 },
-      "house2": { left: 89.9, top: 65.8, width: 5.2, height: 5.6 },
-      "house3": { left: 89.9, top: 58.2, width: 5.2, height: 5.6 },
-      "house4": { left: 89.9, top: 50.6, width: 5.2, height: 5.6 },
-      "house5": { left: 89.9, top: 43.0, width: 5.2, height: 5.6 },
-      "house6": { left: 89.9, top: 35.4, width: 5.2, height: 5.6 },
-      "house7": { left: 89.9, top: 27.8, width: 5.2, height: 5.6 },
-      "house8": { left: 89.9, top: 20.2, width: 5.2, height: 5.6 }
+      "rock-yard": { left: 7.2, top: 50.4, width: 20.2, height: 31.8 },
+      "field-shrub": { left: 49.4, top: 49.6, width: 8.8, height: 7.8 },
+      "sun-perennials": { left: 53.6, top: 55.2, width: 15.8, height: 10.6 },
+      "roses": { left: 57.6, top: 50.0, width: 14.6, height: 18.0 },
+      "tropicals": { left: 33.4, top: 66.2, width: 11.8, height: 7.8 },
+      "shade-perennials": { left: 50.6, top: 61.8, width: 18.6, height: 7.6 },
+      "annuals": { left: 51.6, top: 70.2, width: 13.2, height: 7.8 },
+      "fruit-edibles": { left: 68.6, top: 62.0, width: 7.0, height: 15.4 },
+      "house1": { left: 85.9, top: 72.4, width: 4.8, height: 4.8 },
+      "house2": { left: 85.9, top: 65.5, width: 4.8, height: 4.8 },
+      "house3": { left: 85.9, top: 58.6, width: 4.8, height: 4.8 },
+      "house4": { left: 85.9, top: 51.7, width: 4.8, height: 4.8 },
+      "house5": { left: 85.9, top: 44.8, width: 4.8, height: 4.8 },
+      "house6": { left: 85.9, top: 37.9, width: 4.8, height: 4.8 },
+      "house7": { left: 85.9, top: 31.0, width: 4.8, height: 4.8 },
+      "house8": { left: 85.9, top: 24.1, width: 4.8, height: 4.8 }
     };
 
     function betaZoneRect(zone) {
@@ -4420,7 +4420,7 @@ function renderDefinitions() {
       const houseClass = isHouse ? " beta-house-zone" : "";
       const houseNumber = isHouse ? zone.id.replace("house", "") : "";
       const labelInner = isHouse
-        ? `<span class="beta-zone-number">${escapeHtml(houseNumber)}</span><span class="beta-zone-label-text">${escapeHtml(betaZoneLabel(zone.id))}</span>`
+        ? `<span class="beta-zone-number">${escapeHtml(houseNumber)}</span>`
         : `<span class="beta-zone-flag" style="--flag:${flagColor}"></span><span class="beta-zone-label-text">${escapeHtml(betaZoneLabel(zone.id))}</span>`;
       return `
         <div class="beta-zone-highlight active${houseClass}${narrowClass}" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%;--beta-zone-color:${flagColor}">
