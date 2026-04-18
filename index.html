@@ -2181,56 +2181,43 @@
     }
 
     .beta-house-zone .beta-zone-label {
-      left: 4px;
+      left: 8px;
       top: 50%;
       transform: translateY(-50%);
-      width: auto;
-      height: auto;
-      min-height: 0;
-      max-width: calc(100% - 8px);
-      padding: 4px 6px 4px 4px;
-      border-radius: 12px;
-      background: rgba(7, 19, 37, 0.88);
-      border: 1px solid rgba(255,255,255,0.16);
-      justify-content: flex-start;
+      width: 28px;
+      height: 28px;
+      min-height: 28px;
+      padding: 0;
+      border-radius: 999px;
+      background: rgba(7, 19, 37, 0.94);
+      border: 1px solid rgba(255,255,255,0.18);
+      justify-content: center;
       align-items: center;
-      text-align: left;
-      gap: 5px;
-      box-shadow: 0 5px 14px rgba(0,0,0,0.24);
-      font-size: .56rem;
-      line-height: 1.02;
-      backdrop-filter: blur(3px);
+      text-align: center;
+      gap: 0;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+      max-width: 28px;
+      overflow: hidden;
     }
 
-    .beta-house-zone .beta-zone-label-text {
-      display: block;
-      white-space: normal;
-      overflow-wrap: anywhere;
-      word-break: break-word;
-      text-wrap: balance;
-      max-width: calc(100% - 22px);
-      font-size: .52rem;
-      font-weight: 800;
-      line-height: 1.02;
-    }
-
+    .beta-house-zone .beta-zone-label-text,
     .beta-house-zone .beta-zone-flag {
-      display: none;
+      display: none !important;
     }
 
     .beta-house-zone .beta-zone-number {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 18px;
-      height: 18px;
+      width: 100%;
+      height: 100%;
       border-radius: 999px;
-      background: rgba(10,20,38,0.96);
-      border: 1px solid rgba(255,255,255,0.14);
+      background: transparent;
+      border: none;
       color: #fff;
-      font-size: .60rem;
+      font-size: .74rem;
       font-weight: 900;
-      flex: 0 0 auto;
+      line-height: 1;
     }
 
     .beta-house-guide {
@@ -2273,10 +2260,6 @@
       min-width: 0;
       font-weight: 700;
     }
-
-      flex: 0 0 auto;
-    }
-
 
     .site-footer {
       margin-top: 32px;
@@ -4395,20 +4378,20 @@ function renderDefinitions() {
     const BETA_ZONE_RECT_OVERRIDES = {
       "rock-yard": { left: 6.8, top: 49.0, width: 20.8, height: 33.8 },
       "field-shrub": { left: 50.8, top: 48.8, width: 10.2, height: 8.6 },
-      "sun-perennials": { left: 46.4, top: 55.2, width: 27.2, height: 12.8 },
-      "roses": { left: 64.8, top: 54.0, width: 15.6, height: 18.2 },
-      "tropicals": { left: 28.2, top: 63.6, width: 21.8, height: 17.0 },
-      "shade-perennials": { left: 49.8, top: 69.2, width: 24.4, height: 8.8 },
-      "annuals": { left: 56.6, top: 76.2, width: 18.8, height: 8.8 },
-      "fruit-edibles": { left: 72.2, top: 67.2, width: 7.2, height: 17.2 },
-      "house1": { left: 76.6, top: 84.4, width: 11.8, height: 6.6 },
-      "house2": { left: 76.6, top: 75.7, width: 11.8, height: 6.6 },
-      "house3": { left: 76.6, top: 66.9, width: 11.8, height: 6.6 },
-      "house4": { left: 76.6, top: 58.1, width: 11.8, height: 6.6 },
-      "house5": { left: 76.6, top: 49.2, width: 11.8, height: 6.6 },
-      "house6": { left: 76.6, top: 40.3, width: 11.8, height: 6.6 },
-      "house7": { left: 76.6, top: 31.4, width: 11.8, height: 6.6 },
-      "house8": { left: 76.6, top: 22.5, width: 11.8, height: 6.6 }
+      "sun-perennials": { left: 41.8, top: 55.6, width: 33.2, height: 13.6 },
+      "roses": { left: 62.4, top: 53.8, width: 15.8, height: 18.6 },
+      "tropicals": { left: 21.8, top: 61.8, width: 24.8, height: 18.2 },
+      "shade-perennials": { left: 45.8, top: 68.2, width: 29.0, height: 8.8 },
+      "annuals": { left: 58.8, top: 77.6, width: 19.6, height: 8.8 },
+      "fruit-edibles": { left: 72.6, top: 66.8, width: 7.4, height: 18.6 },
+      "house1": { left: 72.0, top: 84.0, width: 11.8, height: 6.8 },
+      "house2": { left: 72.0, top: 74.8, width: 11.8, height: 6.8 },
+      "house3": { left: 72.0, top: 65.4, width: 11.8, height: 6.8 },
+      "house4": { left: 72.0, top: 56.0, width: 11.8, height: 6.8 },
+      "house5": { left: 72.0, top: 46.6, width: 11.8, height: 6.8 },
+      "house6": { left: 72.0, top: 37.2, width: 11.8, height: 6.8 },
+      "house7": { left: 72.0, top: 27.8, width: 11.8, height: 6.8 },
+      "house8": { left: 72.0, top: 18.4, width: 11.8, height: 6.8 }
     };
 
     function betaZoneRect(zone) {
@@ -4433,7 +4416,7 @@ function renderDefinitions() {
       const houseClass = isHouse ? " beta-house-zone" : "";
       const houseNumber = isHouse ? zone.id.replace("house", "") : "";
       const labelInner = isHouse
-        ? `<span class="beta-zone-number">${escapeHtml(houseNumber)}</span><span class="beta-zone-label-text">${escapeHtml(betaZoneLabel(zone.id))}</span>`
+        ? `<span class="beta-zone-number">${escapeHtml(houseNumber)}</span>`
         : `<span class="beta-zone-flag" style="--flag:${flagColor}"></span><span class="beta-zone-label-text">${escapeHtml(betaZoneLabel(zone.id))}</span>`;
       return `
         <div class="beta-zone-highlight active${houseClass}${narrowClass}" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%;--beta-zone-color:${flagColor}">
