@@ -2181,25 +2181,37 @@
     }
 
     .beta-house-zone .beta-zone-label {
-      left: 10px;
+      left: 4px;
       top: 50%;
       transform: translateY(-50%);
-      width: 28px;
-      height: 28px;
-      min-height: 28px;
-      padding: 0;
-      border-radius: 999px;
-      background: rgba(7, 19, 37, 0.92);
-      border: 1px solid rgba(255,255,255,0.18);
-      justify-content: center;
+      width: auto;
+      height: auto;
+      min-height: 0;
+      max-width: calc(100% - 8px);
+      padding: 4px 6px 4px 4px;
+      border-radius: 12px;
+      background: rgba(7, 19, 37, 0.88);
+      border: 1px solid rgba(255,255,255,0.16);
+      justify-content: flex-start;
       align-items: center;
-      text-align: center;
-      gap: 0;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+      text-align: left;
+      gap: 5px;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.24);
+      font-size: .56rem;
+      line-height: 1.02;
+      backdrop-filter: blur(3px);
     }
 
     .beta-house-zone .beta-zone-label-text {
-      display: none;
+      display: block;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      text-wrap: balance;
+      max-width: calc(100% - 22px);
+      font-size: .52rem;
+      font-weight: 800;
+      line-height: 1.02;
     }
 
     .beta-house-zone .beta-zone-flag {
@@ -2210,14 +2222,15 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 100%;
-      height: 100%;
+      width: 18px;
+      height: 18px;
       border-radius: 999px;
-      background: transparent;
-      border: none;
+      background: rgba(10,20,38,0.96);
+      border: 1px solid rgba(255,255,255,0.14);
       color: #fff;
-      font-size: .74rem;
+      font-size: .60rem;
       font-weight: 900;
+      flex: 0 0 auto;
     }
 
     .beta-house-guide {
@@ -4385,17 +4398,17 @@ function renderDefinitions() {
       "sun-perennials": { left: 46.4, top: 55.2, width: 27.2, height: 12.8 },
       "roses": { left: 64.8, top: 54.0, width: 15.6, height: 18.2 },
       "tropicals": { left: 28.2, top: 63.6, width: 21.8, height: 17.0 },
-      "shade-perennials": { left: 50.6, top: 63.8, width: 24.8, height: 10.8 },
-      "annuals": { left: 56.6, top: 74.4, width: 18.8, height: 9.8 },
-      "fruit-edibles": { left: 72.2, top: 66.4, width: 7.2, height: 18.2 },
-      "house1": { left: 75.8, top: 83.0, width: 13.4, height: 7.6 },
-      "house2": { left: 75.8, top: 73.7, width: 13.4, height: 7.6 },
-      "house3": { left: 75.8, top: 64.3, width: 13.4, height: 7.6 },
-      "house4": { left: 75.8, top: 54.8, width: 13.4, height: 7.6 },
-      "house5": { left: 75.8, top: 45.3, width: 13.4, height: 7.6 },
-      "house6": { left: 75.8, top: 35.8, width: 13.4, height: 7.6 },
-      "house7": { left: 75.8, top: 26.2, width: 13.4, height: 7.6 },
-      "house8": { left: 75.8, top: 16.6, width: 13.4, height: 7.6 }
+      "shade-perennials": { left: 49.8, top: 69.2, width: 24.4, height: 8.8 },
+      "annuals": { left: 56.6, top: 76.2, width: 18.8, height: 8.8 },
+      "fruit-edibles": { left: 72.2, top: 67.2, width: 7.2, height: 17.2 },
+      "house1": { left: 76.6, top: 84.4, width: 11.8, height: 6.6 },
+      "house2": { left: 76.6, top: 75.7, width: 11.8, height: 6.6 },
+      "house3": { left: 76.6, top: 66.9, width: 11.8, height: 6.6 },
+      "house4": { left: 76.6, top: 58.1, width: 11.8, height: 6.6 },
+      "house5": { left: 76.6, top: 49.2, width: 11.8, height: 6.6 },
+      "house6": { left: 76.6, top: 40.3, width: 11.8, height: 6.6 },
+      "house7": { left: 76.6, top: 31.4, width: 11.8, height: 6.6 },
+      "house8": { left: 76.6, top: 22.5, width: 11.8, height: 6.6 }
     };
 
     function betaZoneRect(zone) {
