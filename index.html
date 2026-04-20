@@ -2189,13 +2189,16 @@
       min-height: 38px;
       padding: 0;
       border-radius: 999px;
-      background: rgba(7, 19, 37, 0.94);
-      border: 1px solid rgba(255,255,255,0.18);
+      background: linear-gradient(180deg, rgba(10, 24, 46, 0.98), rgba(8, 18, 36, 0.96));
+      border: 1px solid rgba(255,255,255,0.14);
       justify-content: center;
       align-items: center;
       text-align: center;
       gap: 0;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+      box-shadow:
+        0 10px 22px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+      backdrop-filter: blur(2px);
     }
 
     .beta-house-zone .beta-zone-label-text {
@@ -2223,42 +2226,50 @@
     .beta-house-guide {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 10px;
+      gap: 10px;
+      margin-top: 12px;
     }
 
     .beta-house-guide-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(106, 135, 180, 0.34);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)),
+        color-mix(in srgb, var(--panel) 94%, transparent);
       color: var(--text);
-      font-size: .82rem;
+      font-size: .84rem;
       line-height: 1.15;
-      box-shadow: var(--shadow-sm, 0 8px 20px rgba(0,0,0,0.18));
+      box-shadow:
+        0 12px 28px rgba(0,0,0,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
     .beta-house-guide-num {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       border-radius: 999px;
-      background: rgba(7, 19, 37, 0.92);
-      border: 1px solid rgba(255,255,255,0.18);
+      background: linear-gradient(180deg, rgba(10, 24, 46, 0.98), rgba(8, 18, 36, 0.96));
+      border: 1px solid rgba(255,255,255,0.14);
       color: #fff;
-      font-size: .74rem;
+      font-size: .76rem;
       font-weight: 900;
       flex: 0 0 auto;
+      box-shadow:
+        0 8px 18px rgba(0,0,0,0.22),
+        inset 0 1px 0 rgba(255,255,255,0.06);
     }
 
     .beta-house-guide-text {
       min-width: 0;
-      font-weight: 700;
+      font-weight: 800;
+      letter-spacing: 0.01em;
     }
 
       flex: 0 0 auto;
@@ -4412,6 +4423,9 @@ function renderDefinitions() {
     }
 
     function betaZoneMarkup(zone, markerItems = []) {
+      if (zone.id === "between123") {
+        return "";
+      }
       const { left, top, width, height } = betaZoneRect(zone);
       const marker = (markerItems || []).find(item => (item.zoneIds || []).includes(zone.id)) || null;
       const flagColor = FLAG_COLORS[marker?.flagColor] || marker?.flagColor || primaryFlagColorForZones([zone.id]) || "#19c4c4";
