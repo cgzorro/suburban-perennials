@@ -2008,9 +2008,9 @@
     .beta-map-wrap {
       position: relative;
       width: 100%;
+      aspect-ratio: 1745 / 2048;
       border-radius: 18px;
       overflow: hidden;
-      min-height: 360px;
       background: var(--map-bg);
       border: 1px solid rgba(166, 187, 203, 0.18);
     }
@@ -2018,8 +2018,7 @@
     .beta-map-image {
       display: block;
       width: 100%;
-      height: auto;
-      min-height: 360px;
+      height: 100%;
       object-fit: cover;
     }
 
@@ -2181,12 +2180,12 @@
     }
 
     .beta-house-zone .beta-zone-label {
-      left: 10px;
+      left: 8px;
       top: 50%;
       transform: translateY(-50%);
-      width: 38px;
-      height: 38px;
-      min-height: 38px;
+      width: 32px;
+      height: 32px;
+      min-height: 32px;
       padding: 0;
       border-radius: 999px;
       background: linear-gradient(180deg, rgba(10, 24, 46, 0.98), rgba(8, 18, 36, 0.96));
@@ -2196,7 +2195,7 @@
       text-align: center;
       gap: 0;
       box-shadow:
-        0 10px 22px rgba(0,0,0,0.28),
+        0 8px 18px rgba(0,0,0,0.24),
         inset 0 1px 0 rgba(255,255,255,0.06);
       backdrop-filter: blur(2px);
     }
@@ -2276,7 +2275,21 @@
     }
 
 
-    .site-footer {
+    
+    @media (max-width: 768px) {
+      .beta-house-zone .beta-zone-label {
+        left: 6px;
+        width: 26px;
+        height: 26px;
+        min-height: 26px;
+      }
+
+      .beta-house-zone .beta-zone-number {
+        font-size: .72rem;
+      }
+    }
+
+.site-footer {
       margin-top: 32px;
       padding: 18px 16px 28px;
       border-top: 1px solid var(--border);
