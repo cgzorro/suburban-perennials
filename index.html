@@ -4,6 +4,57 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Suburban Perennials</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NFMZDY1SL0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    var FX_SRC = (new URLSearchParams(location.search).get('source') || '').toLowerCase();
+    var FX_INSTORE = (FX_SRC === 'instore' || FX_SRC === 'kiosk' || location.search.indexOf('mode=kiosk') !== -1);
+    var FX_SESSION = FX_INSTORE ? 'in_store' : 'remote';
+    gtag('config', 'G-NFMZDY1SL0', { session_source: FX_SESSION });
+    function fxTrack(name, params){
+      try { gtag('event', name, Object.assign({ session_source: FX_SESSION }, params || {})); } catch (e) {}
+    }
+    var _fxSearchTimers = {}, _fxLastSearch = {};
+    function fxTrackSearch(term, count, context){
+      term = (term || '').trim();
+      context = context || 'browse';
+      if (!term || term.length < 2) return;
+      clearTimeout(_fxSearchTimers[context]);
+      _fxSearchTimers[context] = setTimeout(function(){
+        if (_fxLastSearch[context] === term) return;
+        _fxLastSearch[context] = term;
+        fxTrack('search', { search_term: term, results_count: count | 0, search_context: context });
+        if (!count) fxTrack('no_result_search', { search_term: term, search_context: context });
+      }, 700);
+    }
+    var FX_DEPT_ZONES = { 'annuals': 1, 'sun-perennials': 1, 'shade-perennials': 1, 'tropicals': 1 };
+    function fxResolution(zoneIds){
+      if (!zoneIds || !zoneIds.length) return 'department';
+      for (var i = 0; i < zoneIds.length; i++) { if (!FX_DEPT_ZONES[zoneIds[i]]) return 'precise'; }
+      return 'department';
+    }
+    var _fxFeedbackDone = false;
+    function fxMaybeFeedback(container, context){
+      if (_fxFeedbackDone || !container || container.querySelector('.fx-fb')) return;
+      var row = document.createElement('div');
+      row.className = 'fx-fb';
+      row.innerHTML = '<span class="fx-fb-q">Find what you needed?</span>'
+        + '<button type="button" class="fx-fb-btn" data-fb="yes" aria-label="Yes, helpful">&#128077;</button>'
+        + '<button type="button" class="fx-fb-btn" data-fb="no" aria-label="No, not helpful">&#128078;</button>';
+      container.appendChild(row);
+      row.querySelectorAll('.fx-fb-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if (_fxFeedbackDone) return;
+          _fxFeedbackDone = true;
+          fxTrack('feedback', { helpful: btn.getAttribute('data-fb'), context: context || 'finder' });
+          row.innerHTML = '<span class="fx-fb-thanks">Thanks &mdash; noted.</span>';
+        });
+      });
+    }
+  </script>
   <style>
     :root {
       --bg: #071325;
@@ -2355,6 +2406,10 @@
       }
     }
 
+    .fx-fb { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 14px; padding-top: 11px; border-top: 1px solid var(--border); }
+    .fx-fb-q, .fx-fb-thanks { color: var(--text-muted); font-size: 13px; }
+    .fx-fb-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 9px; width: 36px; height: 30px; font-size: 15px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: border-color .15s, background .15s; }
+    .fx-fb-btn:hover { border-color: var(--accent); background: var(--bg-soft); }
 </style>
 </head>
 <body>
@@ -3803,6 +3858,7 @@
       renderSummary();
       renderResults();
       updateActionButtons();
+      fxTrackSearch(q, state.filtered.length, 'browse');
     }
 
     function renderSummary() {
@@ -4775,7 +4831,14 @@ function renderDefinitions() {
       }).join("");
 
       els.finderResults.querySelectorAll("[data-item-id]").forEach(btn => {
-        btn.addEventListener("click", () => selectFinderItem(btn.dataset.itemId, true));
+        btn.addEventListener("click", () => {
+          selectFinderItem(btn.dataset.itemId, true);
+          const _it = getFinderItems().find(e => e.id === btn.dataset.itemId);
+          if (_it) {
+            fxTrack('plant_located', { plant_name: _it.name, resolution: fxResolution(_it.zoneIds), zones: (_it.zoneIds || []).join(','), context: 'finder' });
+            fxMaybeFeedback(els.locationDetails, 'finder');
+          }
+        });
       });
     }
 
@@ -4878,6 +4941,7 @@ function renderDefinitions() {
       state.finderResults = sortFinderItems(
         getFinderItems().filter(item => finderMatches(item, state.finderQuery, state.finderCategory, state.finderTraits))
       );
+      fxTrackSearch(state.finderQuery, state.finderResults.length, 'finder');
 
       if (state.finderFocusedZoneId && !state.finderResults.some(item => (item.zoneIds || []).includes(state.finderFocusedZoneId))) {
         state.finderFocusedZoneId = "";
@@ -5049,6 +5113,7 @@ function renderDefinitions() {
       }));
 
       state.kioskMatchCount = filtered.length;
+      fxTrackSearch(query, filtered.length, 'kiosk');
       state.kioskResults = filtered.slice(0, 120);
 
       const selected = state.kioskResults.find(item => item.id === state.selectedKioskId) || null;
@@ -5143,6 +5208,8 @@ function renderDefinitions() {
       state.selectedKioskId = item.id;
       renderKioskResults();
       renderKioskDetail(item);
+      fxTrack('plant_located', { plant_name: item.name, resolution: fxResolution(item.zoneIds), zones: (item.zoneIds || []).join(','), context: 'kiosk' });
+      fxMaybeFeedback(els.kioskDetailPanel, 'kiosk');
 
       const detailTarget = els.kioskDetailPanel || els.kioskMapPanel || els.kioskMapBoard;
       if (detailTarget && typeof detailTarget.scrollIntoView === "function") {
