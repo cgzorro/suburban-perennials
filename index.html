@@ -5232,6 +5232,16 @@ function renderDefinitions() {
         applyFilters();
         applyFinderFilters();
         applyKioskFilters();
+        try{
+          window.fxResolveSku = function(sku){
+            var hits = findPlantsBySku(sku);
+            if(!hits || !hits.length) return null;
+            var p = hits[0];
+            return { name: p.name||"", img: imageFor(p)||"", size: p.size||"", price: p.price||"" };
+          };
+          window.fxCatalogReady = true;
+          if (typeof window.fxHydrateList === "function") window.fxHydrateList();
+        }catch(e){}
       } catch (err) {
         els.summaryBar.innerHTML = `<span class="pill">Failed to load plants</span>`;
         els.results.innerHTML = `<div class="empty">Could not load <code>plants.json</code>. ${err.message}</div>`;
@@ -5467,7 +5477,7 @@ function renderDefinitions() {
         var thumb=i.img?'<img src="'+i.img+'" alt="">':'<div class="fx-thumb"></div>';
         return '<div class="fx-item">'+thumb+'<div class="fx-item-main"><div class="fx-item-name">'+(i.name||i.sku||"Plant")+'</div><div class="fx-item-meta">'+meta+'</div><div class="fx-qty"><button type="button" class="fx-step fx-dec" data-key="'+k+'" aria-label="Decrease quantity">\u2212</button><span class="fx-qn">'+(i.qty||1)+'</span><button type="button" class="fx-step fx-inc" data-key="'+k+'" aria-label="Increase quantity">+</button></div></div><button type="button" class="fx-rm" data-key="'+k+'">Remove</button></div>';
       }).join("");
-      panel.innerHTML='<h2>My List</h2><p class="fx-sub">Show this at the counter, print it, or start a plan.</p>'+items+
+      panel.innerHTML='<h2>My List</h2><p class="fx-sub">Show this at the counter, print it, or save it for later.</p>'+items+
         '<div id="fxQrWrap"><img alt="Scan to open this list"><div class="fx-qr-cap">Scan with a phone to open the list \u2014 staff can scan to pull it</div></div>'+
         '<div class="fx-actions"><button type="button" class="fx-qr-btn fx-primary">Show QR</button><button type="button" class="fx-print-btn">Print</button><button type="button" class="fx-save-btn">Save list</button><button type="button" class="fx-clear-btn">Clear</button><button type="button" class="fx-close-btn">Close</button></div>'+savedListsHtml();
     }
