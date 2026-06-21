@@ -13,7 +13,7 @@
     var FX_SRC = (new URLSearchParams(location.search).get('source') || '').toLowerCase();
     var FX_INSTORE = (FX_SRC === 'instore' || FX_SRC === 'kiosk' || location.search.indexOf('mode=kiosk') !== -1);
     var FX_SESSION = FX_INSTORE ? 'in_store' : 'remote';
-    gtag('config', 'G-NFMZDY1SL0', { session_source: FX_SESSION });
+    gtag('config', 'G-NFMZDY1SL0', { session_source: FX_SESSION, page_location: (function(){ try{ var u=new URL(location.href); u.searchParams.delete('list'); return u.href; }catch(e){ return location.href; } })() });
     function fxTrack(name, params){
       try { gtag('event', name, Object.assign({ session_source: FX_SESSION }, params || {})); } catch (e) {}
     }
@@ -3922,7 +3922,7 @@
               <div class="price">${plant.price || ""}</div>
               <div class="sku">SKU: ${plant.sku || "—"}</div>
             </div>
-            ${plant.link ? `<a class="btn product-btn" href="${plant.link}" target="_blank" rel="noopener noreferrer">View Product</a>` : ""}
+            ${plant.link ? `<a class="btn product-btn" href="${plant.link}" target="_blank" rel="noopener noreferrer" data-sku="${escapeHtml(plant.sku || "")}">View Product</a>` : ""}
             <button type="button" class="btn product-btn fx-add-btn" data-sku="${escapeHtml(plant.sku || "")}" data-name="${escapeHtml(plant.name || "")}" data-size="${escapeHtml(plant.size || "")}" data-price="${escapeHtml(plant.price || "")}" data-img="${escapeHtml(img || "")}">Add to list</button>
           </div>
         `;
@@ -5409,6 +5409,7 @@ function renderDefinitions() {
     function count(){ return list.reduce(function(n,i){return n+(i.qty||1);},0); }
     function syncFab(){ var c=fab.querySelector(".fx-count"); if(c) c.textContent=count(); }
     function keyOf(i){ return i.sku||i.name||""; }
+    function track(n,p){ try{ if(typeof fxTrack==="function"){ fxTrack(n,p||{}); } else if(typeof gtag==="function"){ gtag("event",n,p||{}); } }catch(e){} }
     function hydrate(){
       if(typeof window.fxResolveSku!=="function") return false;
       var changed=false;
@@ -5439,23 +5440,24 @@ function renderDefinitions() {
       if(!item.sku && !item.name) return;
       var f=null,i; for(i=0;i<list.length;i++){ if(keyOf(list[i])===(item.sku||item.name)){ f=list[i]; break; } }
       if(f){ f.qty=(f.qty||1)+1; } else { item.qty=1; list.push(item); }
+      track("add_to_list",{item_sku:item.sku||"",item_name:item.name||"",list_count:count()});
       save(); syncFab(); flash("Added to list \u2713");
     }
-    function remove(k){ list=list.filter(function(i){return keyOf(i)!==k;}); save(); syncFab(); renderPanel(); }
-    function clearAll(){ list=[]; save(); syncFab(); renderPanel(); }
+    function remove(k){ list=list.filter(function(i){return keyOf(i)!==k;}); save(); syncFab(); renderPanel(); track("list_remove",{list_count:count()}); if(!list.length) track("list_emptied",{}); }
+    function clearAll(){ track("list_clear",{list_count:count()}); list=[]; save(); syncFab(); renderPanel(); }
     function saveSavedStore(){ try{ localStorage.setItem(SKEY,JSON.stringify(saved)); }catch(e){} }
     function saveCurrentAs(){
       if(!list.length){ flash("List is empty"); return; }
       var nm=null; try{ nm=window.prompt("Name this list",""); }catch(e){ nm=""; }
       if(nm===null) return; nm=String(nm).trim(); if(!nm) nm="My list";
       saved.unshift({ id:"l"+Date.now().toString(36)+Math.random().toString(36).slice(2,6), name:nm, items:JSON.parse(JSON.stringify(list)), at:Date.now() });
-      saveSavedStore(); flash("Saved: "+nm); renderPanel();
+      saveSavedStore(); flash("Saved: "+nm); renderPanel(); track("list_save",{list_count:count()});
     }
     function loadList(id){
       var sv=null,i; for(i=0;i<saved.length;i++){ if(String(saved[i].id)===String(id)){ sv=saved[i]; break; } }
-      if(!sv) return; list=JSON.parse(JSON.stringify(sv.items||[])); save(); syncFab(); renderPanel(); flash("Opened: "+(sv.name||"list"));
+      if(!sv) return; list=JSON.parse(JSON.stringify(sv.items||[])); save(); syncFab(); renderPanel(); flash("Opened: "+(sv.name||"list")); track("list_open_saved",{list_count:count()});
     }
-    function deleteSaved(id){ saved=saved.filter(function(sv){ return String(sv.id)!==String(id); }); saveSavedStore(); renderPanel(); }
+    function deleteSaved(id){ saved=saved.filter(function(sv){ return String(sv.id)!==String(id); }); saveSavedStore(); renderPanel(); track("list_delete_saved",{}); }
     function savedListsHtml(){
       if(!saved.length) return "";
       var rows=saved.map(function(sv){
@@ -5481,9 +5483,9 @@ function renderDefinitions() {
         '<div id="fxQrWrap"><img alt="Scan to open this list"><div class="fx-qr-cap">Scan with a phone to open the list \u2014 staff can scan to pull it</div></div>'+
         '<div class="fx-actions"><button type="button" class="fx-qr-btn fx-primary">Show QR</button><button type="button" class="fx-print-btn">Print</button><button type="button" class="fx-save-btn">Save list</button><button type="button" class="fx-clear-btn">Clear</button><button type="button" class="fx-close-btn">Close</button></div>'+savedListsHtml();
     }
-    function openPanel(){ renderPanel(); overlay.classList.add("open"); }
+    function openPanel(){ renderPanel(); overlay.classList.add("open"); track("list_view",{list_count:count()}); }
     function closePanel(){ overlay.classList.remove("open"); }
-    function printList(){
+    function printList(){ track("list_print",{list_count:count()});
       var w; try{ w=window.open("","_blank"); }catch(e){}
       if(!w){ flash("Allow pop-ups to print"); return; }
       var rows=list.map(function(i){return "<tr><td>"+(i.qty||1)+"</td><td>"+(i.name||i.sku||"")+"</td><td>"+(i.sku||"")+"</td><td>"+(i.size||"")+"</td><td>"+(i.price||"")+"</td></tr>";}).join("");
@@ -5495,16 +5497,17 @@ function renderDefinitions() {
     document.addEventListener("click", function(e){
       var t=e.target, addBtn=t.closest?t.closest(".fx-add-btn"):null;
       if(addBtn){ e.preventDefault(); add({sku:addBtn.getAttribute("data-sku")||"",name:addBtn.getAttribute("data-name")||"",size:addBtn.getAttribute("data-size")||"",price:addBtn.getAttribute("data-price")||"",img:addBtn.getAttribute("data-img")||""}); return; }
+      var buyA=t.closest?t.closest("a.product-btn"):null; if(buyA){ track("buy_click",{item_sku:buyA.getAttribute("data-sku")||""}); }
       if(!t.classList) return;
       if(t.classList.contains("fx-close-btn")) closePanel();
       else if(t.classList.contains("fx-rm")) remove(t.getAttribute("data-key"));
-      else if(t.classList.contains("fx-step")){ var sk=t.getAttribute("data-key"), sd=t.classList.contains("fx-inc")?1:-1, si, sit=null; for(si=0;si<list.length;si++){ if(keyOf(list[si])===sk){ sit=list[si]; break; } } if(sit){ sit.qty=Math.max(1,(sit.qty||1)+sd); save(); syncFab(); var qn=t.parentNode&&t.parentNode.querySelector(".fx-qn"); if(qn) qn.textContent=sit.qty; var qw=document.getElementById("fxQrWrap"); if(qw&&qw.classList.contains("show")){ var qim=qw.querySelector("img"); if(qim) qim.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data="+encodeURIComponent(listUrl()); } } }
+      else if(t.classList.contains("fx-step")){ var sk=t.getAttribute("data-key"), sd=t.classList.contains("fx-inc")?1:-1, si, sit=null; for(si=0;si<list.length;si++){ if(keyOf(list[si])===sk){ sit=list[si]; break; } } if(sit){ sit.qty=Math.max(1,(sit.qty||1)+sd); save(); syncFab(); track("list_qty_change",{item_sku:sk,qty:sit.qty}); var qn=t.parentNode&&t.parentNode.querySelector(".fx-qn"); if(qn) qn.textContent=sit.qty; var qw=document.getElementById("fxQrWrap"); if(qw&&qw.classList.contains("show")){ var qim=qw.querySelector("img"); if(qim) qim.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data="+encodeURIComponent(listUrl()); } } }
       else if(t.classList.contains("fx-clear-btn")) clearAll();
       else if(t.classList.contains("fx-print-btn")) printList();
       else if(t.classList.contains("fx-save-btn")) saveCurrentAs();
       else if(t.classList.contains("fx-saved-open")) loadList(t.getAttribute("data-id"));
       else if(t.classList.contains("fx-saved-del")) deleteSaved(t.getAttribute("data-id"));
-      else if(t.classList.contains("fx-qr-btn")){ var w=document.getElementById("fxQrWrap"); if(w){ var im=w.querySelector("img"); if(im) im.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data="+encodeURIComponent(listUrl()); w.classList.toggle("show"); } }
+      else if(t.classList.contains("fx-qr-btn")){ var w=document.getElementById("fxQrWrap"); if(w){ var im=w.querySelector("img"); if(im) im.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data="+encodeURIComponent(listUrl()); w.classList.toggle("show"); track("list_show_qr",{list_count:count()}); } }
     });
     try{
       var qp=new URLSearchParams(location.search), lp=qp.get("list");
@@ -5513,6 +5516,7 @@ function renderDefinitions() {
         save();
         openPanel();
         try{ qp.delete("list"); var qs=qp.toString(); history.replaceState(null,"",location.pathname+(qs?"?"+qs:"")+location.hash); }catch(e){}
+        track("list_opened_via_qr",{item_count:list.length});
       }
     }catch(e){}
     syncFab();
