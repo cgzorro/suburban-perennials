@@ -3923,6 +3923,7 @@
               <div class="sku">SKU: ${plant.sku || "—"}</div>
             </div>
             ${plant.link ? `<a class="btn product-btn" href="${plant.link}" target="_blank" rel="noopener noreferrer">View Product</a>` : ""}
+            <button type="button" class="btn product-btn fx-add-btn" data-sku="${escapeHtml(plant.sku || "")}" data-name="${escapeHtml(plant.name || "")}" data-size="${escapeHtml(plant.size || "")}" data-price="${escapeHtml(plant.price || "")}" data-img="${escapeHtml(img || "")}">Add to list</button>
           </div>
         `;
         els.results.appendChild(card);
@@ -5346,5 +5347,168 @@ function renderDefinitions() {
     </div>
   </footer>
 
+<style>
+  #fxListFab{position:fixed;right:16px;bottom:16px;z-index:9000;display:inline-flex;align-items:center;gap:8px;padding:12px 16px;border-radius:999px;border:none;cursor:pointer;font:600 14px/1 -apple-system,Segoe UI,Roboto,sans-serif;background:var(--accent,#58b641);color:#10210e;box-shadow:0 6px 18px rgba(0,0,0,.28)}
+  #fxListFab .fx-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:rgba(0,0,0,.18);font-weight:800;font-size:12px}
+  #fxListOverlay{position:fixed;inset:0;z-index:9001;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center}
+  #fxListOverlay.open{display:flex}
+  #fxListPanel{width:100%;max-width:560px;max-height:86vh;overflow:auto;background:#0f1c2e;color:#eaf0f7;border-radius:18px 18px 0 0;padding:18px 18px 26px;font-family:-apple-system,Segoe UI,Roboto,sans-serif}
+  @media(min-width:600px){#fxListOverlay{align-items:center}#fxListPanel{border-radius:18px}}
+  #fxListPanel h2{margin:0 0 2px;font-size:19px}
+  #fxListPanel .fx-sub{margin:0 0 14px;font-size:13px;opacity:.7}
+  #fxListPanel .fx-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+  #fxListPanel .fx-item img,#fxListPanel .fx-thumb{width:46px;height:46px;border-radius:8px;object-fit:cover;flex:none;background:rgba(255,255,255,.08)}
+  #fxListPanel .fx-item-main{flex:1;min-width:0}
+  #fxListPanel .fx-item-name{font-weight:700;font-size:14px}
+  #fxListPanel .fx-item-meta{font-size:12px;opacity:.7}
+  #fxListPanel .fx-rm{background:none;border:none;color:#ef9a9a;cursor:pointer;font-size:13px;font-weight:700;flex:none}
+  #fxListPanel .fx-qty{display:inline-flex;align-items:stretch;margin-top:8px;border:1px solid rgba(255,255,255,.2);border-radius:9px;overflow:hidden}
+  #fxListPanel .fx-step{-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.05);border:none;color:inherit;width:32px;height:30px;font:800 17px/1 -apple-system,Segoe UI,Roboto,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  #fxListPanel .fx-step:active{background:rgba(123,208,95,.28)}
+  #fxListPanel .fx-qn{min-width:36px;padding:0 4px;display:flex;align-items:center;justify-content:center;font:800 14px/1 -apple-system,Segoe UI,Roboto,sans-serif;font-variant-numeric:tabular-nums;border-left:1px solid rgba(255,255,255,.16);border-right:1px solid rgba(255,255,255,.16)}
+  #fxListPanel .fx-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  #fxListPanel .fx-actions button,#fxListPanel .fx-actions a{flex:1;min-width:120px;text-align:center;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#eaf0f7;font:600 14px/1 -apple-system,Segoe UI,Roboto,sans-serif;cursor:pointer;text-decoration:none}
+  #fxListPanel .fx-actions .fx-primary{background:var(--accent,#58b641);border-color:var(--accent,#58b641);color:#10210e}
+  #fxQrWrap{margin-top:16px;text-align:center;display:none}
+  #fxQrWrap.show{display:block}
+  #fxQrWrap img{background:#fff;padding:10px;border-radius:12px;width:200px;height:200px}
+  #fxQrWrap .fx-qr-cap{margin-top:8px;font-size:12px;opacity:.7}
+  #fxListPanel .fx-empty{opacity:.7;font-size:14px;padding:14px 0}
+  #fxListPanel .fx-saved{margin-top:18px;border-top:1px solid rgba(255,255,255,.12);padding-top:14px}
+  #fxListPanel .fx-saved-h{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;opacity:.6;margin-bottom:8px}
+  #fxListPanel .fx-saved-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+  #fxListPanel .fx-saved-main{flex:1;min-width:0}
+  #fxListPanel .fx-saved-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #fxListPanel .fx-saved-meta{font-size:12px;opacity:.6}
+  #fxListPanel .fx-saved-open{background:rgba(123,208,95,.18);border:1px solid rgba(123,208,95,.45);color:#cfe8bb;border-radius:8px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;flex:none}
+  #fxListPanel .fx-saved-del{background:none;border:none;color:#ef9a9a;cursor:pointer;font-size:13px;font-weight:600;flex:none}
+  .fx-add-btn{margin-top:8px;background:transparent !important;border:1px solid var(--accent,#58b641) !important;color:var(--accent,#58b641) !important}
+</style>
+<button id="fxListFab" type="button" aria-label="My plant list">My List <span class="fx-count">0</span></button>
+<div id="fxListOverlay"><div id="fxListPanel" role="dialog" aria-modal="true"></div></div>
+<script>
+(function(){
+  try{
+    var KEY="suburban-wf-list", list=[];
+    try{ list=JSON.parse(localStorage.getItem(KEY)||"[]")||[]; }catch(e){ list=[]; }
+    var SKEY="suburban-wf-saved", saved=[];
+    try{ saved=JSON.parse(localStorage.getItem(SKEY)||"[]")||[]; }catch(e){ saved=[]; }
+    var fab=document.getElementById("fxListFab"), overlay=document.getElementById("fxListOverlay"), panel=document.getElementById("fxListPanel");
+    if(!fab||!overlay||!panel) return;
+    function save(){ try{ localStorage.setItem(KEY,JSON.stringify(list)); }catch(e){} }
+    function count(){ return list.reduce(function(n,i){return n+(i.qty||1);},0); }
+    function syncFab(){ var c=fab.querySelector(".fx-count"); if(c) c.textContent=count(); }
+    function keyOf(i){ return i.sku||i.name||""; }
+    function hydrate(){
+      if(typeof window.fxResolveSku!=="function") return false;
+      var changed=false;
+      list.forEach(function(it){
+        if(!it.sku) return;
+        if(it.name && it.name!==it.sku && it.img) return;
+        var r=window.fxResolveSku(it.sku);
+        if(r){
+          if(r.name) it.name=r.name;
+          if(r.img) it.img=r.img;
+          if(r.size) it.size=r.size;
+          if(r.price) it.price=r.price;
+          changed=true;
+        }
+      });
+      if(changed){ save(); syncFab(); if(overlay.classList.contains("open")) renderPanel(); }
+      return changed;
+    }
+    window.fxHydrateList=hydrate;
+    function payload(){ return list.map(function(i){return (i.sku||"")+"."+(i.qty||1);}).filter(function(s){return s.charAt(0)!=="."}).join("_"); }
+    function listUrl(){ return location.origin+location.pathname+"?list="+encodeURIComponent(payload()); }
+    var toast;
+    function flash(msg){
+      if(!toast){ toast=document.createElement("div"); toast.style.cssText="position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:9002;background:#1c8a4a;color:#fff;padding:10px 16px;border-radius:999px;font:600 14px/1 -apple-system,Segoe UI,Roboto,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.3);opacity:0;transition:opacity .2s;pointer-events:none"; document.body.appendChild(toast); }
+      toast.textContent=msg; toast.style.opacity="1"; clearTimeout(toast._t); toast._t=setTimeout(function(){toast.style.opacity="0";},1100);
+    }
+    function add(item){
+      if(!item.sku && !item.name) return;
+      var f=null,i; for(i=0;i<list.length;i++){ if(keyOf(list[i])===(item.sku||item.name)){ f=list[i]; break; } }
+      if(f){ f.qty=(f.qty||1)+1; } else { item.qty=1; list.push(item); }
+      save(); syncFab(); flash("Added to list \u2713");
+    }
+    function remove(k){ list=list.filter(function(i){return keyOf(i)!==k;}); save(); syncFab(); renderPanel(); }
+    function clearAll(){ list=[]; save(); syncFab(); renderPanel(); }
+    function saveSavedStore(){ try{ localStorage.setItem(SKEY,JSON.stringify(saved)); }catch(e){} }
+    function saveCurrentAs(){
+      if(!list.length){ flash("List is empty"); return; }
+      var nm=null; try{ nm=window.prompt("Name this list",""); }catch(e){ nm=""; }
+      if(nm===null) return; nm=String(nm).trim(); if(!nm) nm="My list";
+      saved.unshift({ id:"l"+Date.now().toString(36)+Math.random().toString(36).slice(2,6), name:nm, items:JSON.parse(JSON.stringify(list)), at:Date.now() });
+      saveSavedStore(); flash("Saved: "+nm); renderPanel();
+    }
+    function loadList(id){
+      var sv=null,i; for(i=0;i<saved.length;i++){ if(String(saved[i].id)===String(id)){ sv=saved[i]; break; } }
+      if(!sv) return; list=JSON.parse(JSON.stringify(sv.items||[])); save(); syncFab(); renderPanel(); flash("Opened: "+(sv.name||"list"));
+    }
+    function deleteSaved(id){ saved=saved.filter(function(sv){ return String(sv.id)!==String(id); }); saveSavedStore(); renderPanel(); }
+    function savedListsHtml(){
+      if(!saved.length) return "";
+      var rows=saved.map(function(sv){
+        var c=(sv.items||[]).reduce(function(n,i){return n+(i.qty||1);},0);
+        var nm=String(sv.name||"List").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        var id=String(sv.id).replace(/"/g,"&quot;");
+        return '<div class="fx-saved-row"><div class="fx-saved-main"><div class="fx-saved-name">'+nm+'</div><div class="fx-saved-meta">'+c+" plant"+(c===1?"":"s")+'</div></div><button type="button" class="fx-saved-open" data-id="'+id+'">Open</button><button type="button" class="fx-saved-del" data-id="'+id+'">Delete</button></div>';
+      }).join("");
+      return '<div class="fx-saved"><div class="fx-saved-h">Saved lists</div>'+rows+'</div>';
+    }
+    function renderPanel(){
+      if(!list.length){
+        panel.innerHTML='<h2>My List</h2><p class="fx-sub">Plants you save show up here.</p><div class="fx-empty">Your list is empty \u2014 tap \u201cAdd to list\u201d on any plant.</div>'+savedListsHtml()+'<div class="fx-actions"><button type="button" class="fx-close-btn">Close</button></div>';
+        return;
+      }
+      var items=list.map(function(i){
+        var meta=[i.size,i.price].filter(Boolean).join(" \u00b7 "); if(i.sku) meta+=(meta?" \u00b7 ":"")+"SKU "+i.sku;
+        var k=String(keyOf(i)).replace(/"/g,"&quot;");
+        var thumb=i.img?'<img src="'+i.img+'" alt="">':'<div class="fx-thumb"></div>';
+        return '<div class="fx-item">'+thumb+'<div class="fx-item-main"><div class="fx-item-name">'+(i.name||i.sku||"Plant")+'</div><div class="fx-item-meta">'+meta+'</div><div class="fx-qty"><button type="button" class="fx-step fx-dec" data-key="'+k+'" aria-label="Decrease quantity">\u2212</button><span class="fx-qn">'+(i.qty||1)+'</span><button type="button" class="fx-step fx-inc" data-key="'+k+'" aria-label="Increase quantity">+</button></div></div><button type="button" class="fx-rm" data-key="'+k+'">Remove</button></div>';
+      }).join("");
+      panel.innerHTML='<h2>My List</h2><p class="fx-sub">Show this at the counter, print it, or start a plan.</p>'+items+
+        '<div id="fxQrWrap"><img alt="Scan to open this list"><div class="fx-qr-cap">Scan with a phone to open the list \u2014 staff can scan to pull it</div></div>'+
+        '<div class="fx-actions"><button type="button" class="fx-qr-btn fx-primary">Show QR</button><button type="button" class="fx-print-btn">Print</button><button type="button" class="fx-save-btn">Save list</button><button type="button" class="fx-clear-btn">Clear</button><button type="button" class="fx-close-btn">Close</button></div>'+savedListsHtml();
+    }
+    function openPanel(){ renderPanel(); overlay.classList.add("open"); }
+    function closePanel(){ overlay.classList.remove("open"); }
+    function printList(){
+      var w; try{ w=window.open("","_blank"); }catch(e){}
+      if(!w){ flash("Allow pop-ups to print"); return; }
+      var rows=list.map(function(i){return "<tr><td>"+(i.qty||1)+"</td><td>"+(i.name||i.sku||"")+"</td><td>"+(i.sku||"")+"</td><td>"+(i.size||"")+"</td><td>"+(i.price||"")+"</td></tr>";}).join("");
+      w.document.write('<html><head><title>My Plant List</title><style>body{font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;padding:24px;color:#111}h1{font-size:20px;margin:0 0 4px}table{width:100%;border-collapse:collapse;margin-top:14px}td,th{text-align:left;padding:7px 8px;border-bottom:1px solid #ddd}th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#666}</style></head><body><h1>My Plant List</h1><div style="color:#888;font-size:12px">Foxfield Wayfinder</div><table><thead><tr><th>Qty</th><th>Plant</th><th>SKU</th><th>Size</th><th>Price</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>');
+      w.document.close(); w.focus(); setTimeout(function(){ try{w.print();}catch(e){} },300);
+    }
+    fab.addEventListener("click", openPanel);
+    overlay.addEventListener("click", function(e){ if(e.target===overlay) closePanel(); });
+    document.addEventListener("click", function(e){
+      var t=e.target, addBtn=t.closest?t.closest(".fx-add-btn"):null;
+      if(addBtn){ e.preventDefault(); add({sku:addBtn.getAttribute("data-sku")||"",name:addBtn.getAttribute("data-name")||"",size:addBtn.getAttribute("data-size")||"",price:addBtn.getAttribute("data-price")||"",img:addBtn.getAttribute("data-img")||""}); return; }
+      if(!t.classList) return;
+      if(t.classList.contains("fx-close-btn")) closePanel();
+      else if(t.classList.contains("fx-rm")) remove(t.getAttribute("data-key"));
+      else if(t.classList.contains("fx-step")){ var sk=t.getAttribute("data-key"), sd=t.classList.contains("fx-inc")?1:-1, si, sit=null; for(si=0;si<list.length;si++){ if(keyOf(list[si])===sk){ sit=list[si]; break; } } if(sit){ sit.qty=Math.max(1,(sit.qty||1)+sd); save(); syncFab(); var qn=t.parentNode&&t.parentNode.querySelector(".fx-qn"); if(qn) qn.textContent=sit.qty; var qw=document.getElementById("fxQrWrap"); if(qw&&qw.classList.contains("show")){ var qim=qw.querySelector("img"); if(qim) qim.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data="+encodeURIComponent(listUrl()); } } }
+      else if(t.classList.contains("fx-clear-btn")) clearAll();
+      else if(t.classList.contains("fx-print-btn")) printList();
+      else if(t.classList.contains("fx-save-btn")) saveCurrentAs();
+      else if(t.classList.contains("fx-saved-open")) loadList(t.getAttribute("data-id"));
+      else if(t.classList.contains("fx-saved-del")) deleteSaved(t.getAttribute("data-id"));
+      else if(t.classList.contains("fx-qr-btn")){ var w=document.getElementById("fxQrWrap"); if(w){ var im=w.querySelector("img"); if(im) im.src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data="+encodeURIComponent(listUrl()); w.classList.toggle("show"); } }
+    });
+    try{
+      var qp=new URLSearchParams(location.search), lp=qp.get("list");
+      if(lp){
+        lp.split("_").forEach(function(tok){ var p=tok.split("."), sku=p[0], qty=parseInt(p[1]||"1",10)||1; if(sku){ var ex=false,j; for(j=0;j<list.length;j++){ if(list[j].sku===sku){ex=true;break;} } if(!ex) list.push({sku:sku,name:sku,qty:qty}); } });
+        save();
+        openPanel();
+        try{ qp.delete("list"); var qs=qp.toString(); history.replaceState(null,"",location.pathname+(qs?"?"+qs:"")+location.hash); }catch(e){}
+      }
+    }catch(e){}
+    syncFab();
+    hydrate();
+  }catch(err){}
+})();
+</script>
 </body>
 </html>
