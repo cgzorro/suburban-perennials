@@ -680,6 +680,8 @@
     .card {
       border-radius: 24px;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .card-image {
@@ -715,6 +717,13 @@
 
     .card-body {
       padding: 18px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+    }
+
+    .card-actions {
+      margin-top: auto;
     }
 
     .card-title,
@@ -3918,12 +3927,14 @@
               ${(plant.height || plant.width) ? `Mature size: ${plant.height || "—"} × ${plant.width || "—"}` : ""}
             </div>
             ${extraTags.length ? `<div class="tag-row">${extraTags.map(t => `<span class="tag">${t}</span>`).join("")}</div>` : ""}
+            <div class="card-actions">
             <div class="price-row">
               <div class="price">${plant.price || ""}</div>
               <div class="sku">SKU: ${plant.sku || "—"}</div>
             </div>
             ${plant.link ? `<a class="btn product-btn" href="${plant.link}" target="_blank" rel="noopener noreferrer" data-sku="${escapeHtml(plant.sku || "")}">View Product</a>` : ""}
             <button type="button" class="btn product-btn fx-add-btn" data-sku="${escapeHtml(plant.sku || "")}" data-name="${escapeHtml(plant.name || "")}" data-size="${escapeHtml(plant.size || "")}" data-price="${escapeHtml(plant.price || "")}" data-img="${escapeHtml(img || "")}">Add to list</button>
+            </div>
           </div>
         `;
         els.results.appendChild(card);
