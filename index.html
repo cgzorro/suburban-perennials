@@ -83,27 +83,27 @@
     }
 
     html[data-theme="light"] {
-      --bg: #eef4fb;
-      --bg-elev: #ffffff;
-      --bg-soft: #e7eef8;
-      --panel: #dde7f5;
+      --bg: #e6e1d6;
+      --bg-elev: #f4f1ea;
+      --bg-soft: #ebe6dc;
+      --panel: #e0dbcf;
       --text: #182435;
-      --text-muted: #526274;
-      --border: #c5d3e8;
+      --text-muted: #6c6456;
+      --border: #d8d0c1;
       --accent: #58b641;
       --accent-2: #65c24d;
-      --chip-bg: #d8e5f7;
+      --chip-bg: #e9e3d6;
       --chip-text: #182435;
       --shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-      --input-bg: #ffffff;
-      --card-bg: #ffffff;
+      --input-bg: #fbfaf5;
+      --card-bg: #f4f1ea;
       --success: #53b44c;
       --warning: #a77400;
       --danger: #c94b4b;
-      --map-bg: #f8fbff;
+      --map-bg: #efece4;
       --map-line: #526274;
       --map-text: #182435;
-      --map-zone: #ecf2f8;
+      --map-zone: #e7e0d2;
       --map-zone-active: #cfe9ae;
       --map-divider: rgba(82, 98, 116, 0.18);
     }
@@ -219,8 +219,8 @@
 
     .hero-actions {
       display: flex;
-      flex-direction: column;
-      align-items: stretch;
+      flex-direction: row;
+      align-items: center;
       gap: 12px;
       min-width: 0;
       width: 100%;
@@ -228,7 +228,7 @@
     }
 
     .view-tabs-shell {
-      width: 100%;
+      flex: 1 1 auto;
       min-width: 0;
       overflow: hidden;
     }
@@ -273,11 +273,25 @@
         linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
         var(--bg-elev);
       border-radius: 999px;
-      padding: 12px 18px;
-      font-weight: 800;
-      white-space: nowrap;
-      height: fit-content;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .theme-toggle svg { width: 20px; height: 20px; display: none; }
+    html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+    html[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
     }
 
     .view-tab {
@@ -339,9 +353,9 @@
 
     html[data-theme="light"] .view-tab {
       background:
-        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(241,246,252,0.96)),
-        #eef4fb;
-      border-color: #c8d6ea;
+        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(246,242,233,0.96)),
+        #f1ece1;
+      border-color: #ddd3c2;
       color: #182435;
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.9),
@@ -1338,7 +1352,7 @@
       }
       .hero-actions {
         width: 100%;
-        align-items: stretch;
+        align-items: center;
       }
       .view-tabs {
         justify-content: flex-start;
@@ -2464,7 +2478,12 @@
             </button>
           </div>
         </div>
-        <button id="themeToggle" class="theme-toggle" type="button">Dark / Light: Dark</button>
+        <div class="nav-controls">
+          <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light or dark theme" title="Toggle light / dark">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -3262,7 +3281,7 @@
       state.theme = theme;
       els.html.setAttribute("data-theme", theme);
       localStorage.setItem("suburban-theme", theme);
-      els.themeToggle.textContent = theme === "dark" ? "Dark / Light: Dark" : "Dark / Light: Light";
+      // theme icon (sun in dark, moon in light) is swapped via CSS on html[data-theme]
     }
 
     function syncOwnerLogo() {
