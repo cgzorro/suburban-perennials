@@ -221,14 +221,15 @@
       display: flex;
       flex-direction: row;
       align-items: center;
+      justify-content: flex-end;
       gap: 12px;
       min-width: 0;
-      width: 100%;
+      width: auto;
       max-width: 100%;
     }
 
     .view-tabs-shell {
-      flex: 1 1 auto;
+      flex: 0 1 auto;
       min-width: 0;
       overflow: hidden;
     }
@@ -696,7 +697,7 @@
     html[data-theme="light"] .panel,
     html[data-theme="light"] .def-card,
     html[data-theme="light"] .kiosk-card {
-      background: linear-gradient(180deg, #f7fbff, #edf4fb);
+      background: linear-gradient(180deg, #faf7f1, #f1ece2);
     }
 
     .card {
@@ -786,6 +787,14 @@
       padding: 10px 14px;
       font-size: .92rem;
       font-weight: 800;
+    }
+
+    html[data-theme="light"] .tag,
+    html[data-theme="light"] .trait-badge,
+    html[data-theme="light"] .note-badge,
+    html[data-theme="light"] .location-badge {
+      background: #e9e1d2;
+      border-color: rgba(60, 50, 35, 0.12);
     }
 
     .tag.green,
