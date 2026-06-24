@@ -149,7 +149,7 @@
       align-items: flex-start;
       gap: 18px;
       background:
-        radial-gradient(circle at top right, rgba(123, 208, 95, 0.10), transparent 26%),
+        radial-gradient(circle at top right, rgba(123, 208, 95, 0.05), transparent 30%),
         linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
         var(--bg-elev);
       border: 1px solid var(--border);
@@ -393,6 +393,10 @@
       margin-bottom: 14px;
     }
 
+    html[data-theme="light"] .controls-wrap {
+      background: linear-gradient(180deg, #efe9de, #e8e1d4);
+    }
+
     .controls-grid {
       display: grid;
       grid-template-columns: 2fr 1.1fr 1.2fr 1.1fr 1.1fr 0.9fr;
@@ -602,6 +606,10 @@
       padding: 14px 16px;
       margin-bottom: 16px;
       box-shadow: var(--shadow);
+    }
+
+    html[data-theme="light"] .summary-bar {
+      background: linear-gradient(180deg, #efe9de, #e8e1d4);
     }
 
     .pill {
